@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 import sys 
 import os
 import gzip
@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
 import platform
-
 
 NICOS=1
 #replaced DejaVuSans by Courier due to segmentation faults when typing fi or simelar ...
@@ -77,63 +76,63 @@ SUMUP_ARRAY=[[[0 for i in range(ALL_CHANNELS+1)] for j in range(ALL_CHANNELS+1)]
 
 def usage():
   global DEBUG
-  print "usage: images.py [options] -base name -seq list"
-  print
-  print "options:"
-  print "          -help            Print this" 
-  print "          -base            Give the basename of the file" 
-  print "          -seq             List of number (space separated) of basename" 
-  print "          -div # # #...    List of numbers (space separated) as dividers between sequences" 
-  print "          -fread           Force reading full data set again" 
-  print "          -fpng            Force writing all png files" 
-  print "          -favi            Force writing movie file" 
-  print "          -faiaf           Force writing aiaf-map" 
-  print "          -nopngcairo           Don't create jpeg images of detector images" 
-  print "          -noavi           Don't create avi-movie of detector images (pngcairo have to exist)" 
-  print "          -noaiaf          Don't create alpha_i/alpha_f map" 
-  print "          -aiafmm # #      Minimum und maximum value for aiaf plot" 
-  print "          -bglin #         Use linear background correction and # of points beside ROI, (0 switches of)"
-  print "          -roffset #       Offset of to the center channel at 512 (def: 0)"
-  print "          -roi # #         Give the width and height for the roi (def: 24 440)"
-  print "                           If only one number is give it's just width"  
-  print "          -nmon #          Normalize reflectivity, aiaf-map: 0=Time 1=Mon1 2=Mon2 -1=Nothing counts/s"
-  print "                           Mon1 takes s1 and s2 into account, Mon2 only s2 and Time nothing else"
-  print "                           In the case of counts/s, normalize to the direct beam"  
-  print "          -scale #         Scale reflectivity by given value (default value 1, -1 will try to find best scale value)"
-  print "          -sfc             Simple footprint correction (divide by omega) (default off)" 
-  print "          -fc #            Testing!!! Footprint correction with sample length in mm (default off)" 
-  print "          -HMIN            Set HMIN-Channel for measurement" 
-  print "          -mansel #        Manually set wavelength of selektor" 
-  print "          -divdet          Divide 2 det images by each other (0/1 2/3 4/5 etc.)" 
-  print "          -subdet          Substract two det images by each other (0/1 2/3 4/5 etc.)" 
-  print "          -rev             Revers the filenames om divdet and subdet" 
-  print "          -sumup           Sum all detector images up (for splitted gisans/timescan measurements)" 
-  print "          -noref           No reflectivity curve" 
-  print "          -maxi #          Maximum intensity for gnuplot detector images" 
-  print "          -mini #          Maximum intensity for gnuplot detector images" 
-  print "          -smaxi #         Maximum intensity for gnuplot detector sumup images" 
-  print "          -smini #         Maximum intensity for gnuplot detector sumup images" 
-  print "          -submaxi #       Maximum intensity for gnuplot detector subdet images" 
-  print "          -submini #       Minimum intensity for gnuplot detector subdet images" 
-  print "          -divmaxi #       Maximum intensity for gnuplot detector divdet images" 
-  print "          -divmini #       Minimum intensity for gnuplot detector divdet images" 
-  print "          -divsmaxi #      Maximum intensity for gnuplot detector divdet sumup images" 
-  print "          -divsmini #      Minimum intensity for gnuplot detector divdet sumup images" 
-  print "          -sens #          Read detector image as sesnitivity file (default: ~/bin/det_sens_img.gz)" 
-  print "          -nosens          Switch off sensitivity map correction of detector images." 
-  print "          -gisans          Switch to gisans mode." 
-  print "          -cut x1 y1 x2 y2 Export cut of sumup.img to gnuplot (x1,y1,x2,y2 in detector channels)" 
-  print "          -leak #          Substract from the spin flip map the leakage of the non spin flip curve" 
-  print "          -noq  \"string\"   Instead plotting reflectivity intensity versus q but 'parameter' e.g. magnet" 
-  print "          -genx            Export the data for genx data format instead parat" 
-  print "          -coh             Analyse the data of a soft matter experiment with polarizer and analyzer"
-  print "                           to measure the incoherent background with SF and NSF channel (Highly experimental)"
-  print "          -nicos           switch to NICOS mode"
-  print "          -pyfrid          switch to PYFRID mode (default)"
-  print "          -specfromaiaf    Get specular reflectivity from aiaf plot"
-  print "          -vert            Measure specular by rotating rx instead of omega"
-  print
-  print
+  print( "usage: images.py [options] -base name -seq list")
+  print()
+  print( "options:")
+  print( "          -help            Print this" )
+  print( "          -base            Give the basename of the file" )
+  print( "          -seq             List of number (space separated) of basename" )
+  print( "          -div # # #...    List of numbers (space separated) as dividers between sequences" )
+  print( "          -fread           Force reading full data set again" )
+  print( "          -fpng            Force writing all png files" )
+  print( "          -favi            Force writing movie file")
+  print( "          -faiaf           Force writing aiaf-map" )
+  print( "          -nopngcairo           Don't create jpeg images of detector images" )
+  print( "          -noavi           Don't create avi-movie of detector images (pngcairo have to exist)" )
+  print( "          -noaiaf          Don't create alpha_i/alpha_f map" )
+  print( "          -aiafmm # #      Minimum und maximum value for aiaf plot" )
+  print( "          -bglin #         Use linear background correction and # of points beside ROI, (0 switches of)")
+  print( "          -roffset #       Offset of to the center channel at 512 (def: 0)")
+  print( "          -roi # #         Give the width and height for the roi (def: 24 440)")
+  print( "                           If only one number is give it's just width"  )
+  print( "          -nmon #          Normalize reflectivity, aiaf-map: 0=Time 1=Mon1 2=Mon2 -1=Nothing counts/s")
+  print( "                           Mon1 takes s1 and s2 into account, Mon2 only s2 and Time nothing else")
+  print( "                           In the case of counts/s, normalize to the direct beam"  )
+  print( "          -scale #         Scale reflectivity by given value (default value 1, -1 will try to find best scale value)")
+  print( "          -sfc             Simple footprint( correction (divide by omega) (default off)" )
+  print( "          -fc #            Testing!!! Footprint( correction with sample length in mm (defa))ult off)" )
+  print( "          -HMIN            Set HMIN-Channel for measurement" )
+  print( "          -mansel #        Manually set wavelength of selektor" )
+  print( "          -divdet          Divide 2 det images by each other (0/1 2/3 4/5 etc.)" )
+  print( "          -subdet          Substract two det images by each other (0/1 2/3 4/5 etc.)" )
+  print( "          -rev             Revers the filenames om divdet and subdet" )
+  print( "          -sumup           Sum all detector images up (for splitted gisans/timescan measurements)" )
+  print( "          -noref           No reflectivity curve" )
+  print( "          -maxi #          Maximum intensity for gnuplot detector images" )
+  print( "          -mini #          Maximum intensity for gnuplot detector images" )
+  print( "          -smaxi #         Maximum intensity for gnuplot detector sumup images" )
+  print( "          -smini #         Maximum intensity for gnuplot detector sumup images" )
+  print( "          -submaxi #       Maximum intensity for gnuplot detector subdet images" )
+  print( "          -submini #       Minimum intensity for gnuplot detector subdet images" )
+  print( "          -divmaxi #       Maximum intensity for gnuplot detector divdet images" )
+  print( "          -divmini #       Minimum intensity for gnuplot detector divdet images" )
+  print( "          -divsmaxi #      Maximum intensity for gnuplot detector divdet sumup images" )
+  print( "          -divsmini #      Minimum intensity for gnuplot detector divdet sumup images" )
+  print( "          -sens #          Read detector image as sesnitivity file (default: ~/bin/det_sens_img.gz)" )
+  print( "          -nosens          Switch off sensitivity map correction of detector images." )
+  print( "          -gisans          Switch to gisans mode." )
+  print( "          -cut x1 y1 x2 y2 Export cut of sumup.img to gnuplot (x1,y1,x2,y2 in detector channels)" )
+  print( "          -leak #          Substract from the spin flip map the leakage of the non spin flip curve" )
+  print( "          -noq  \"string\"   Instead plotting reflectivity intensity versus q but 'parameter' e.g. magnet" )
+  print( "          -genx            Export the data for genx data format instead parat" )
+  print( "          -coh             Analyse the data of a soft matter experiment with polarizer and analyzer")
+  print( "                           to measure the incoherent background with SF and NSF channel (Highly experimental)")
+  print( "          -nicos           switch to NICOS mode")
+  print( "          -pyfrid          switch to PYFRID mode (default)")
+  print( "          -specfromaiaf    Get specular reflectivity from aiaf plot")
+  print( "          -vert            Measure specular by rotating rx instead of omega")
+  print()
+  print()
   
   sys.exit(1)
 
@@ -190,12 +189,12 @@ def get_switches ():
 
   if(os.path.isfile("/home/maria/bin/sens_det_image.gz")==True):
     sens_det_image="/home/maria/bin/sens_det_image.gz"
-    print "Using default sensitivity map: /home/maria/bin/sens_det_image.gz"
+    print( "Using default sensitivity map: /home/maria/bin/sens_det_image.gz")
   elif (os.path.isfile("/Users/mattauch/bin/sens_det_image.gz")==True):
     sens_det_image="/Users/mattauch/bin/sens_det_image.gz"
-    print "Using default sensitivity map: /Users/mattauch/bin/sens_det_image.gz"
+    print( "Using default sensitivity map: /Users/mattauch/bin/sens_det_image.gz")
   else:
-    print "Cannot find the default sens_det_image switching to -sdet 0"
+    print( "Cannot find the default sens_det_image switching to -sdet 0")
     sens_det_image=""
     sdet=0
   if len(sys.argv) >= 1:
@@ -214,7 +213,7 @@ def get_switches ():
         while (i+1 < len(sys.argv)) and (is_number(sys.argv[i+1])==True):
           window.append(float(sys.argv[i+1]))
           i=i+1
-        print "window:",window
+        print( "window:",window)
       if sys.argv[i] == "-logz":
         logz=1
       if sys.argv[i] == "-roffset":
@@ -331,7 +330,7 @@ def get_switches ():
       if sys.argv[i] == "-HMIN":
         H_MIN_CHANNEL=int(sys.argv[i+1])
         if nmon < -1 or nmon > 2:
-          print "Wrong value (%d) given to flag -nmon!" %(nmon)
+          print( "Wrong value (%d) given to flag -nmon!" %(nmon))
       if (sys.argv[i] == "-help" or sys.argv[i] == "-h"):
         usage()
       i+=1
@@ -347,18 +346,18 @@ def get_switches ():
       if base[base.rfind("_")+1:].isdigit():
         sequence.append(int(base[base.rfind("_")+1:]))
         base=base[:base.rfind("_")+1]
-      print "base=%s  seq=%d" %(base,sequence[0])
+      print( "base=%s  seq=%d" %(base,sequence[0]))
 
   if len(divisors) > 0:
     if len(sequence)!=len(divisors):
-      print "The number of values given for divisors (%d) differs from sequence (%d)!" %(len(divisors),len(sequence))
-      print "I have to exit now"
+      print( "The number of values given for divisors (%d) differs from sequence (%d)!" %(len(divisors),len(sequence)))
+      print( "I have to exit now")
       sys.exit(-1)
 
   if len(roffset) > 0 and len(roffset) != 1:
     if len(sequence)!=len(roffset):
-      print "The number of values given for roffset (%d) differs from the one for sequence (%d) ansd it is not 1!" %(len(roffset),len(sequence))
-      print "I have to exit now"
+      print( "The number of values given for roffset (%d) differs from the one for sequence (%d) ansd it is not 1!" %(len(roffset),len(sequence)))
+      print( "I have to exit now")
       sys.exit(-1)
 
 
@@ -408,7 +407,7 @@ def create_number_from_flipper_states(alldata,seq,number):
       pf=0
 
 
-#  print "create_number_from_flipper: pf=",pf," af=",af,"  number=",pf+2*af
+#  print( "create_number_from_flipper: pf=",pf," af=",af,"  number=",pf+2*af)
   return pf+2*af
 
 
@@ -488,8 +487,8 @@ def bg_fit_neu_bin(npo,bgo,width,niter,sigma):
     # ----  ... Reduce width for stripping during final cycles                                                                                
     if modified==0:
       break
-#  print modified,iter,niter,width                                                                                                            
-#  print "bgfit Finished after iter=",iter                                                                                                    
+#  print( modified,iter,niter,width                                                                                                            )
+#  print( "bgfit Finished after iter=",iter                                                                                                    )
 
   for i in range(0,len(bg)-2,1):
     bgn[i*2]=bg[i]
@@ -579,7 +578,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
   sigma = .5
 
   ## ---- Peak stripping ...
-#  print bg
+#  print( bg)
 
   erster_punkt=0 # continuous scan 
   np=np-1
@@ -594,7 +593,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
       left_points=lmax-left
       if left_points>1 :
         left_integral = 0
-#        print "left range:", lmax, left-1,i,left_points
+#        print( "left range:", lmax, left-1,i,left_points)
         for j in range(lmax,left-1,-1):
           left_integral = left_integral + bg[j]
 	left_integral = float(left_integral / left_points)
@@ -608,7 +607,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
       right_points = right-rmin
       if right_points>1:
         right_integral = 0
-#        print "right range:", rmin, right,i
+#        print( "right range:", rmin, right,i)
         for j in range(rmin,right):
           right_integral = right_integral + bg[j]
 	right_integral = float(right_integral / right_points)
@@ -623,7 +622,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
 	continue
 
       if (left_diff > sigma_left) or (right_diff > sigma_right):
-#        print i,bg[i],mean,left_diff,sigma_left,right_diff,sigma_right
+#        print( i,bg[i],mean,left_diff,sigma_left,right_diff,sigma_right)
 	bg[i] = mean
 	modified = 1
 
@@ -631,9 +630,9 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
     if modified==0:
       break
 
-#  print bg
-#  print niter,iter,modified,i,mean,bg[i]
-#  print bg
+#  print( bg)
+#  print( niter,iter,modified,i,mean,bg[i])
+#  print( bg)
 #  sys.exit(0)
 
   return bg
@@ -738,16 +737,16 @@ def calc_illumination(s1,s2):
         maxpos=pos
 
   maxpos=int(round(maxpos,0))
-#  print "s1l=",s1l,"s2l=",s2l,"s1r=",s1r,"s2r=",s2r
-#  print "maxpos=",maxpos
+#  print( "s1l=",s1l,"s2l=",s2l,"s1r=",s1r,"s2r=",s2r)
+#  print( "maxpos=",maxpos)
 
   tmp=(0)
   for i in range(0,maxpos+1,1):
     beleuchtung.append(tmp)
 
-#  print "s1l=",s1l,"s2l=",s2l,"s1r=",s1r,"s2r=",s2r
-#  print "maxpos=",maxpos
-#  print "Res:",slitres
+#  print( "s1l=",s1l,"s2l=",s2l,"s1r=",s1r,"s2r=",s2r)
+#  print( "maxpos=",maxpos)
+#  print( "Res:",slitres)
 
   for i in range(s1l,s1r+1,1):
     ai=float(i)
@@ -771,8 +770,8 @@ def calc_illumination(s1,s2):
   for i in range(0,maxpos+1,1):
       integral+=beleuchtung[i]
   
-#  print "Integral=",integral,"  maxint=",maxint,"  maxpos=",maxpos
-#  print beleuchtung
+#  print( "Integral=",integral,"  maxint=",maxint,"  maxpos=",maxpos)
+#  print( beleuchtung)
 
   return beleuchtung, integral, maxint, maxpos, slitres
 
@@ -831,7 +830,7 @@ def calc_intensity(hsum,roi,offset,paramdic,nmon,fc):
     s2_left=float(paramdic['s2_left'])
     s2_right=float(paramdic['s2_right'])
   else:
-    print "Slits not available!!!!"
+    print( "Slits not available!!!!")
     s1_left=1
     s1_right=1
     s2_left=1
@@ -904,8 +903,8 @@ def smooth_intensity(hsum,flag):
     elif flag==-1:
       bg.append(0)
     else:
-      print "unknown flag"
-      system.exit(-1)
+      print( "unknown flag")
+      sys.exit(-1)
 
   return bg
 
@@ -972,7 +971,7 @@ def find_bg_hsum(hsum,bglin,roi,offset,sdet):
     elif bglin==0:
       allint.append([i,hsum[i],intens[i-H_MIN_CHANNEL],0,intens[i-H_MIN_CHANNEL]])
     else:
-#      print i,intens[i-H_MIN_CHANNEL],intens[i-H_MIN_CHANNEL]-bg[i-H_MIN_CHANNEL] 
+#      print( i,intens[i-H_MIN_CHANNEL],intens[i-H_MIN_CHANNEL]-bg[i-H_MIN_CHANNEL] )
       allint.append([i,hsum[i],intens[i-H_MIN_CHANNEL],bg[i-H_MIN_CHANNEL],intens[i-H_MIN_CHANNEL]-bg[i-H_MIN_CHANNEL]])
 
   return allint
@@ -1142,7 +1141,7 @@ def get_params(paramfile,filename):
   
 #  while(paramfile[i].find(filename)==-1):
 #  while(paramfile[i].find("sps5__1")==-1):
-#    print "i=",i
+#    print( "i=",i)
 #    i=i+1
   i=get_file_number(filename)+1
 
@@ -1155,10 +1154,10 @@ def get_params(paramfile,filename):
 #  tmp=paramfile[i].split()
 
   for i in paramdic:
-#    print i,paramdic[i]
+#    print( i,paramdic[i])
     liste[i]=tmp[paramdic[i]]
 
-#  print liste
+#  print( liste)
 
   
   return liste
@@ -1177,7 +1176,7 @@ def get_nicos_params(paramfile):
     name = itm.pop("name")
     dev[name] = itm['value']
 
-#  print dev
+#  print( dev)
 
   return dev
 
@@ -1466,7 +1465,7 @@ def make_gnuplot_pngfile(base,number,seq,filename,alldata,max,logz,roi,offset,bg
     ttheta=float(check_dic(paramdic,'detarm'))
     min_det=ttheta-(atan((512-H_MIN_CHANNEL)*CHANNELWIDTH/DIST_SAMP_DET)*180.0/3.1415)
     max_det=ttheta+(atan((H_MAX_CHANNEL-512)*CHANNELWIDTH/DIST_SAMP_DET)*180.0/3.1415)
-#  print "angles:",omega, ttheta,atan(300.0*0.666/1900.0)*180.0/3.1415,min_det,max_det,sin(min_det/2.0/180.0*3.1415)*4*3.1415/selector,sin(max_det/2.0/180.0*3.1415)*4*3.1415/selector
+#  print( "angles:",omega, ttheta,atan(300.0*0.666/1900.0)*180.0/3.1415,min_det,max_det,sin(min_det/2.0/180.0*3.1415)*4*3.1415/selector,sin(max_det/2.0/180.0*3.1415)*4*3.1415/selector)
 
     if NICOS==1:
       tmp="set x2range [%f:%f]\n" %(sin(min_det/2.0/180.0*3.1415)*4*3.1415/wavelength,sin(max_det/2.0/180.0*3.1415)*4*3.1415/wavelength)
@@ -1651,7 +1650,7 @@ def make_gnuplot_pngfile(base,number,seq,filename,alldata,max,logz,roi,offset,bg
   tmp="plot \"-\" u 2:1 t \"\" w l lw 2\n" 
   fp.write(tmp)
   j=0
-#  print "V_MAX_CHANNEL %d   V_MIN_CHANNEL %d" %(V_MAX_CHANNEL,V_MIN_CHANNEL)
+#  print( "V_MAX_CHANNEL %d   V_MIN_CHANNEL %d" %(V_MAX_CHANNEL,V_MIN_CHANNEL))
   for i in  range(V_MIN_CHANNEL,V_MAX_CHANNEL):
     tmp="%d %d\n" %(j,alldata[seq][number][3][i])
     fp.write(tmp)
@@ -1910,7 +1909,7 @@ def analyse_pol_state(base,sequence,filelist,alldata,mr,mansel,noq):
   if NICOS!=1:
     polfilename=base+str(sequence[0])+".set"
     polflag=get_polarization(polfilename)
-  #print "polflag from files ->",polflag,"<- may differ from reality"
+  #print( "polflag from files ->",polflag,"<- may differ from reality")
 
   for seq in sequence:
     for filename in filelist[seq]:
@@ -2015,77 +2014,77 @@ def analyse_pol_state(base,sequence,filelist,alldata,mr,mansel,noq):
   pfs=float(pfs)/float(count)
   afs=float(afs)/float(count)
 
-  print "pfs=",pfs
-  print "afs=",afs
-  print "pfs0=",pfs0, pfs0/float(count)
-  print "pfs1=",pfs1, pfs1/float(count)
-  print "afs0=",afs0, afs0/float(count)
-  print "afs1=",afs1, afs1/float(count)
-  print "a_shift_0=",a_shift_0, a_shift_0/float(count)
-  print "a_shift_1=",a_shift_1, a_shift_1/float(count)
-  print "pol_pos_u=",pol_pos_u, pol_pos_u/float(count)
-  print "pol_pos_d=",pol_pos_d, pol_pos_d/float(count)
-  print "real uu=", ruu, ruu/float(count)
-  print "real dd=", rdd, rdd/float(count)
-  print "real du=", rdu, rdu/float(count)
-  print "real ud=", rud, rud/float(count)
+  print( "pfs=",pfs)
+  print( "afs=",afs)
+  print( "pfs0=",pfs0, pfs0/float(count))
+  print( "pfs1=",pfs1, pfs1/float(count))
+  print( "afs0=",afs0, afs0/float(count))
+  print( "afs1=",afs1, afs1/float(count))
+  print( "a_shift_0=",a_shift_0, a_shift_0/float(count))
+  print( "a_shift_1=",a_shift_1, a_shift_1/float(count))
+  print( "pol_pos_u=",pol_pos_u, pol_pos_u/float(count))
+  print( "pol_pos_d=",pol_pos_d, pol_pos_d/float(count))
+  print( "real uu=", ruu, ruu/float(count))
+  print( "real dd=", rdd, rdd/float(count))
+  print( "real du=", rdu, rdu/float(count))
+  print( "real ud=", rud, rud/float(count))
 
   if pol_pos_u > 0 and pol_pos_d == 0:
-    print "Unpolarized beam: pol=3"
+    print( "Unpolarized beam: pol=3")
     pol=3
   elif pol_pos_d > 0 and pol_pos_u == 0 and a_shift_1 == 0:
     #no analyzer but polarized beam:
     if pfs0 > 0 and  pfs1 > 0:
-      print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-      print "Flipping with pflipper: pol=1!"
+      print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+      print( "Flipping with pflipper: pol=1!")
       pol=1
     else:
-      print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-      print "No flipping: pol=3"
+      print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+      print( "No flipping: pol=3")
       pol=3
   elif pol_pos_d > 0 and a_shift_1 > 0 and pol_pos_u == 0 and a_shift_0 == 0:
     #analyzer and polarized beam:
     if pfs0 > 0 and  pfs1 > 0 and afs0 > 0 and afs1 >0:
       if rdu>0 and rud>0:
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Full poarization flip: pol=4"
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Full poarization flip: pol=4")
         pol=4
       elif rdu>0 and rud==0:
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Full poarization flip with one SF(rdu) channel: pol=7"
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Full poarization flip with one SF(rdu) channel: pol=7")
         pol=7
       elif rud>0 and rdu==0:
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Full poarization flip with one SF(rud) channel: pol=8"
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Full poarization flip with one SF(rud) channel: pol=8")
         pol=8
       elif ruu > 0 and rud  == 0  and rdd > 0 and rdu ==0 :
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Non Spin flip channels: pol=6"
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Non Spin flip channels: pol=6")
         pol=6
       elif rdu > 0 and ruu  == 0  and rud > 0 and rdd ==0 :
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Only spin flip channles: pol=5"
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Only spin flip channles: pol=5")
         pol=5
       else:
-        print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-        print "Unknown state" 
+        print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+        print( "Unknown state" )
         sys.exit(0)
 #    elif (pfs0 > 0 or pfs1 > 0)  and afs0 > 0 and afs1 >0 :
     elif (rud == 0 and rdd == 0 and rdu>0 and ruu >0) or (rud > 0 and rdd > 0 and rdu == 0 and ruu == 0): 
-      print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-      print "Flipping with pflipper: pol=1"
+      print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+      print( "Flipping with pflipper: pol=1")
       pol=1
 #    elif (afs0 > 0 or afs1 > 0)  and pfs0 > 0 and pfs1 >0 :
     elif (rdu == 0 and rdd == 0 and rud>0 and ruu >0) or (rdu > 0 and rdd > 0 and rud == 0 and ruu == 0): 
-      print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
-      print "Flipping with aflipper: pol=2"
+      print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
+      print( "Flipping with aflipper: pol=2")
       pol=2
     else:
-      print "shouldn't happen!1"
-      print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
+      print( "shouldn't happen!1")
+      print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
   else:
-    print "shouldn't happen!2"
-    print "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu
+    print( "shouldn't happen!2")
+    print( "ruu:", ruu, "  rdd:", rdd,"  rud:",rud,"  rdu:",rdu)
   
   return pol,maxomrad,aimaxrad,aiminrad,afmaxrad,afminrad
 
@@ -2193,7 +2192,7 @@ def find_maxvals_for_qmap(base,sequence,filelist,alldata,mr,nmon,divisors,mansel
 def write_gnuoplot_header_taiafmap(fp,aimaxrad,aiminrad,afmaxrad,afminrad,aiafmm):
   global GNUFONT
 
-  print "afmaxrad=",afmaxrad,"  afminrad=",afminrad,"  aimaxrad=",aimaxrad,"  aiminrad=",aiminrad
+  print( "afmaxrad=",afmaxrad,"  afminrad=",afminrad,"  aimaxrad=",aimaxrad,"  aiminrad=",aiminrad)
   tmp="set size ratio %f \n" %((afmaxrad-afminrad)/(aimaxrad-aiminrad))
   fp.write(tmp)
   tmp="set yrange [%f:%f] \n" %(afminrad+aiminrad,afmaxrad+aimaxrad)
@@ -2225,7 +2224,7 @@ def write_gnuoplot_header_taiafmap(fp,aimaxrad,aiminrad,afmaxrad,afminrad,aiafmm
 def write_gnuoplot_header_aiafmap(fp,aimaxrad,aiminrad,afmaxrad,afminrad,aiafmm):
   global GNUFONT
 
-  print "afmaxrad=",afmaxrad,"  afminrad=",afminrad,"  aimaxrad=",aimaxrad,"  aiminrad=",aiminrad
+  print( "afmaxrad=",afmaxrad,"  afminrad=",afminrad,"  aimaxrad=",aimaxrad,"  aiminrad=",aiminrad)
   tmp="set size ratio %f \n" %((afmaxrad-afminrad)/(aimaxrad-aiminrad))
   fp.write(tmp)
   tmp="set yrange [%f:%f] \n" %(afminrad,afmaxrad)
@@ -2269,7 +2268,7 @@ def write_gnuoplot_header_qmap(fp,qxmin,qxmax,qzmin,qzmax,aiafmm):
   fp.write(tmp)
   tmp="#set size square\n"
   fp.write(tmp)
-  print "qxmax=%f  qxmin=%f qzmax=%f  qzmin=%f" %(qxmax,qxmin,qzmax,qzmin)
+  print( "qxmax=%f  qxmin=%f qzmax=%f  qzmin=%f" %(qxmax,qxmin,qzmax,qzmin))
   tmp="#set size ratio %f \n" %((qzmax-qzmin)/(qxmax-qxmin))
   fp.write(tmp)
   tmp="#set yrange [%f:%f] \n" %(qzmin,qzmax)
@@ -2459,7 +2458,7 @@ def create_qmap_intlist(sequence,filelist,alldata,nmon,roffset,divisors,sfc,fc,m
         detector.append([qx,qz,pf,af,intensity,intensitybg,i,seq,number,omrad*1000*2*pi/lam,afrad*1000*2*pi/lam,rawintensity,divider,factor,value_noq])
       intlist[j].append(detector)
 
-  print "maxv=",maxv,"  maxvbg=",maxvbg
+  print( "maxv=",maxv,"  maxvbg=",maxvbg)
 
   return intlist, maxv,maxvbg
 
@@ -2624,7 +2623,7 @@ def plot_taiaf_map(fp,basename,sname,sequence,filelist,alldata,aiafmm,nmon,pf,af
   write_qmap_data(basename+".taiafmap."+sname+".dat",sequence,filelist,alldata,aiafmm,nmon,pf,af,roffset,leak,divisors,0,flag,intlist,maxv,maxvbg,"")
 #
   if(find(sname,"-")==-1 and specfromaiaf==1):
-    print "using:",basename+".taiafmap."+sname+".dat"
+    print( "using:",basename+".taiafmap."+sname+".dat")
     extract_specref_from_taiaf(basename+".taiafmap."+sname+".dat",roi,roffset,scale)  
 #
   if flag!=1:
@@ -2642,7 +2641,7 @@ def plot_taiaf_map(fp,basename,sname,sequence,filelist,alldata,aiafmm,nmon,pf,af
 def get_aflipper(alldata,sequence,pos):
 
   if pos==0:
-#    print alldata[sequence[0]][0]
+#    print( alldata[sequence[0]][0])
     paramdic=alldata[sequence[0]][0][5]
     if 'aflipper' in paramdic:
       if is_number(paramdic['aflipper']):
@@ -2894,10 +2893,10 @@ def find_maxvals_for_specref(base,sequence,filelist,alldata,mr,nmon,divisors,man
     if NICOS!=1:
       polfilename=base+str(sequence[0])+".set"
       polflag=get_polarization(polfilename)
-#      print "polflag from files ->",polflag,"<- may differ from reality"
+#      print( "polflag from files ->",polflag,"<- may differ from reality")
     
     for filename in filelist[seq]:
-      print "filename:",filename
+      print( "filename:",filename)
       number=get_file_number(filename)
       paramdic=alldata[seq][number][5]
 
@@ -2944,7 +2943,7 @@ def find_maxvals_for_specref(base,sequence,filelist,alldata,mr,nmon,divisors,man
 
       q=sin(om)*4*pi/wl
 
- #     print "omega=",om," q=",q," lambda=",wl," seq=",seq," number=",number
+ #     print( "omega=",om," q=",q," lambda=",wl," seq=",seq," number=",number)
 
       if q>maxq:
         maxq=q
@@ -3065,10 +3064,10 @@ def write_specref_data(basename,sname,pol,leak,intlist,maxv,maxvcoh,scale):
           cj+=1
           aver+=entry[1]/maxv
         ci+=1
-    #print "aver=",aver," aver/cj=",aver/cj
-    #print "max=",max," cj=",cj," ci=",ci," maxcj=",maxcj," maxci",maxci
+    #print( "aver=",aver," aver/cj=",aver/cj)
+    #print( "max=",max," cj=",cj," ci=",ci," maxcj=",maxcj," maxci",maxci)
     scale=1.0/(aver/cj)
-    print "estimated scale factor:", scale
+    print( "estimated scale factor:", scale)
 
 
 
@@ -3078,8 +3077,8 @@ def write_specref_data(basename,sname,pol,leak,intlist,maxv,maxvcoh,scale):
     tmpnist="#q\t int_norm\t sigma_norm\n"
     fpnist.write(tmpnist)
     for j in jlist:
-#      print jlist
-      print "j=",j," pol=",pol
+#      print( jlist)
+      print( "j=",j," pol=",pol)
       if pol!=3:
         filename="%s%s%s.dat" %(basename,sname,sname2[j])
       else:
@@ -3112,7 +3111,7 @@ def write_specref_data(basename,sname,pol,leak,intlist,maxv,maxvcoh,scale):
       os.system(tmp)
 
   else:
-    print "leak on reflectivity is not implemented"
+    print( "leak on reflectivity is not implemented")
     for j in jlist:
       if pol!=3:
         filename="%s%s%s.dat" %(basename,sname,sname2[j])
@@ -3179,7 +3178,7 @@ def plot_specref(fp,basename,sname,pol,leak,intlist,maxv,maxvcoh,maxq):
 
   jlist=get_jlist(intlist)
   
-#  print "jlist", jlist
+#  print( "jlist", jlist)
   
   tmp=create_plot_string(basename,sname,pol, jlist,0,0,maxq)
   fp.write(tmp)    
@@ -3250,36 +3249,36 @@ def make_specref_file(base,sequence,filelist,alldata,divisors,nmon,scale,sfc,fc,
 #  mr=400.0/(H_MAX_CHANNEL-H_MIN_CHANNEL)/1900.0*1000
   mr=(CHANNELWIDTH/DIST_SAMP_DET)*1000.0
 
-  print "Inside make_spec_ref"
+  print( "Inside make_spec_ref")
   pol,maxomrad,aimaxrad,aiminrad,afmaxrad,afminrad=analyse_pol_state(base,sequence,filelist,alldata,mr,mansel,noq)
-  print "analyse_pol: done"
+  print( "analyse_pol: done")
   intlist,maxv,maxvcoh,maxq=find_maxvals_for_specref(base,sequence,filelist,alldata,mr,nmon,divisors,mansel,sfc,noq,vert)
-  print "find_maxvals_for_specref: done"
+  print( "find_maxvals_for_specref: done")
 
   #illumination correction is missing here ???
 
   filename="%s%d-%d.specref.gpl" %(base,sequence[0],sequence[len(sequence)-1])
   fp=open(filename,"w")
-  print "filename=",filename, "fpopen: done"
+  print( "filename=",filename, "fpopen: done")
 
   write_gnuoplot_header_specref(fp,base,sequence[0],sequence[len(sequence)-1],noq)
-  print "write_gnuplot_header_specref: done="
+  print( "write_gnuplot_header_specref: done=")
 
   basename="%s%d-%d.specref." %(base,sequence[0],sequence[len(sequence)-1])
-  print "basename=",basename,"  done"
+  print( "basename=",basename,"  done")
   
   write_specref_data(basename,sname[pol],pol,leak,intlist,maxv,maxvcoh,scale)
-  print "write_specref_dat: done"
+  print( "write_specref_dat: done")
   
   plot_specref(fp,basename,sname[pol],pol,leak,intlist,maxv,maxvcoh,maxq)
-  print "plot_specref: done"
+  print( "plot_specref: done")
 
   
   fp.close()
 
   tmp="gnuplot %s" %(filename)
   result=os.system(tmp)
-  print "result:",result
+  print( "result:",result)
 
   return
 
@@ -3299,8 +3298,8 @@ def append_analyse_data(base,sequence,filelist,bglin,roi,roffset,alldata,maxv,nm
   kf=1
 
 
-#  print "len(sequence)",len(sequence) 
-#  print "len(alldata)",len(alldata) 
+#  print( "len(sequence)",len(sequence) )
+#  print( "len(alldata)",len(alldata) )
 
   start=sequence[0]
   
@@ -3312,7 +3311,7 @@ def append_analyse_data(base,sequence,filelist,bglin,roi,roffset,alldata,maxv,nm
       
     start=seq
     if NICOS!=1:
-#      print base,seq,sequence,filelist
+#      print( base,seq,sequence,filelist)
       filename="%s%s.dat" %(base,seq)
       fp=open(filename)
       paramfile=fp.readlines()
@@ -3338,9 +3337,9 @@ def append_analyse_data(base,sequence,filelist,bglin,roi,roffset,alldata,maxv,nm
         beleuchtung, integral, maxint, maxpos, res=calc_illumination(s1_left+s1_right,s2_left+s2_right)
 
 
-#    print "seq",seq
-#    print "len(filelist[seq])",len(filelist[seq]) 
-#    print "len(alldata[seq])",len(alldata[seq])
+#    print( "seq",seq)
+#    print( "len(filelist[seq])",len(filelist[seq]) )
+#    print( "len(alldata[seq])",len(alldata[seq]))
 
     if len(filelist[seq])>len(alldata[seq]):
       c2=0
@@ -3387,15 +3386,15 @@ def append_analyse_data(base,sequence,filelist,bglin,roi,roffset,alldata,maxv,nm
                   kf=1/(om/(float(s2_left+s2_right)/sfc))
                 else:
                   kf=1
-                tmp="simple footprint correction with sample length=%d and factor %.3f" %(round(sfc,0),kf) 
+                tmp="simple footprint( correction with sample length=%d and factor %.3f" %(round(sfc,0),kf) 
               else:
                 kf=1
-                tmp="No footprint correction"
+                tmp="No footprint( correction"
               intensity=kf*intensity
               sigma=sigma
-              print "filename2=",filename,tmp
+              print( "filename2=",filename,tmp)
             else:
-              print "reading=",filename
+              print( "reading=",filename)
 
           np.append(alldata[seq][number],[])
           np.append(alldata[seq][number],hsum[:])
@@ -3407,7 +3406,7 @@ def append_analyse_data(base,sequence,filelist,bglin,roi,roffset,alldata,maxv,nm
           c2+=1
 
     counter+=1
-  print "Found maximal value:",maxv
+  print( "Found maximal value:",maxv)
 
   return alldata,maxv
 
@@ -3496,9 +3495,9 @@ def integrate(filename,roi,sdet,sens_det_array,offset,vert):
       hmaxv=hsum[i]
 
   fp.close()
-#  print "hsum\n",hsum
-#  print "vsum\n",vsum
-#  print hmaxv, vmaxv, maxv
+#  print( "hsum\n",hsum)
+#  print( "vsum\n",vsum)
+#  print( hmaxv, vmaxv, maxv)
   return hsum,hmaxv,vsum,vmaxv,maxv,vroisum
 
 
@@ -3526,8 +3525,8 @@ def integrate_orig(filename,roi,sdet,sens_det_array,offset,vert):
   v_min_channel= int((ALL_CHANNELS/2) + offset - (float(roi[0])/2))
   v_max_channel= int((ALL_CHANNELS/2) + offset + (float(roi[0])/2))
 
-  #print "h_min_channel=",h_min_channel," h_max_channel=",h_max_channel
-  #print "v_min_channel=",v_min_channel," v_max_channel=",v_max_channel
+  #print( "h_min_channel=",h_min_channel," h_max_channel=",h_max_channel)
+  #print( "v_min_channel=",v_min_channel," v_max_channel=",v_max_channel)
 
   fp=gzip.open(filename,"r")
 
@@ -3599,9 +3598,9 @@ def integrate_orig(filename,roi,sdet,sens_det_array,offset,vert):
       hmaxv=hsum[i]
 
   fp.close()
-#  print "hsum\n",hsum
-#  print "vsum\n",vsum
-#  print hmaxv, vmaxv, maxv
+#  print( "hsum\n",hsum)
+#  print( "vsum\n",vsum)
+#  print( hmaxv, vmaxv, maxv)
   return hsum,hmaxv,vsum,vmaxv,maxv,vroisum
 
 
@@ -3630,7 +3629,7 @@ def analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_
     start=seq
     if NICOS!=1:
       filename="%s%s.dat" %(base,seq)
-      print "filename=",filename
+      print( "filename=",filename)
       fp=open(filename)
       paramfile=fp.readlines()
       fp.close()
@@ -3671,7 +3670,7 @@ def analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_
 
       if vert!=0:
         loffset=offset-int((2*tan(radians(vert+float(paramdic['rx'])))*DIST_SAMP_DET/CHANNELWIDTH))
-#        print float(paramdic['rx']),float(paramdic['rx'])+vert,2*radians(vert+float(paramdic['rx'])),tan(2*radians(vert+float(paramdic['rx']))),tan(2*radians(vert+float(paramdic['rx'])))*DIST_SAMP_DET, tan(2*radians(vert+float(paramdic['rx'])))*DIST_SAMP_DET/CHANNELWIDTH
+#        print( float(paramdic['rx']),float(paramdic['rx'])+vert,2*radians(vert+float(paramdic['rx'])),tan(2*radians(vert+float(paramdic['rx']))),tan(2*radians(vert+float(paramdic['rx'])))*DIST_SAMP_DET, tan(2*radians(vert+float(paramdic['rx'])))*DIST_SAMP_DET/CHANNELWIDTH)
       else:
         loffset=offset
 
@@ -3701,15 +3700,15 @@ def analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_
               kf=1/(om/(float(s2_left+s2_right)/sfc))
             else:
               kf=1
-            tmp="simple footprint correction with sample length=%d and factor %.3f" %(round(sfc,0),kf) 
+            tmp="simple footprint( correction with sample length=%d and factor %.3f" %(round(sfc,0),kf) 
           else:
             kf=1
-            tmp="No footprint correction"
+            tmp="No footprint( correction"
           intensity=kf*intensity
           sigma=sigma
-          print "filename2=",filename,tmp
+          print( "filename2=",filename,tmp)
         else:
-          print "filename2=",filename
+          print( "filename2=",filename)
 
       alldata[seq][number].append([])
       alldata[seq][number].append(hsum[:])
@@ -3719,7 +3718,7 @@ def analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_
       alldata[seq][number].append(vroisum[:])
       
     counter+=1
-  print "Found maximal value: maxv %d  hmaxv %d   vmaxv %d" %(maxv,hmaxv,vmaxv)
+  print( "Found maximal value: maxv %d  hmaxv %d   vmaxv %d" %(maxv,hmaxv,vmaxv))
 
   return alldata,maxv
 
@@ -3780,7 +3779,7 @@ def create_tmp_img(tfilename,sens_det_array,sumup,window,fs,time,vert):
   fpt.write(tmp)
   fpt.close()
 
-#  print "pixels above 0: before=%d    after=%d" %(counter1,counter2)
+#  print( "pixels above 0: before=%d    after=%d" %(counter1,counter2))
 
   if sumup==1:
     tmp="tmp_sumup_%s.img" %(FS_DICT[fs])
@@ -3852,7 +3851,7 @@ def create_png_images(base,sequence,filelist,alldata,maxv,gdfontpath,logz,roi,ro
       offset=roffset[0]
 
     for filename in filelist[seq]:
-      print filename
+      print( filename)
 #      basename=base+"%d" %(seq)
       number=get_file_number(filename)
       targetfile="%s%d.%04d.png" %(base,seq,number)
@@ -3893,8 +3892,8 @@ def create_png_images(base,sequence,filelist,alldata,maxv,gdfontpath,logz,roi,ro
 #        os.remove(tfilename)
 #        os.remove(tfilename+".gz")
         if sdet==1:          
-#          print tfilename
-#          print "Sens_"+filename
+#          print( tfilename)
+#          print( "Sens_"+filename)
           if(os.path.isfile("Sens_"+filename)==True):
                os.remove("Sens_"+filename)
 #          os.rename(tfilename,"Sens_"+filename[:-3])
@@ -3902,7 +3901,7 @@ def create_png_images(base,sequence,filelist,alldata,maxv,gdfontpath,logz,roi,ro
           os.system(tmp)
           tmp="gzip %s" %("Sens_"+filename[:-3])
           os.system(tmp)
-#          print tmp
+#          print( tmp)
           os.remove(tfilename+".gz")
         else:
           os.remove(tfilename)
@@ -3911,7 +3910,7 @@ def create_png_images(base,sequence,filelist,alldata,maxv,gdfontpath,logz,roi,ro
   
   if sumup==1:
     for fs in range(4):
-      print "fs=",fs," : ",SUMUP_ARRAY[fs][1024][1024]," ",FS_DICT[fs]
+      print( "fs=",fs," : ",SUMUP_ARRAY[fs][1024][1024]," ",FS_DICT[fs])
       if SUMUP_ARRAY[fs][1024][1024]>0:
         make_sumup_pngfile(logz,smaxi,smini,gisans,window,fs)
         if len(window)>0:
@@ -3932,16 +3931,16 @@ def create_avi_movie(base,sequence):
 
   if platform.system()=='MacOS':
     tmp="mencoder -really-quiet \"mf://%s[%d-%d].*.png\" -mf fps=10 -o %s%d-%d.avi -ovc lavc -lavcopts vcodec=msmpeg4v2:vbitrate=2000" %(base,sequence[0],sequence[len(sequence)-1],base,sequence[0],sequence[len(sequence)-1])
-    print tmp
+    print( tmp)
     os.system(tmp)
   elif platform.system()=='Linux':
     globstring=""
     for i in range(sequence[0],sequence[len(sequence)-1]):
       globstring+="-i '%s%d.*.png' " %(base,i)
     tmp="ffmpeg -pattern_type glob %s' -vcodec mpeg2video -pix_fmt yuv420p %s%d-%d.avi" %(globstring,base,sequence[0],sequence[len(sequence)-1])
-    print tmp
+    print( tmp)
     tmp="ffmpeg -pattern_type glob -i '%s[%d-%d].*.png' -vcodec mpeg2video -pix_fmt yuv420p %s%d-%d.avi" %(base,sequence[0],sequence[len(sequence)-1],base,sequence[0],sequence[len(sequence)-1])
-    print tmp
+    print( tmp)
     os.system(tmp)
 
   return
@@ -3960,7 +3959,7 @@ def get_polarization(filename):
     i=i+1
 
   tmp=liste[i].split()
-#  print "polflag",tmp," : ",tmp[2][:-1]
+#  print( "polflag",tmp," : ",tmp[2][:-1])
   polflag=tmp[2]
 
   return polflag
@@ -3995,7 +3994,7 @@ def get_savetime(filename):
     i=i+1
 
   tmp=liste[i]
-#  print "saved",tmp[6:-1]
+#  print( "saved",tmp[6:-1])
   savedtime=tmp[6:-1]
 
   return savedtime
@@ -4014,11 +4013,11 @@ def get_roi_det(filename):
     i=i+1
 
   for j in range(1,7):
-#    print "roi:",liste[i]
+#    print( "roi:",liste[i])
     if liste[i+5].find("true")!=-1 :
-#      print "liste[i+5].find:",liste[i+5]
+#      print( "liste[i+5].find:",liste[i+5])
       tmp=[]
-#      print "number:",liste[i][3:4]
+#      print( "number:",liste[i][3:4])
       tmp.append(int(liste[i][3:4]))
       string=liste[i+3]
       string=string.replace("-"," ")
@@ -4030,7 +4029,7 @@ def get_roi_det(filename):
       rois.append(tmp)
     i=i+7
 
-#  print rois
+#  print( rois)
 
   return rois
 
@@ -4068,7 +4067,7 @@ def get_alldata_from_file_neu(base,sequence,filelist):
   filename="%s%d-%d.dat" %(base,sequence[0],sequence[len(sequence)-1])
   alldata=np.load(filename+".npz").items()[0][1]
 
-#  print alldata
+#  print( alldata)
 
   start =0
   for seq in sequence:
@@ -4115,26 +4114,26 @@ def call_divdet(base,sequence,sumup,filelist,divmaxi,divmini,divsmaxi,divsmini,r
           filename=tmp
         #tmp="divdetimg %s %s" %(ofilename,filename)
         tmp="divdetimg_simple.py %s -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(slogz,divmini,divmaxi,ofilename,filename)
-        print "call:", tmp
+        print( "call:", tmp)
         os.system(tmp)
-        print tmp
+        print( tmp)
         counter+=1
 
   if sumup==1:
-    print "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[1][1024][1024]
+    print( "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[1][1024][1024])
     if SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0:
       tmp="divdetimg_simple.py %s -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(slogz,divsmini,divsmaxi,"sumup_uu.gz","sumup_dd.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
-    print "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[3][1024][1024]
+    print( "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[3][1024][1024])
     if SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0:
       tmp="divdetimg_simple.py %s -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(slogz,divsmini,divsmaxi,"sumup_uu.gz","sumup_du.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
-    print "SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:",SUMUP_ARRAY[1][1024][1024], SUMUP_ARRAY[3][1024][1024]
+    print( "SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:",SUMUP_ARRAY[1][1024][1024], SUMUP_ARRAY[3][1024][1024])
     if SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:
       tmp="divdetimg_simple.py %s -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(slogz,divsmini,divsmaxi,"sumup_dd.gz","sumup_ud.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
 
 
@@ -4144,7 +4143,7 @@ def call_divdet(base,sequence,sumup,filelist,divmaxi,divmini,divsmaxi,divsmini,r
 
 def call_subdet(base,sequence,sumup,filelist,submaxi,submini,smaxi,rev):
 
-  print "Inside subdet"
+  print( "Inside subdet")
   for seq in sequence:
     counter=0
     for filename in filelist[seq]:
@@ -4158,26 +4157,26 @@ def call_subdet(base,sequence,sumup,filelist,submaxi,submini,smaxi,rev):
           filename=tmp
         #tmp="subdetimg.py %s %s" %(ofilename,filename)
         tmp="subdetimg_simple.py -bin 4 -mini %d -maxi %d -f1 %s -f2 %s" %(submini,submaxi,ofilename,filename)
-        print "call:", tmp
+        print( "call:", tmp)
         os.system(tmp)
-        print tmp
+        print( tmp)
         counter+=1
 
   if sumup==1:
-    print "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[1][1024][1024]
+    print( "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[1][1024][1024])
     if SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[1][1024][1024]>0:
       tmp="subdetimg_simple.py -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(-smaxi/2.0,smaxi/2.0,"sumup_uu.gz","sumup_dd.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
-    print "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[3][1024][1024]
+    print( "SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0",SUMUP_ARRAY[2][1024][1024],SUMUP_ARRAY[3][1024][1024])
     if SUMUP_ARRAY[2][1024][1024]>0 and SUMUP_ARRAY[3][1024][1024]>0:
       tmp="subdetimg_simple.py -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(-smaxi/2.0,smaxi/2.0,"sumup_uu.gz","sumup_du.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
-    print "SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:",SUMUP_ARRAY[1][1024][1024], SUMUP_ARRAY[3][1024][1024]
+    print( "SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:",SUMUP_ARRAY[1][1024][1024], SUMUP_ARRAY[3][1024][1024])
     if SUMUP_ARRAY[1][1024][1024]>0 and SUMUP_ARRAY[0][1024][1024]>0:
       tmp="subdetimg_simple.py -bin 4 -mini %f -maxi %f -f1 %s -f2 %s" %(-smaxi/2.0,smaxi/2.0,"sumup_dd.gz","sumup_ud.gz")
-      print "call:", tmp
+      print( "call:", tmp)
       os.system(tmp)
       
   return
@@ -4211,15 +4210,15 @@ def get_sens_det_image(sens_det_image):
   #find maximum in defined window
   value=0
 
-  print "Number of channels horizontally:",len(array)," and vertically:",len(array[0])
-  print "Using from H_MIN_CHANNEL=", H_MIN_CHANNEL," to H_MAX_CHANNEL=",H_MAX_CHANNEL," and from V_MIN_CHANNEL=",V_MIN_CHANNEL," to V_MAX_CHANNEL=",V_MAX_CHANNEL
+  print( "Number of channels horizontally:",len(array)," and vertically:",len(array[0]))
+  print( "Using from H_MIN_CHANNEL=", H_MIN_CHANNEL," to H_MAX_CHANNEL=",H_MAX_CHANNEL," and from V_MIN_CHANNEL=",V_MIN_CHANNEL," to V_MAX_CHANNEL=",V_MAX_CHANNEL)
   
   for i in range(H_MIN_CHANNEL,H_MAX_CHANNEL):
     for j in range(V_MIN_CHANNEL,V_MAX_CHANNEL):
       value+=float(array[i][j])
 
   aver=float(value)/float(H_MAX_CHANNEL-H_MIN_CHANNEL)/float(V_MAX_CHANNEL-V_MIN_CHANNEL)
-  print "aver aus get_sens_det_image=",aver
+  print( "aver aus get_sens_det_image=",aver)
 
   for i in range(0,ALL_CHANNELS):
     tmp=[]
@@ -4272,8 +4271,8 @@ def redo_bg_correction(base,sequence,filelist,alldata,roi,roffset,bglin,nmon,fc)
       apos = int(alldata[seq][number][5]['analyzer_shift'])
 
       if apos==0:
-        print "analyzer was not in the beam, so this correction makes no sense!"
-        print "please rerun it and nad remove the switch -coh"
+        print( "analyzer was not in the beam, so this correction makes no sense!")
+        print( "please rerun it and nad remove the switch -coh")
         sys.exit(-1)
       elif pfs!=afs:
         for i in  range(H_MIN_CHANNEL,H_MAX_CHANNEL):
@@ -4334,9 +4333,9 @@ def fit3_row(row,lroi,limit,scale):
     if fabs(row[i][0])>lroi and fabs(row[i][0])<limit:
       count+=1
       
-#    print "count",count
+#    print( "count",count)
   if count==0:
-    print "Find new limit, no background in this range!"
+    print( "Find new limit, no background in this range!")
     for i in range(len(row)):
       if fabs(row[i][0]+limit)<(row[cn][0]+limit):
         cn=i
@@ -4367,8 +4366,8 @@ def fit3_row(row,lroi,limit,scale):
       bgl+=row[i][1]
       bglc+=1
 
-#    print "bgrc=",bgrc," bglc=",bglc," bglc+bgrc=",bglc+bgrc
-#    print "bgr=",bgr," bgl=",bgl
+#    print( "bgrc=",bgrc," bglc=",bglc," bglc+bgrc=",bglc+bgrc)
+#    print( "bgr=",bgr," bgl=",bgl)
   if bgrc==0:
     if bglc==0:
       bgr=0
@@ -4385,7 +4384,7 @@ def fit3_row(row,lroi,limit,scale):
   else:
     bgl=bgl/bglc
   
-#    print "bgr=",bgr," bgl=",bgl
+#    print( "bgr=",bgr," bgl=",bgl)
   
   m=(bgr-bgl)/(((limit-lroi)/2.0)+lroi)
   if bglc>0 and bgrc>0:
@@ -4397,24 +4396,24 @@ def fit3_row(row,lroi,limit,scale):
   else:
     mean=0
   
-#    print 
+#    print( )
   
   if bglc==0 or bgrc==0:
     if bglc==0:
-      print "Fix background to left side, not enough points for fit"
+      print( "Fix background to left side, not enough points for fit")
       poptb=[0,0,mean]
     elif bgrc==0:
-      print "Fix background to right side, not enough points for fit"
+      print( "Fix background to right side, not enough points for fit")
       poptb=[0,0,mean]
     elif bglc==0 and bgrc==0:
-      print "Fix background to 0, no points found"
+      print( "Fix background to 0, no points found")
       poptb=[0,0,0]
   else:
     try:
       poptb,pcovb = curve_fit(lin,xo,yo,p0=[0,m,mean])
-#            print "mean=",mean," m=",m
+#            print( "mean=",mean," m=",m)
     except:
-      print "Background fit didn't work, taking fix points"
+      print( "Background fit didn't work, taking fix points")
       poptb=[0,0,(bgr+bgl)/2.0]
       mean=(bgr+bgl)/2.0
 
@@ -4445,7 +4444,7 @@ def fit3_row(row,lroi,limit,scale):
     if sum(yc*(xc - mean)**2)/sum(yc)>0:
       sigma=np.sqrt(sum(yc*(xc - mean)**2)/sum(yc))
     else:
-      #        print "sum is negative, sigma=1"
+      #        print( "sum is negative, sigma=1")
       sigma=1
     cmean=mean
     csigma=sigma
@@ -4461,20 +4460,20 @@ def fit3_row(row,lroi,limit,scale):
   try:
     popt,pcov = curve_fit(gaus,xc,yc,p0=[max,mean,sigma])
     if popt[2]>20:
-      print "Peak fit failed, sigma too large"
-#      print "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2]
+      print( "Peak fit failed, sigma too large")
+#      print( "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2])
       failed=1
       popt=[cmax,cmean,csigma]            
       intensity,sigma=calc_simple_intensity(xc,yc,sc)
     elif fabs(popt[1])>lroi:
-      print "Peak fit failed center of gaussian fit is outside lroi"
-#      print "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2]
+      print( "Peak fit failed center of gaussian fit is outside lroi")
+#      print( "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2])
       failed=1
       popt=[cmax,cmean,csigma]            
       intensity,sigma=calc_simple_intensity(xc,yc,sc)
     elif popt[0]<0:
-      print "Peak fit failed amplitude of gaussian fit is negative"
-#      print "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2]
+      print( "Peak fit failed amplitude of gaussian fit is negative")
+#      print( "amp=",popt[0]," x0=",popt[1]," sigma=",popt[2])
       failed=1
       popt=[cmax,cmean,csigma]            
       intensity,sigma=calc_simple_intensity(xc,yc,sc)
@@ -4499,7 +4498,7 @@ def fit3_row(row,lroi,limit,scale):
     popt=[cmax,cmean,csigma]
     intensity,sigma=calc_simple_intensity(xc,yc,sc)
 
-#  print "amp=",popt[0]," max=",max," x0=",popt[1]," cmean=",cmean," sigma1=",popt[2]," csigma=",csigma 
+#  print( "amp=",popt[0]," max=",max," x0=",popt[1]," cmean=",cmean," sigma1=",popt[2]," csigma=",csigma )
 
   return poptb,popt,failed,intensity,sigma
 
@@ -4515,7 +4514,7 @@ def calc_simple_intensity(xc,yc,sc):
     elif i< len(xc)-1:
       width=xc[i+1]-xc[i]
     else:
-      print "Error in width, stopping"
+      print( "Error in width, stopping")
       exit(0)
     intensity+=yc[i]*width
     sigma+=(yc[i]*width*sc[i])/(sc[i]*sc[i])
@@ -4602,7 +4601,7 @@ def plot_row(row,y,result,lroi,limit,filename,fcounter):
   tmp="gnuplot plot_it.gpl" 
   os.system(tmp)
   
-  print "plotting: %s_%03d_%s" %(filename[:-4],fcounter,str(round(y[0],3)))
+  print( "plotting: %s_%03d_%s" %(filename[:-4],fcounter,str(round(y[0],3))))
   
   tmp="rm -f plot_it.gpl"
   os.system(tmp)
@@ -4617,8 +4616,8 @@ def plot_row(row,y,result,lroi,limit,filename,fcounter):
 def extract_specular(allrow,allres,lroi,limit,filename,scale):
 
     filename="%s-specrefnew.dat" %(filename[:-4])
-    print filename
-    print "scale=",scale
+    print( filename)
+    print( "scale=",scale)
     fp=open(filename,'w')
 
     maxv=0
@@ -4638,9 +4637,9 @@ def extract_specular(allrow,allres,lroi,limit,filename,scale):
 
     filenamegpl="%s.gpl" %(filename[:-4])
     filenameps="%s.ps" %(filename[:-4])
-    print "filename:", filename
-    print "filenamegpl:", filenamegpl
-    print "filenameps:", filenameps
+    print( "filename:", filename)
+    print( "filenamegpl:", filenamegpl)
+    print( "filenameps:", filenameps)
 
     fp=open(filenamegpl,'w')
     tmp="#!/usr/bin/gnuplot\n"
@@ -4666,7 +4665,7 @@ def extract_specular(allrow,allres,lroi,limit,filename,scale):
 
     tmp="export GDFONTPATH=\"%s\"; gnuplot < %s" %(gdfontpath,filenamegpl)
     os.system(tmp)
-    print tmp
+    print( tmp)
 
     return
 
@@ -4685,7 +4684,7 @@ def extract_specref_from_taiaf(filename,roi,lroffset,overallscale):
   allrow=[]
   allscale=[]
 
-  print "Filename=",filename
+  print( "Filename=",filename)
   fp=open(filename,"r")  
   counter=0
   maxcount=0
@@ -4703,7 +4702,7 @@ def extract_specref_from_taiaf(filename,roi,lroffset,overallscale):
       counter=0
   fp.close
 
-#  print len(map)
+#  print( len(map))
   map2=[]
   pos1=[]
   pos2=[]
@@ -4774,7 +4773,7 @@ def extract_specref_from_taiaf(filename,roi,lroffset,overallscale):
     allres.append(result)
     allrow.append(row)
     allscale.append(scale)
-#    print "plotting:",filename," y=",y
+#    print( "plotting:",filename," y=",y)
     plot_row(row,y,result,lroi,limit,filename,fcounter)
 
   extract_specular(allrow,allres,lroi,limit,filename,overallscale)
@@ -4785,21 +4784,21 @@ def extract_specref_from_taiaf(filename,roi,lroffset,overallscale):
     asigma+=allres[i][2]
     ax0+=allres[i][1]
     bx0+=allres[i][3]
-  print "Values for extractet specular reflectivity from %s:" %(filename)
-  print "Aver sigma=", asigma/float(len(allres))
-  print "Aver peakx0==", ax0/float(len(allres))
-  print "Aver backx0==", bx0/float(len(allres))
+  print( "Values for extractet specular reflectivity from %s:" %(filename))
+  print( "Aver sigma=", asigma/float(len(allres)))
+  print( "Aver peakx0==", ax0/float(len(allres)))
+  print( "Aver backx0==", bx0/float(len(allres)))
 
   if platform.system()=='MacOS':
     tmp="mencoder -really-quiet \"mf://%s*.*.png\" -mf fps=10 -o %s-specrefnew.avi -ovc lavc -lavcopts vcodec=msmpeg4v2:vbitrate=2000" %(filename[:-4],filename[:-4])
   elif platform.system()=='Linux':
     tmp="ffmpeg -r 1/2 -pattern_type glob -i '%s*.*.png' -vcodec mpeg2video -pix_fmt yuv420p -r 25 %s/-specrefnew.avi" %(filename[:-4],filename[:-4])
     tmp="ffmpeg -pattern_type glob -i '%s*.*.png' -vcodec mpeg2video -pix_fmt yuv420p %s/-specrefnew.avi" %(filename[:-4],filename[:-4])
-  print tmp
+  print( tmp)
   os.system(tmp)
   tmp="rm -f %s*.*.png" % (filename[:-4])
   os.system(tmp)
-  print tmp
+  print( tmp)
 
   return
 
@@ -4824,25 +4823,25 @@ def main_part():
 #    gdfontpath="/usr/share/fonts/truetype/ttf-dejavu"
 #    GNUFONT="DejaVuSans"
 #  else:
-#    print os.path.isdir("/usr/local/TeX/texmf-dist/fonts/truetype/public/dejavu/")
+#    print( os.path.isdir("/usr/local/TeX/texmf-dist/fonts/truetype/public/dejavu/"))
 #    if(os.path.isdir("/usr/local/TeX/texmf-dist/fonts/truetype/public/dejavu/")==True):
 #      gdfontpath="/usr/local/TeX/texmf-dist/fonts/truetype/public/dejavu/"
 #      GNUFONT="Courier"
 #    else:
 #      gdfontpath="/usr/share/fonts/dejavu"
 #
-#  print gdfontpath
+#  print( gdfontpath)
 
   if platform.system()=='Linux':
-    print "Platform Linux"
+    print( "Platform Linux")
     gdfontpath="/usr/share/fonts/dejavu"
     GNUFONT="DejaVuSans"
   elif platform.system()=='MacOS':
-    print "Platform MacOS"
+    print( "Platform MacOS")
     gdfontpath="/usr/local/TeX/texmf-dist/fonts/truetype/public/dejavu/"
     GNUFONT="Courier"
   else:
-    print "Platform unknown"
+    print( "Platform unknown")
     GNUFONT="DejaVuSans"
   
   
@@ -4864,21 +4863,21 @@ def main_part():
 
   if os.path.isfile(targetfile)==True and fread==0:
 #    alldata,maxv,short_filelist,short_sequence=get_alldata_from_file(base,sequence,filelist)
-    print "get all data from file neu"
+    print( "get all data from file neu")
     alldata,maxv,short_filelist,short_sequence=get_alldata_from_file_neu(base,sequence,filelist)
-    print "append data"
+    print( "append data")
     alldata,maxv=append_analyse_data(base,short_sequence,short_filelist,bglin,roi,roffset,alldata,maxv,nmon,sfc,fc,sdet,sens_det_array,mansel,vert)
 #    write_data_to_file(base,sequence,filelist,alldata,mansel)
-    print "write data to file neu"
+    print( "write data to file neu")
     write_data_to_file_neu(base,sequence,filelist,alldata,mansel)
-    print "finished"
+    print( "finished")
   else:
     alldata,maxv=analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_det_array,mansel,vert)
 #    write_data_to_file(base,sequence,filelist,alldata,mansel)
     write_data_to_file_neu(base,sequence,filelist,alldata,mansel)
 	
 
-  print "main part: noref=",noref," coh=",coh
+  print( "main part: noref=",noref," coh=",coh)
   if noref==0:
     if coh==1:
       redo_bg_correction(base,sequence,filelist,alldata,roi,roffset,bglin,nmon,fc)
@@ -4901,10 +4900,10 @@ def main_part():
 
   b = datetime.datetime.now()
   c = b-a
-  print "Operation took: "+str(c.seconds)+" seconds"
+  print( "Operation took: "+str(c.seconds)+" seconds")
   
 #main_part()
 cProfile.run('main_part()', 'fooprof')
 p = pstats.Stats('fooprof')
 p.sort_stats('time')
-#p.print_stats()
+#p.print(_stats())
