@@ -2439,7 +2439,7 @@ def create_qmap_intlist(sequence,filelist,alldata,nmon,roffset,divisors,sfc,fc,m
         else:
           factor=kf
           intensity=intensity/time/nmon/factor
-          intensitybg=intensitybg/time/mon/factor
+          intensitybg=intensitybg/time/nmon/factor
         if intensity > maxv:
           maxv=intensity
         if intensitybg > maxvbg:
