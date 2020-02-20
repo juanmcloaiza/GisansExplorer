@@ -222,7 +222,7 @@ def get_switches ():
           roffset.append(float(sys.argv[i+1]))
           i=i+1
       if sys.argv[i] == "-roi":
-	roi[0]=int(sys.argv[i+1])
+        roi[0]=int(sys.argv[i+1])
         if sys.argv[i+2].isdigit():
           roi[1]=int(sys.argv[i+2])
           i=i+2
@@ -230,39 +230,39 @@ def get_switches ():
           roi[1]=440
           i=i+1
       if sys.argv[i] == "-genx":
-	genx=1
+        genx=1
       if sys.argv[i] == "-fread":
-	fread=1
+        fread=1
       if sys.argv[i] == "-fpng":
-	fpng=1
+        fpng=1
       if sys.argv[i] == "-favi":
-	favi=1
+        favi=1
       if sys.argv[i] == "-faiaf":
-	faiaf=1
+        faiaf=1
       if sys.argv[i] == "-nopng":
-	nopng=1
+        nopng=1
       if sys.argv[i] == "-noref":
-	noref=1
+        noref=1
       if sys.argv[i] == "-noavi":
-	noavi=1
+        noavi=1
       if sys.argv[i] == "-noaiaf":
-	noaiaf=1
+        noaiaf=1
       if sys.argv[i] == "-sfc":
-	sfc=float(sys.argv[i+1])
+        sfc=float(sys.argv[i+1])
       if sys.argv[i] == "-divdet":
-	divdet=1
+        divdet=1
       if sys.argv[i] == "-subdet":
-	subdet=1
+        subdet=1
       if sys.argv[i] == "-rev":
         rev=1
       if sys.argv[i] == "-sumup":
-	sumup=1
+        sumup=1
       if sys.argv[i] == "-vert":
-	vert=float(sys.argv[i+1])
+        vert=float(sys.argv[i+1])
       if sys.argv[i] == "-specfromaiaf":
-	specfromaiaf=1
+        specfromaiaf=1
       if sys.argv[i] == "-gisans":
-	gisans=1
+        gisans=1
         noaiaf=1
         noavi=1
         noref=1
@@ -596,7 +596,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
 #        print( "left range:", lmax, left-1,i,left_points)
         for j in range(lmax,left-1,-1):
           left_integral = left_integral + bg[j]
-	left_integral = float(left_integral / left_points)
+        left_integral = float(left_integral / left_points)
       else:
         left_integral = bg[min(i-width,0)]
       left_diff  = fabs(left_integral - bg[i])
@@ -610,7 +610,7 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
 #        print( "right range:", rmin, right,i)
         for j in range(rmin,right):
           right_integral = right_integral + bg[j]
-	right_integral = float(right_integral / right_points)
+        right_integral = float(right_integral / right_points)
       else:
         right_integral = bg[rmin]
       right_diff  = fabs(right_integral - bg[i])
@@ -619,12 +619,12 @@ def bg_fit_orig(np,h,fwhm,niter,sigma):
       mean = float(0.5*(left_integral + right_integral))+1 #average
       
       if (mean >= bg[i]):
-	continue
+        continue
 
       if (left_diff > sigma_left) or (right_diff > sigma_right):
 #        print( i,bg[i],mean,left_diff,sigma_left,right_diff,sigma_right)
-	bg[i] = mean
-	modified = 1
+        bg[i] = mean
+        modified = 1
 
     # ----  ... Reduce width for stripping during final cycles
     if modified==0:
@@ -4875,7 +4875,6 @@ def main_part():
     alldata,maxv=analyse_data(base,sequence,filelist,bglin,roi,roffset,nmon,sfc,fc,sdet,sens_det_array,mansel,vert)
 #    write_data_to_file(base,sequence,filelist,alldata,mansel)
     write_data_to_file_neu(base,sequence,filelist,alldata,mansel)
-	
 
   print( "main part: noref=",noref," coh=",coh)
   if noref==0:
