@@ -30,14 +30,22 @@ class FrozenClass(object):
 
 
 class Canvas(FigureCanvas):
-    def __init__(self, parent = None, width = 28, height = 28, dpi = 100):
-        fig, self.axes = plt.subplots(1, 1, figsize=(width, height), dpi=dpi, sharex=False, sharey=False)
+    def __init__(self, parent = None, width = 28, height = 28):#, dpi = 500):
+        fig, self.axes = plt.subplots(1, 1, figsize=(width, height), sharex=False, sharey=False)
 
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
 
+    def test(self):
+        x = np.linspace(0,1,1024)
+        y = np.linspace(0,1,1024)
+        I = np.abs(np.random.normal(1,100,1024))
+        self.scatter(x, y, I)
+
+
     def scatter(self, xarr, yarr, Iarr, vmin = None, vmax = None):
+        print("generating figure...")
         if vmin is None:
             vmin = min(Iarr)
 
@@ -48,7 +56,7 @@ class Canvas(FigureCanvas):
         axes = self.axes
         im = axes.scatter(xarr, yarr, edgecolors='none', c=Iarr, 
                             norm = LogNorm(vmin=vmin, vmax=vmax),
-                            marker = 's')
+                            marker = '.')
         axes.set_title("GISANS map")
         cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
         cbar = fig.colorbar(im, cax=cbar_ax)
