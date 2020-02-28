@@ -396,22 +396,26 @@ class App(QWidget,FrozenClass):
         zc=zc+int((1990.0*np.tan(np.pi*float(omega)/180.0))/0.5755)
         print(f"Corrected zc = {zc}")
 
+        two_pi_over_lambda = 2*np.pi/float(selector_lambda)
+        sin_2theta_f = lambda pixel_i : 0.5755*(yc-pixel_i)/np.sqrt(1990*1990+(0.5755*(yc-pixel_i))*(0.5755*(yc-pixel_i))) ## Unchanged
+        sin_alpha_f  = lambda pixel_j : 0.5755*(pixel_j-zc)/np.sqrt(1990*1990+(0.5755*(zc-pixel_j))*(0.5755*(zc-pixel_j)))
+        cos_alpha_f  = lambda pixel_j : np.sqrt(1 - sin_alpha_f(pixel_j)**2)
+        sin_alpha_i        = np.sin(np.pi*float(omega)/180.0)
+        #cos_alpha_i        = np.cos(np.pi*float(omega)/180.0) ## Not needed
+
         y, z, I = [], [], [] 
         with open(self.settings.gisans_map_filepath(), "w") as fp:
-            for i in range(1,1024):
-                 for j in range(1,1024):
-                     if i>=162 and i<=862:
-                         if j>=162 and j<=862:
-                             y.append((2*np.pi/float(selector_lambda))*
-                                np.cos(np.pi*float(omega)/180.0)*
-                                (0.5755*(yc-i)/np.sqrt(1990*1990+(0.5755*(yc-i))*
-                                (0.5755*(yc-i)))))
-                             z.append((2*np.pi/float(selector_lambda))*
-                                (np.sin(np.pi*float(omega)/180.0)+
-                                (0.5755*(j-zc)/np.sqrt(1990*1990+(0.5755*(zc-j))*(0.5755*(zc-j))))))
-                             if float(sens[i,j]) > 0.0:
+            for i in range(162,863):
+                for j in range(162,863):
+                    y.append(two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i))
+                    z.append(two_pi_over_lambda * sin_alpha_f(j) + sin_alpha_i)
+                    if float(sens[i,j]) > 0.0:
                                  I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
                                  fp.write(str(y[-1])+' '+str(z[-1])+' '+str(I[-1])+'\n')
+
+        print(f"len(y) = {len(y)}")
+        print(f"len(z) = {len(z)}")
+        print(f"len(I) = {len(I)}")
         self.experiment.y = np.asarray(y)
         self.experiment.z = np.asarray(z)
         self.experiment.I = np.asarray(I)
