@@ -1,5 +1,6 @@
 #!/bin/env python
 
+from matplotlib.ticker import NullFormatter
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -16,13 +17,12 @@ import traceback
 import gzip
 
 
-
-
 class FrozenClass(object):
     __isfrozen = False
+
     def __setattr__(self, key, value):
         if self.__isfrozen and not hasattr(self, key):
-            raise TypeError( "%r is a frozen class" % self )
+            raise TypeError("%r is a frozen class" % self)
         object.__setattr__(self, key, value)
 
     def _freeze(self):
@@ -30,18 +30,50 @@ class FrozenClass(object):
 
 
 class Canvas(FigureCanvas):
-    def __init__(self, parent = None, width = 28, height = 28):#, dpi = 500):
-        fig, self.axes = plt.subplots(1, 1, figsize=(width, height), sharex=False, sharey=False)
+    def __init__(self, parent=None, width=1000, height=28):  # , dpi = 500):
+        # definitions for the axes
+        left, width = 0.1, 0.65
+        bottom, height = 0.1, 0.65
+        spacing = 0.005
+        
+        rect_scatter = [left, bottom, width, height]
+        rect_histx = [left, bottom + height + spacing, width, 0.2]
+        rect_histy = [left + width + spacing, bottom, 0.2, height]
+        
+        # start with a rectangular Figure
+        fig = plt.figure(figsize=(50, 10))
+        
+        ax_scatter = plt.axes(rect_scatter)
+        ax_scatter.tick_params(direction='in', top=True, right=True)
 
+        ax_histx = plt.axes(rect_histx)
+        ax_histx.tick_params(direction='in', labelbottom=False)
+
+        ax_histy = plt.axes(rect_histy)
+        ax_histy.tick_params(direction='in', labelleft=False)
+        
+       
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
+        self.ax_scatter = ax_scatter
+        self.ax_histx = ax_histx
+        self.ax_histy = ax_histy
+        self.colorbar = None
+        self.test()
 
 
     def test(self):
-        x = np.linspace(0,1,1024)
-        y = np.linspace(0,1,1024)
-        I = np.abs(np.random.normal(1,100,1024))
+        delta = 0.025
+        x = np.random.uniform(-15.0, 15.0, 100000)
+        y = np.random.uniform(-15.0, 15.0, 100000)
+        #X, Y = np.meshgrid(x, y)
+        #Z1 = np.exp(-X**2 - Y**2)
+        #Z2 = np.exp(-(X - 1)**2 - (Y - 1)**2)
+        #I = (Z1 - Z2) * 2
+        #self.plot_colormap(I)
+        I = np.exp(np.sin(x)*np.cos(y))
         self.scatter(x, y, I)
+        return True
 
 
     def scatter(self, xarr, yarr, Iarr, vmin = None, vmax = None):
@@ -50,19 +82,83 @@ class Canvas(FigureCanvas):
             vmin = min(Iarr)
 
         if vmax is None:
-            vmax = max(Iarr)
+            vmax = min(Iarr)
+
+        fig = self.figure
+        ax_scatter = self.ax_scatter
+        ax_histx = self.ax_histx
+        ax_histy = self.ax_histy
+        choice_size = 1024
+        idx = np.random.choice(range(len(xarr)), size=choice_size, replace=False)
+        x = xarr#[idx]
+        y = yarr#[idx]
+        I = Iarr#[idx]
+
+        # the scatter plot:
+        im = ax_scatter.scatter(x, y, edgecolors='none', c=I, 
+                            norm = LogNorm(vmin=vmin, vmax=vmax),
+                            marker = '.')
+        
+        # now determine nice limits by hand:
+        #ybinwidth = 
+        ax_scatter.set_xlim((x.min(), x.max()))
+        ax_scatter.set_ylim((y.min(), y.max()))
+        
+        #bins = np.arange(x.min(), x.max() + binwidth, binwidth)
+        #ax_histx.hist(x, bins=bins)
+        #ax_histy.hist(y, bins=bins, orientation='horizontal')
+        
+        #ax_histx.set_xlim(ax_scatter.get_xlim())
+        #ax_histy.set_ylim(ax_scatter.get_ylim())
+ 
+###
+        ax_scatter.set_title("GISANS map")
+        self.colorbar = self.figure.colorbar(im)
+        self.colorbar.set_label("Intensity")
+        ax_scatter.set_ylabel(r'$Q_{y}(\AA^{-1})$')
+        ax_scatter.set_xlabel(r'$Q_{z}(\AA^{-1})$') 
+        print("Figure Generated")
+
+        return True
+
+
+    def plot_colormap(self, Iarr, vmin=None, vmax=None, extent = [-1,1,-1,1]):
+        print("generating figure...")
+        if vmin is None:
+            vmin = Iarr.min()
+
+        if vmax is None:
+            vmax = Iarr.max()
 
         fig = self.figure
         axes = self.axes
-        im = axes.scatter(xarr, yarr, edgecolors='none', c=Iarr, 
-                            norm = LogNorm(vmin=vmin, vmax=vmax),
-                            marker = '.')
+        im = axes.imshow(Iarr, interpolation='bilinear', cmap='RdYlGn',
+               origin='lower', extent=[-3, 3, -3, 3],
+               vmax=abs(Iarr).max(), vmin=-abs(Iarr).max())
+
         axes.set_title("GISANS map")
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-        cbar = fig.colorbar(im, cax=cbar_ax)
+        # cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        cbar = fig.colorbar(im)#, cax=cbar_ax)
         cbar.set_label("Intensity", fontsize=20)
         plt.ylabel(r'$Q_{y}(\AA^{-1})$')
         plt.xlabel(r'$Q_{z}(\AA^{-1})$') 
+
+    def line_cut(self, xarr, yarr, Iarr, vmin = None, vmax = None):
+        cut_qy=[0] * len(z)
+        cut_qy_xaxis=[0] * len(z)
+        for i in range(162, 863):
+            for j in range(162,863):
+                cut_qy_xaxis[i]=((2*np.pi/float(selector_lambda))*np.cos(np.pi*float(omega)/180.0)*(0.5755*(yc-i)/np.sqrt(1990*1990+(0.5755*(yc-i))*(0.5755*(yc-i)))))
+                cqz=((2*np.pi/float(selector_lambda))*(np.sin(np.pi*float(omega)/180.0)+(0.5755*(j-zc)/np.sqrt(1990*1990+(0.5755*(zc-j))*(0.5755*(zc-j))))))
+                if cqz>=qzvalue-dqzvalue and cqz<=qzvalue+dqzvalue:
+                    cut_qy[i]=cut_qy[i]+(meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
+
+        return cut_qy_axis, cut_qy
+        plt.loglog(cut_qy_xaxis, cut_qy,label=
+        "cut at "+r'$Q_{z}$= '+'{:06.4f}'.format(qzvalue)+'$ \AA^{-1})$'+'\n'+r'$\Delta Q_{z}$= '+'{:06.4f}'.format(dqzvalue)+'$ \AA^{-1})$')
+        plt.legend()
+        plt.ylabel(r'$I(A.U.)$')
+        plt.xlabel(r'$Q_{y}(\AA^{-1})$')
 
 
 class Experiment(FrozenClass):
@@ -133,8 +229,8 @@ class App(QWidget,FrozenClass):
         self.title = 'Alexandros GISANS Viewer'
         self.left = 3000
         self.top = 500
-        self.width = 640
-        self.height = 480
+        self.width = 1500
+        self.height = 1500
         self.layout = QVBoxLayout()
         self.minSpinBox = QDoubleSpinBox()
         self.maxSpinBox = QDoubleSpinBox()
@@ -156,8 +252,8 @@ class App(QWidget,FrozenClass):
         self.addMinMaxSpinBoxes()
         self.addOpenFileButton()
         self.show()
-        #self.openFileNamesDialog()
-        #self.saveFileDialog()
+        # self.openFileNamesDialog()
+        # self.saveFileDialog()
 
 
     def addOpenFileButton(self):
@@ -270,13 +366,14 @@ class App(QWidget,FrozenClass):
             return False
 
 
-    def handle_exception(self, e):
+    @staticmethod
+    def handle_exception(e):
         msg = (f"Exception: {e}\n")
         msg += ("-"*60+"\n")
         msg += traceback.format_exc()
         msg += ("-"*60+"\n")
         print(msg)
-        #traceback.#.print_exc(file=sys.stdout)
+        # traceback.#.print_exc(file=sys.stdout)
         pop_up = QMessageBox()
         pop_up.setWindowTitle(f"Exception: {e}\n")   
         pop_up.setText(msg)
@@ -401,44 +498,50 @@ class App(QWidget,FrozenClass):
         sin_alpha_f  = lambda pixel_j : 0.5755*(pixel_j-zc)/np.sqrt(1990*1990+(0.5755*(zc-pixel_j))*(0.5755*(zc-pixel_j)))
         cos_alpha_f  = lambda pixel_j : np.sqrt(1 - sin_alpha_f(pixel_j)**2)
         sin_alpha_i        = np.sin(np.pi*float(omega)/180.0)
-        #cos_alpha_i        = np.cos(np.pi*float(omega)/180.0) ## Not needed
+        # cos_alpha_i        = np.cos(np.pi*float(omega)/180.0) ## Not needed
 
         y, z, I = [], [], [] 
         with open(self.settings.gisans_map_filepath(), "w") as fp:
             for i in range(162,863):
                 for j in range(162,863):
-                    y.append(two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i))
-                    z.append(two_pi_over_lambda * sin_alpha_f(j) + sin_alpha_i)
                     if float(sens[i,j]) > 0.0:
-                                 I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
-                                 fp.write(str(y[-1])+' '+str(z[-1])+' '+str(I[-1])+'\n')
+                        I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
+                        y.append(two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i))
+                        z.append(two_pi_over_lambda * sin_alpha_f(j) + sin_alpha_i)
+                        fp.write(str(y[-1])+' '+str(z[-1])+' '+str(I[-1])+'\n')
 
-        print(f"len(y) = {len(y)}")
-        print(f"len(z) = {len(z)}")
-        print(f"len(I) = {len(I)}")
-        self.experiment.y = np.asarray(y)
-        self.experiment.z = np.asarray(z)
-        self.experiment.I = np.asarray(I)
+        y = np.asarray(y)
+        z = np.asarray(z)
+        I = np.asarray(I)
+
+        self.experiment.y = y 
+        self.experiment.z = z 
+        self.experiment.I = I 
+
         return True
 
 
     def show_gisans_map(self):
-        if self.settings.cbar_min < 0:
-            min_value = min(self.experiment.I)+float(1)/float(self.experiment.monitor_counts)
-        else:
-            min_value = self.settings.cbar_min
+        try:
+            if self.settings.cbar_min < 0:
+                min_value = min(self.experiment.I)+float(1)/float(self.experiment.monitor_counts)
+            else:
+                min_value = self.settings.cbar_min
 
-        if self.settings.cbar_max < 0:
-            max_value=max(self.experiment.I)
-        else:
-            max_value = self.settings.cbar_max
+            if self.settings.cbar_max < 0:
+                max_value=max(self.experiment.I)
+            else:
+                max_value = self.settings.cbar_max
 
-        self.canvas.scatter(self.experiment.y,
+            self.canvas.scatter(self.experiment.y,
                             self.experiment.z,
                             self.experiment.I,
                             vmin=min_value,
                             vmax=max_value
                             )
+        except Exception as e:
+            App.handle_exception(e)
+            return False
 
         return True
 
@@ -452,15 +555,15 @@ exit(0)
 
 
 minmax = raw_input("enter min/max (yes/no): ")
-#minmax='no'
+# minmax='no'
 if minmax=='yes':
     gmin=input('Give min value:');
     gmax=input('Give max value:');
 
-#qzvalue=0.0
-#dqzvalue=0.05
-#qzvalue=input("Give qz: ");
-#dqzvalue=input("Give delta qz: ");
+# qzvalue=0.0
+# dqzvalue=0.05
+# qzvalue=input("Give qz: ");
+# dqzvalue=input("Give delta qz: ");
 
 # Open file dialog
 file_path_string = openFileNameDialog()
@@ -514,7 +617,7 @@ file.close()
 # Define the position of the direct beam on the detector
 yc=528 #530
 zc=211 #220
-#zc=512
+# zc=512
 
 y=[]
 z=[]
@@ -528,7 +631,7 @@ os.system('gzip -d -q temp.gz')
 
 
 sens = np.loadtxt("sensitivity_map", dtype='i', delimiter=' ')
-#sens = np.loadtxt("sens.map", dtype='i', delimiter=' ')
+# sens = np.loadtxt("sens.map", dtype='i', delimiter=' ')
 
 num=0.0
 meansens=0.0
@@ -543,9 +646,9 @@ meansens=meansens/num
 
 inputd = np.loadtxt("temp", dtype='i', delimiter=' ')
 os.system('rm temp')
-#os.system('rm temp.gz')
+# os.system('rm temp.gz')
 
-#file = open('output.dat','w') 
+# file = open('output.dat','w') 
 
 # Addition important... qz=0 at the horizon of the sample
 
@@ -564,7 +667,7 @@ for i in xrange(1,1024):
                  if float(sens[i,j]) > 0.0:
                      I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
                      file.write(str((2*np.pi/float(selector_lambda))*np.cos(np.pi*float(omega)/180.0)*(0.5755*(yc-i)/np.sqrt(1990*1990+(0.5755*(yc-i))*(0.5755*(yc-i)))))+'   '+str((2*np.pi/float(selector_lambda))*(np.sin(np.pi*float(omega)/180.0)+(0.5755*(j-zc)/np.sqrt(1990*1990+(0.5755*(zc-j))*(0.5755*(zc-j))))))+'   '+str((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))+'\n')
-                    #file.write(str((2*np.pi/float(selector_lambda))*np.cos(np.pi*float(omega)/162.0)*((yc-i)/np.sqrt(1990*1990+(0.6*(yc-i))*(0.6*(zc-i)))))+' '+str((-2*np.pi/float(selector_lambda))*(np.sin(np.pi*float(omega)/162.0)+((zc-j)/np.sqrt(1990*1990+(0.6*(zc-j))*(0.6*(zc-j))))))+' '+str(float(input[i,j])/float(monitor))+'\n')
+                    # file.write(str((2*np.pi/float(selector_lambda))*np.cos(np.pi*float(omega)/162.0)*((yc-i)/np.sqrt(1990*1990+(0.6*(yc-i))*(0.6*(zc-i)))))+' '+str((-2*np.pi/float(selector_lambda))*(np.sin(np.pi*float(omega)/162.0)+((zc-j)/np.sqrt(1990*1990+(0.6*(zc-j))*(0.6*(zc-j))))))+' '+str(float(input[i,j])/float(monitor))+'\n')
 
 file.close()
 
