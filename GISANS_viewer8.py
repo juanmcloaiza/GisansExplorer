@@ -41,16 +41,16 @@ class Canvas(FigureCanvas):
         rect_histy = [left + width + spacing, bottom, 0.2, height]
         
         # start with a rectangular Figure
-        fig = plt.figure(figsize=(50, 10))
+        fig = plt.figure(figsize=(10, 10))
         
         ax_scatter = plt.axes(rect_scatter)
-        ax_scatter.tick_params(direction='in', top=True, right=True)
+#        ax_scatter.tick_params(direction='in', top=True, right=True)
 
         ax_histx = plt.axes(rect_histx)
-        ax_histx.tick_params(direction='in', labelbottom=False)
+#        ax_histx.tick_params(direction='in', labelbottom=False)
 
         ax_histy = plt.axes(rect_histy)
-        ax_histy.tick_params(direction='in', labelleft=False)
+#        ax_histy.tick_params(direction='in', labelleft=False)
         
        
         FigureCanvas.__init__(self, fig)
@@ -59,24 +59,26 @@ class Canvas(FigureCanvas):
         self.ax_histx = ax_histx
         self.ax_histy = ax_histy
         self.colorbar = None
-        self.test()
+#        self.test()
+        return
 
 
     def test(self):
-        delta = 0.025
-        x = np.random.uniform(-15.0, 15.0, 100000)
-        y = np.random.uniform(-15.0, 15.0, 100000)
+        x = np.random.uniform(0.5*np.pi, 2*np.pi, 1000)
+        y = np.random.uniform(0.5*np.pi, np.pi, 1000)
         #X, Y = np.meshgrid(x, y)
         #Z1 = np.exp(-X**2 - Y**2)
         #Z2 = np.exp(-(X - 1)**2 - (Y - 1)**2)
         #I = (Z1 - Z2) * 2
         #self.plot_colormap(I)
-        I = np.exp(np.sin(x)*np.cos(y))
-        self.scatter(x, y, I)
+        xcut = abs(np.cos(x))
+        ycut = abs(np.sin(y))
+        I = xcut * ycut
+        self.scatter(x, y, I, x, y, xcut, ycut)
         return True
 
 
-    def scatter(self, xarr, yarr, Iarr, vmin = None, vmax = None):
+    def scatter(self, xarr, yarr, Iarr, xcutaxis, ycutaxis, xcut, ycut, vmin = None, vmax = None):
         print("generating figure...")
         if vmin is None:
             vmin = min(Iarr)
@@ -88,8 +90,8 @@ class Canvas(FigureCanvas):
         ax_scatter = self.ax_scatter
         ax_histx = self.ax_histx
         ax_histy = self.ax_histy
-        choice_size = 1024
-        idx = np.random.choice(range(len(xarr)), size=choice_size, replace=False)
+        #choice_size = 1024
+        #idx = np.random.choice(range(len(xarr)), size=choice_size, replace=False)
         x = xarr#[idx]
         y = yarr#[idx]
         I = Iarr#[idx]
@@ -103,20 +105,29 @@ class Canvas(FigureCanvas):
         #ybinwidth = 
         ax_scatter.set_xlim((x.min(), x.max()))
         ax_scatter.set_ylim((y.min(), y.max()))
-        
+
         #bins = np.arange(x.min(), x.max() + binwidth, binwidth)
         #ax_histx.hist(x, bins=bins)
+        ax_histx.scatter(xcutaxis, xcut)
+        ax_histx.set_yscale('log')
+        ax_histx.set_xlim(ax_scatter.get_xlim())
+        #ax_histx.set_ylim((0.5*xcut.min(), 2*xcut.max()))
         #ax_histy.hist(y, bins=bins, orientation='horizontal')
         
         #ax_histx.set_xlim(ax_scatter.get_xlim())
-        #ax_histy.set_ylim(ax_scatter.get_ylim())
+        ax_histy.scatter(ycut, ycutaxis)
+        ax_histy.set_xscale('log')
+        ax_histy.set_ylim(ax_scatter.get_ylim())
+        #ax_histy.set_xlim((0.5*ycut.min(), 2*ycut.max()))
  
 ###
         ax_scatter.set_title("GISANS map")
         self.colorbar = self.figure.colorbar(im)
         self.colorbar.set_label("Intensity")
-        ax_scatter.set_ylabel(r'$Q_{y}(\AA^{-1})$')
-        ax_scatter.set_xlabel(r'$Q_{z}(\AA^{-1})$') 
+        ax_scatter.set_xlabel(r'$Q_{y}(\AA^{-1})$')
+        ax_scatter.set_ylabel(r'$Q_{z}(\AA^{-1})$') 
+        #ax_histx.set_xlabel("ax_histx")
+        #ax_histy.set_xlabel("ax_histy")
         print("Figure Generated")
 
         return True
@@ -143,28 +154,11 @@ class Canvas(FigureCanvas):
         plt.ylabel(r'$Q_{y}(\AA^{-1})$')
         plt.xlabel(r'$Q_{z}(\AA^{-1})$') 
 
-    def line_cut(self, xarr, yarr, Iarr, vmin = None, vmax = None):
-        cut_qy=[0] * len(z)
-        cut_qy_xaxis=[0] * len(z)
-        for i in range(162, 863):
-            for j in range(162,863):
-                cut_qy_xaxis[i]=((2*np.pi/float(selector_lambda))*np.cos(np.pi*float(omega)/180.0)*(0.5755*(yc-i)/np.sqrt(1990*1990+(0.5755*(yc-i))*(0.5755*(yc-i)))))
-                cqz=((2*np.pi/float(selector_lambda))*(np.sin(np.pi*float(omega)/180.0)+(0.5755*(j-zc)/np.sqrt(1990*1990+(0.5755*(zc-j))*(0.5755*(zc-j))))))
-                if cqz>=qzvalue-dqzvalue and cqz<=qzvalue+dqzvalue:
-                    cut_qy[i]=cut_qy[i]+(meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
-
-        return cut_qy_axis, cut_qy
-        plt.loglog(cut_qy_xaxis, cut_qy,label=
-        "cut at "+r'$Q_{z}$= '+'{:06.4f}'.format(qzvalue)+'$ \AA^{-1})$'+'\n'+r'$\Delta Q_{z}$= '+'{:06.4f}'.format(dqzvalue)+'$ \AA^{-1})$')
-        plt.legend()
-        plt.ylabel(r'$I(A.U.)$')
-        plt.xlabel(r'$Q_{y}(\AA^{-1})$')
-
 
 class Experiment(FrozenClass):
     def __init__(self):
         self.selector_lambda = None
-        self.angle_of_incidence = None
+        self.angle_of_incidence = 0
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
@@ -173,11 +167,46 @@ class Experiment(FrozenClass):
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
-        self.y=[]
-        self.z=[]
-        self.I=[]
+        self.y = []
+        self.z = []
+        self.I = []
+        self.inputd = []
+
+        self.cut_qy_xaxis = []
+        self.cut_qy = []
+        self.cut_qz_xaxis = []
+        self.cut_qz = []
+
         self._freeze()
+
         return
+
+
+    @property
+    def two_pi_over_lambda(self):
+        return 2*np.pi/float(self.selector_lambda)
+
+
+    @property
+    def sin_alpha_i(self):
+        return np.sin(np.pi*float(self.angle_of_incidence)/180.0)
+
+
+    @property
+    def cos_alpha_i(self):
+        return np.cos(np.pi*float(self.angle_of_incidence)/180.0)
+
+
+    def sin_2theta_f(self, pixel_i):
+        return 0.5755*(self.yc-pixel_i)/np.sqrt(1990*1990+(0.5755*(self.yc-pixel_i))*(0.5755*(self.yc-pixel_i)))
+
+
+    def sin_alpha_f(self, pixel_j):
+        return 0.5755*(pixel_j-self.zc)/np.sqrt(1990*1990+(0.5755*(self.zc-pixel_j))*(0.5755*(self.zc-pixel_j)))
+
+
+    def cos_alpha_f(self, pixel_j):
+        return np.sqrt(1 - self.sin_alpha_f(pixel_j)**2)
 
 
 class Settings(FrozenClass):
@@ -227,8 +256,8 @@ class App(QWidget,FrozenClass):
     def __init__(self):
         super().__init__()
         self.title = 'Alexandros GISANS Viewer'
-        self.left = 3000
-        self.top = 500
+        #self.left = 3000
+        #self.top = 500
         self.width = 1500
         self.height = 1500
         self.layout = QVBoxLayout()
@@ -244,7 +273,7 @@ class App(QWidget,FrozenClass):
 
     def initUI(self):
         self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        #self.setGeometry(self.left, self.top, self.width, self.height)
         self.setLayout(self.layout)
         self.layout.setAlignment(Qt.AlignCenter)
         self.addWelcomeMessage()
@@ -331,6 +360,10 @@ class App(QWidget,FrozenClass):
         if not self.read_sensitivity_file():
             return
         if not self.read_intensity_file():
+            return
+        if not self.line_cut_y():
+            return
+        if not self.line_cut_z():
             return
         if not self.show_gisans_map():
             return
@@ -424,6 +457,9 @@ class App(QWidget,FrozenClass):
                 omega=omega_line_list[3]
                 self.experiment.angle_of_incidence = omega
                 print('Angle of incidence (degrees): '+str(omega))
+                print(f"Original zc = {self.experiment.zc}")
+                self.experiment.zc += int( ( 1990.0 * np.tan( np.pi * float(omega) / 180.0 ) ) / 0.5755 )
+                print(f"Corrected zc = {self.experiment.zc}")
             if line.find('selector_lambda_value')>0:
                 lambda_line_list = line.split()
                 selector_lambda=lambda_line_list[3]
@@ -481,24 +517,15 @@ class App(QWidget,FrozenClass):
 
 
     def parse_intensity_map(self, inputd):
-        zc = self.experiment.zc 
-        yc = self.experiment.zc 
-        meansens = self.experiment.meansens
+
         sens = self.experiment.sens
-        omega = self.experiment.angle_of_incidence
-        selector_lambda = self.experiment.selector_lambda
+        meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
-
-        print(f"Original zc = {zc}")
-        zc=zc+int((1990.0*np.tan(np.pi*float(omega)/180.0))/0.5755)
-        print(f"Corrected zc = {zc}")
-
-        two_pi_over_lambda = 2*np.pi/float(selector_lambda)
-        sin_2theta_f = lambda pixel_i : 0.5755*(yc-pixel_i)/np.sqrt(1990*1990+(0.5755*(yc-pixel_i))*(0.5755*(yc-pixel_i))) ## Unchanged
-        sin_alpha_f  = lambda pixel_j : 0.5755*(pixel_j-zc)/np.sqrt(1990*1990+(0.5755*(zc-pixel_j))*(0.5755*(zc-pixel_j)))
-        cos_alpha_f  = lambda pixel_j : np.sqrt(1 - sin_alpha_f(pixel_j)**2)
-        sin_alpha_i        = np.sin(np.pi*float(omega)/180.0)
-        # cos_alpha_i        = np.cos(np.pi*float(omega)/180.0) ## Not needed
+        two_pi_over_lambda = self.experiment.two_pi_over_lambda
+        sin_alpha_i = self.experiment.sin_alpha_i
+        sin_2theta_f = self.experiment.sin_2theta_f
+        cos_alpha_f = self.experiment.cos_alpha_f
+        sin_alpha_f = self.experiment.sin_alpha_f
 
         y, z, I = [], [], [] 
         with open(self.settings.gisans_map_filepath(), "w") as fp:
@@ -506,17 +533,77 @@ class App(QWidget,FrozenClass):
                 for j in range(162,863):
                     if float(sens[i,j]) > 0.0:
                         I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
-                        y.append(two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i))
-                        z.append(two_pi_over_lambda * sin_alpha_f(j) + sin_alpha_i)
+                        y.append(two_pi_over_lambda *  cos_alpha_f(j) * sin_2theta_f(i))
+                        z.append(two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i))
                         fp.write(str(y[-1])+' '+str(z[-1])+' '+str(I[-1])+'\n')
 
         y = np.asarray(y)
         z = np.asarray(z)
         I = np.asarray(I)
 
+        self.experiment.inputd = inputd
         self.experiment.y = y 
         self.experiment.z = z 
         self.experiment.I = I 
+
+        return True
+
+
+    def line_cut_y(self, dqzvalue=None, qzvalue=None):
+        sens = self.experiment.sens
+        meansens = self.experiment.meansens
+        monitor = self.experiment.monitor_counts
+        inputd = self.experiment.inputd
+        two_pi_over_lambda = self.experiment.two_pi_over_lambda
+        sin_alpha_i = self.experiment.sin_alpha_i
+        cos_alpha_f = self.experiment.cos_alpha_f
+        sin_alpha_f = self.experiment.sin_alpha_f
+        sin_2theta_f = self.experiment.sin_2theta_f
+
+        cut_qy       = np.zeros(len(self.experiment.z))
+        cut_qy_xaxis = np.zeros(len(self.experiment.z))
+        
+        dqzvalue =       0.05         if dqzvalue is None else dqzvalue
+        qzvalue  = self.experiment.zc if  qzvalue is None else  qzvalue
+
+        for i in range(162, 863):
+            for j in range(162,863):
+                cut_qy_xaxis[i] = two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i)
+                cqz = two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i)
+#                if cqz >= (qzvalue - dqzvalue) and cqz <= (qzvalue + dqzvalue):
+                cut_qy[i] += (meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
+
+        self.experiment.cut_qy_xaxis = cut_qy_xaxis
+        self.experiment.cut_qy = cut_qy
+        
+        return True
+
+    def line_cut_z(self, dqyvalue=None, qyvalue=None):
+        sens = self.experiment.sens
+        meansens = self.experiment.meansens
+        monitor = self.experiment.monitor_counts
+        inputd = self.experiment.inputd
+        two_pi_over_lambda = self.experiment.two_pi_over_lambda
+        sin_alpha_i = self.experiment.sin_alpha_i
+        cos_alpha_f = self.experiment.cos_alpha_f
+        sin_alpha_f = self.experiment.sin_alpha_f
+        sin_2theta_f = self.experiment.sin_2theta_f
+
+        cut_qz       = np.zeros(len(self.experiment.y))
+        cut_qz_xaxis = np.zeros(len(self.experiment.y))
+        
+        dqyvalue =       0.05         if dqyvalue is None else dqyvalue
+        qyvalue  = self.experiment.yc if  qyvalue is None else  qyvalue
+
+        for i in range(162, 863):
+            for j in range(162,863):
+                cut_qz_xaxis[j] = two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i)
+                cqy = two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i)
+                #if cqy >= (qyvalue - dqyvalue) and cqy <= (qyvalue + dqyvalue):
+                cut_qz[j] += (meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
+        
+        self.experiment.cut_qz_xaxis = cut_qz_xaxis
+        self.experiment.cut_qz = cut_qz
 
         return True
 
@@ -536,6 +623,10 @@ class App(QWidget,FrozenClass):
             self.canvas.scatter(self.experiment.y,
                             self.experiment.z,
                             self.experiment.I,
+                            self.experiment.cut_qy_xaxis,
+                            self.experiment.cut_qz_xaxis,
+                            self.experiment.cut_qy,
+                            self.experiment.cut_qz,
                             vmin=min_value,
                             vmax=max_value
                             )
