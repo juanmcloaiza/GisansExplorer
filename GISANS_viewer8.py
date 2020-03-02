@@ -16,6 +16,33 @@ import os
 import traceback
 import gzip
 
+# Modules for profiling:
+import cProfile, pstats, io
+
+def profile_dec(fnc):
+    """
+    A decorator that uses cProfile to profile a function
+    """
+
+    def inner(*args, **kwargs):
+        pr = cProfile.Profile()
+        pr.enable()
+        retval = fnc(*args, **kwargs)
+        pr.disable()
+        s = io.StringIO()
+        sortby = 'cumulative'
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+        print(s.getvalue())
+        return retval
+
+    return inner
+
+@profile_dec
+def profile_function_with_arguments(function, *args, **kwargs):
+    return function(*args, **kwargs)
+
+
 
 class FrozenClass(object):
     __isfrozen = False
@@ -504,12 +531,15 @@ class App(QWidget,FrozenClass):
     def parse_sensitivity_map(self, sens):
         num=0.0
         meansens=0.0
-        for i in range(1,1024):
-             for j in range(1,1024):
-                 if i>=162 and i<=862:
-                     if j>=162 and j<=862:
-                         meansens=meansens+float(sens[i,j])
-                         num=num+1.0
+        pix0 = 162
+        pixf = 862
+        ipix_range = np.asarray(range(pix0, pixf+1))
+        jpix_range = np.asarray(range(pix0, pixf+1))
+
+        for i in ipix_range:
+            for j in jpix_range:
+                meansens += float(sens[i,j])
+                num += 1.0
         meansens=meansens/num
         self.experiment.sens = sens 
         self.experiment.meansens = meansens
@@ -517,30 +547,33 @@ class App(QWidget,FrozenClass):
 
 
     def parse_intensity_map(self, inputd):
+        pix0 = 162
+        pixf = 862
+        ipix_range = np.asarray(range(pix0, pixf+1))
+        jpix_range = np.asarray(range(pix0, pixf+1))
 
         sens = self.experiment.sens
         meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
         two_pi_over_lambda = self.experiment.two_pi_over_lambda
         sin_alpha_i = self.experiment.sin_alpha_i
-        sin_2theta_f = self.experiment.sin_2theta_f
-        cos_alpha_f = self.experiment.cos_alpha_f
-        sin_alpha_f = self.experiment.sin_alpha_f
+        sin_2theta_f = self.experiment.sin_2theta_f(ipix_range)
+        cos_alpha_f = self.experiment.cos_alpha_f(jpix_range)
+        sin_alpha_f = self.experiment.sin_alpha_f(jpix_range)
 
-        y, z, I = [], [], [] 
+        y = np.zeros(len(ipix_range)*len(jpix_range))
+        z = np.zeros(len(ipix_range)*len(jpix_range))
+        I = np.zeros(len(ipix_range)*len(jpix_range))
+        idx = 0
         with open(self.settings.gisans_map_filepath(), "w") as fp:
-            for i in range(162,863):
-                for j in range(162,863):
+            for i in ipix_range:
+                for j in jpix_range: 
                     if float(sens[i,j]) > 0.0:
-                        I.append((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
-                        y.append(two_pi_over_lambda *  cos_alpha_f(j) * sin_2theta_f(i))
-                        z.append(two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i))
-                        fp.write(str(y[-1])+' '+str(z[-1])+' '+str(I[-1])+'\n')
-
-        y = np.asarray(y)
-        z = np.asarray(z)
-        I = np.asarray(I)
-
+                        I[idx] = ((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
+                        y[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
+                        z[idx] = (two_pi_over_lambda * (sin_alpha_f[j-pix0] + sin_alpha_i))
+                        idx += 1
+                        fp.write(str(y[idx])+' '+str(z[idx])+' '+str(I[idx])+'\n')
         self.experiment.inputd = inputd
         self.experiment.y = y 
         self.experiment.z = z 
@@ -639,7 +672,10 @@ class App(QWidget,FrozenClass):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
+    x = profile_function_with_arguments(app.exec_)
+    sys.exit(x)
+
 
 
 exit(0)
