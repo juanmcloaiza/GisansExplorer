@@ -189,13 +189,13 @@ class Experiment(FrozenClass):
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
-        self.yc = 528 #530
-        self.zc = 211 #220 #zc=512
+        self.qyc = 528 #530
+        self.qzc = 211 #220 #zc=512
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
-        self.y = []
-        self.z = []
+        self.qy = []
+        self.qz = []
         self.I = []
         self.inputd = []
 
@@ -225,11 +225,11 @@ class Experiment(FrozenClass):
 
 
     def sin_2theta_f(self, pixel_i):
-        return 0.5755*(self.yc-pixel_i)/np.sqrt(1990*1990+(0.5755*(self.yc-pixel_i))*(0.5755*(self.yc-pixel_i)))
+        return 0.5755*(self.qyc-pixel_i)/np.sqrt(1990*1990+(0.5755*(self.qyc-pixel_i))*(0.5755*(self.qyc-pixel_i)))
 
 
     def sin_alpha_f(self, pixel_j):
-        return 0.5755*(pixel_j-self.zc)/np.sqrt(1990*1990+(0.5755*(self.zc-pixel_j))*(0.5755*(self.zc-pixel_j)))
+        return 0.5755*(pixel_j-self.qzc)/np.sqrt(1990*1990+(0.5755*(self.qzc-pixel_j))*(0.5755*(self.qzc-pixel_j)))
 
 
     def cos_alpha_f(self, pixel_j):
@@ -484,9 +484,9 @@ class App(QWidget,FrozenClass):
                 omega=omega_line_list[3]
                 self.experiment.angle_of_incidence = omega
                 print('Angle of incidence (degrees): '+str(omega))
-                print(f"Original zc = {self.experiment.zc}")
-                self.experiment.zc += int( ( 1990.0 * np.tan( np.pi * float(omega) / 180.0 ) ) / 0.5755 )
-                print(f"Corrected zc = {self.experiment.zc}")
+                print(f"Original qzc = {self.experiment.qzc}")
+                self.experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(omega) / 180.0 ) ) / 0.5755 )
+                print(f"Corrected qzc = {self.experiment.qzc}")
             if line.find('selector_lambda_value')>0:
                 lambda_line_list = line.split()
                 selector_lambda=lambda_line_list[3]
@@ -561,8 +561,8 @@ class App(QWidget,FrozenClass):
         cos_alpha_f = self.experiment.cos_alpha_f(jpix_range)
         sin_alpha_f = self.experiment.sin_alpha_f(jpix_range)
 
-        y = np.zeros(len(ipix_range)*len(jpix_range))
-        z = np.zeros(len(ipix_range)*len(jpix_range))
+        qy = np.zeros(len(ipix_range)*len(jpix_range))
+        qz = np.zeros(len(ipix_range)*len(jpix_range))
         I = np.zeros(len(ipix_range)*len(jpix_range))
         idx = 0
         with open(self.settings.gisans_map_filepath(), "w") as fp:
@@ -575,8 +575,8 @@ class App(QWidget,FrozenClass):
                         idx += 1
                         fp.write(str(y[idx])+' '+str(z[idx])+' '+str(I[idx])+'\n')
         self.experiment.inputd = inputd
-        self.experiment.y = y 
-        self.experiment.z = z 
+        self.experiment.qy = qy 
+        self.experiment.qz = qz 
         self.experiment.I = I 
 
         return True
@@ -593,11 +593,11 @@ class App(QWidget,FrozenClass):
         sin_alpha_f = self.experiment.sin_alpha_f
         sin_2theta_f = self.experiment.sin_2theta_f
 
-        cut_qy       = np.zeros(len(self.experiment.z))
-        cut_qy_xaxis = np.zeros(len(self.experiment.z))
+        cut_qy       = np.zeros(len(self.experiment.qz))
+        cut_qy_xaxis = np.zeros(len(self.experiment.qz))
         
         dqzvalue =       0.05         if dqzvalue is None else dqzvalue
-        qzvalue  = self.experiment.zc if  qzvalue is None else  qzvalue
+        qzvalue  = self.experiment.qzc if  qzvalue is None else  qzvalue
 
         for i in range(162, 863):
             for j in range(162,863):
@@ -622,11 +622,11 @@ class App(QWidget,FrozenClass):
         sin_alpha_f = self.experiment.sin_alpha_f
         sin_2theta_f = self.experiment.sin_2theta_f
 
-        cut_qz       = np.zeros(len(self.experiment.y))
-        cut_qz_xaxis = np.zeros(len(self.experiment.y))
+        cut_qz       = np.zeros(len(self.experiment.qy))
+        cut_qz_xaxis = np.zeros(len(self.experiment.qy))
         
         dqyvalue =       0.05         if dqyvalue is None else dqyvalue
-        qyvalue  = self.experiment.yc if  qyvalue is None else  qyvalue
+        qyvalue  = self.experiment.qyc if  qyvalue is None else  qyvalue
 
         for i in range(162, 863):
             for j in range(162,863):
@@ -653,8 +653,8 @@ class App(QWidget,FrozenClass):
             else:
                 max_value = self.settings.cbar_max
 
-            self.canvas.scatter(self.experiment.y,
-                            self.experiment.z,
+            self.canvas.scatter(self.experiment.qy,
+                            self.experiment.qz,
                             self.experiment.I,
                             self.experiment.cut_qy_xaxis,
                             self.experiment.cut_qz_xaxis,
