@@ -86,22 +86,22 @@ class Canvas(FigureCanvas):
         self.ax_histx = ax_histx
         self.ax_histy = ax_histy
         self.colorbar = None
-#        self.test()
+        #self.test()
         return
 
 
     def test(self):
-        x = np.random.uniform(0.5*np.pi, 2*np.pi, 1000)
-        y = np.random.uniform(0.5*np.pi, np.pi, 1000)
-        #X, Y = np.meshgrid(x, y)
+        x = np.linspace(1,10)
+        y = np.linspace(3,7)
+        X, Y = np.meshgrid(x, y)
         #Z1 = np.exp(-X**2 - Y**2)
         #Z2 = np.exp(-(X - 1)**2 - (Y - 1)**2)
         #I = (Z1 - Z2) * 2
         #self.plot_colormap(I)
         xcut = abs(np.cos(x))
         ycut = abs(np.sin(y))
-        I = xcut * ycut
-        self.scatter(x, y, I, x, y, xcut, ycut)
+        I = X + Y
+        self.scatter(x, y, I, x, y, xcut, ycut, vmin=1, vmax=10)
         return True
 
 
@@ -127,6 +127,18 @@ class Canvas(FigureCanvas):
         im = ax_scatter.scatter(x, y, edgecolors='none', c=I, 
                             norm = LogNorm(vmin=vmin, vmax=vmax),
                             marker = '.')
+        #im = ax_scatter.contourf(x, y, I, 32,
+        #                    norm = LogNorm(vmin=vmin, vmax=vmax),
+        #                    linewidths=0,
+        #                    origin="image")
+
+        #contour_labels = ax_scatter.contour(x, y,
+        #                     I, 8, colors='black', linewidth=.5)
+        #ax_scatter.clabel(contour_labels, inline=1, fontsize=10)
+        #H, xedges, yedges = np.histogram2d(x, y, weights=I)
+        #im = ax_scatter.imshow(H, interpolation='bilinear', cmap='RdYlGn',
+        #       origin='lower', extent=[-3, 3, -3, 3],
+        #       vmax=abs(Iarr).max(), vmin=-abs(Iarr).max())
         
         # now determine nice limits by hand:
         #ybinwidth = 
@@ -160,7 +172,11 @@ class Canvas(FigureCanvas):
         return True
 
 
-    def plot_colormap(self, Iarr, vmin=None, vmax=None, extent = [-1,1,-1,1]):
+    def plot_colormap(self, xarr, yarr, Iarr, vmin=None, vmax=None, extent = [-1,1,-1,1]):
+
+
+        H, xedges, yedges = np.histogram2d(x, y, bins=(xedges, yedges))
+        H = H.T  # Let each row list bins with common y range.
         print("generating figure...")
         if vmin is None:
             vmin = Iarr.min()
@@ -198,6 +214,10 @@ class Experiment(FrozenClass):
         self.qz = []
         self.I = []
         self.inputd = []
+
+        self.I2d = []
+        self.qyrange = []
+        self.qzrange = []
 
         self.cut_qy_xaxis = []
         self.cut_qy = []
@@ -444,7 +464,8 @@ class App(QWidget,FrozenClass):
 
     def read_dat_file(self):
         # Open and read the dat file
-        datFilePath = self.openFileNameDialog()
+        #datFilePath = self.openFileNameDialog()
+        datFilePath = "/home/juan/Development/git/imagesNICOS/datafiles/p15347_00001341.dat"
         if datFilePath:
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
@@ -465,7 +486,7 @@ class App(QWidget,FrozenClass):
         if self.settings.sensFileName:
             fpath = self.settings.sensFilePath()
             func = self.parse_sensitivity_map
-            return self.safe_parse_numpy(func, fpath, dtype='i', delimiter=' ')
+            return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
         return False
 
 
@@ -473,7 +494,7 @@ class App(QWidget,FrozenClass):
         if self.settings.gzFileName:
             fpath = self.settings.gzFilePath()
             func = self.parse_intensity_map
-            return self.safe_parse_numpy(func, fpath, dtype='i', delimiter=' ')
+            return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
         return False
 
 
@@ -565,24 +586,35 @@ class App(QWidget,FrozenClass):
         qz = np.zeros(len(ipix_range)*len(jpix_range))
         I = np.zeros(len(ipix_range)*len(jpix_range))
         idx = 0
+
         with open(self.settings.gisans_map_filepath(), "w") as fp:
             for i in ipix_range:
                 for j in jpix_range: 
                     if float(sens[i,j]) > 0.0:
                         I[idx] = ((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
-                        y[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
-                        z[idx] = (two_pi_over_lambda * (sin_alpha_f[j-pix0] + sin_alpha_i))
+                        qy[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
+                        qz[idx] = (two_pi_over_lambda * (sin_alpha_f[j-pix0] + sin_alpha_i))
+                        fp.write(str(qy[idx])+' '+str(qz[idx])+' '+str(I[idx])+'\n')
                         idx += 1
-                        fp.write(str(y[idx])+' '+str(z[idx])+' '+str(I[idx])+'\n')
+
         self.experiment.inputd = inputd
         self.experiment.qy = qy 
-        self.experiment.qz = qz 
+        self.experiment.qz = qz
         self.experiment.I = I 
+        self.experiment.I2d = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
+        self.experiment.qyrange = np.flip(two_pi_over_lambda *  cos_alpha_f[jpix_range-pix0] * sin_2theta_f[ipix_range-pix0])
+        self.experiment.qzrange = (two_pi_over_lambda * (sin_alpha_f[jpix_range-pix0] + sin_alpha_i))
 
         return True
 
 
     def line_cut_y(self, dqzvalue=None, qzvalue=None):
+        print("Performing line cut y")
+
+        self.experiment.cut_qy_xaxis = np.linspace(-1,1)
+        self.experiment.cut_qy = np.sin(self.experiment.cut_qy_xaxis)
+        return True
+#####TODO
         sens = self.experiment.sens
         meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
@@ -610,8 +642,16 @@ class App(QWidget,FrozenClass):
         self.experiment.cut_qy = cut_qy
         
         return True
+######
+
 
     def line_cut_z(self, dqyvalue=None, qyvalue=None):
+        print("Performing line cut z")
+
+        self.experiment.cut_qz_xaxis = np.linspace(-1,1)
+        self.experiment.cut_qz = np.cos(self.experiment.cut_qz_xaxis)
+        return True
+###TODO
         sens = self.experiment.sens
         meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
@@ -639,7 +679,7 @@ class App(QWidget,FrozenClass):
         self.experiment.cut_qz = cut_qz
 
         return True
-
+###
 
     def show_gisans_map(self):
         try:
