@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5.QtWidgets import QVBoxLayout, QDoubleSpinBox, QPushButton, QFormLayout, QMessageBox
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QDoubleSpinBox, QPushButton, QFormLayout, QMessageBox, QListWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QTableWidget
 from PyQt5.QtCore import Qt, pyqtSlot
 
 import numpy as np
@@ -307,12 +307,18 @@ class App(QWidget,FrozenClass):
         #self.top = 500
         self.width = 1500
         self.height = 1500
-        self.layout = QVBoxLayout()
+        self.layout = QHBoxLayout()
+        self.centralpanel = QVBoxLayout()
+        self.leftpanel = QVBoxLayout()
+        self.rightpanel = QVBoxLayout()
+        self.addExperimentInfo()
         self.minSpinBox = QDoubleSpinBox()
         self.maxSpinBox = QDoubleSpinBox()
         self.settings = Settings()
         self.experiment = Experiment()
         self.canvas = Canvas()
+
+
 
         self._freeze()
         self.initUI()
@@ -323,20 +329,59 @@ class App(QWidget,FrozenClass):
         #self.setGeometry(self.left, self.top, self.width, self.height)
         self.setLayout(self.layout)
         self.layout.setAlignment(Qt.AlignCenter)
+        self.addFileList()
         self.addWelcomeMessage()
         self.addCanvas()
         self.addMinMaxSpinBoxes()
-        self.addOpenFileButton()
+        self.addFunctionalityButtons()
+        self.addPanels()
         self.show()
         # self.openFileNamesDialog()
         # self.saveFileDialog()
 
 
-    def addOpenFileButton(self):
-        buttonOpenDialog = QPushButton("Press here")
-        buttonOpenDialog.clicked.connect(self.on_click)
-        self.layout.addWidget(buttonOpenDialog)
+    def addFileList(self):
+        fileList = QListWidget()
+        self.leftpanel.addWidget(QLabel("File:"))
+        self.leftpanel.addWidget(fileList)
         return
+
+
+
+    def addPanels(self):
+        self.layout.addLayout(self.leftpanel)
+        self.layout.addLayout(self.centralpanel)
+        self.layout.addLayout(self.rightpanel)
+        return
+
+
+    def addExperimentInfo(self):
+        infoTable = QTableWidget()
+        self.rightpanel.addWidget(QLabel("Info:"))
+        self.rightpanel.addWidget(infoTable)
+        return
+
+
+    def addFunctionalityButtons(self):
+        buttonOpenDialog = QPushButton("Press here")
+        buttonOpenDialog.clicked.connect(self.on_click_open_file)
+        self.leftpanel.addWidget(buttonOpenDialog)
+
+        buttonLogLinear = QPushButton("Log / Linear")
+        buttonLogLinear .clicked.connect(self.on_click)
+        self.rightpanel.addWidget(buttonLogLinear)
+
+        buttonSavePng = QPushButton("Save png")
+        buttonSavePng.clicked.connect(self.on_click)
+        self.rightpanel.addWidget(buttonSavePng)
+
+        buttonSaveAscii = QPushButton("Save ascii")
+        buttonSaveAscii.clicked.connect(self.on_click)
+        self.rightpanel.addWidget(buttonSaveAscii)
+
+        return
+
+
 
     @staticmethod
     def init_spinbox(spinbox, slot):
@@ -351,10 +396,10 @@ class App(QWidget,FrozenClass):
         self.init_spinbox(self.minSpinBox, self.on_value_change)
         self.init_spinbox(self.maxSpinBox, self.on_value_change)
         formLayout = QFormLayout()
-        formLayout.addRow(self.tr("&Give Min Value"), self.minSpinBox)
-        formLayout.addRow(self.tr("&Give Max Value"), self.maxSpinBox)
-        formLayout.setFormAlignment(Qt.AlignCenter)
-        self.layout.addLayout(formLayout)
+        formLayout.addRow(self.tr("&Min Intensity"), self.minSpinBox)
+        formLayout.addRow(self.tr("&Max Intensity"), self.maxSpinBox)
+        formLayout.setFormAlignment(Qt.AlignBottom)
+        self.rightpanel.addLayout(formLayout)
         return
 
 
@@ -367,17 +412,21 @@ class App(QWidget,FrozenClass):
         )
         message.setTextInteractionFlags(Qt.TextSelectableByMouse)
         message.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(message)
+        self.centralpanel.addWidget(message)
         return
 
     def addCanvas(self):
-        self.layout.addWidget(self.canvas)
+        self.centralpanel.addWidget(self.canvas)
         return
 
 
     @pyqtSlot()
     def on_click(self):
         print('PyQt5 button click')
+
+
+    @pyqtSlot()
+    def on_click_open_file(self):
         self.settings = Settings()
         self.doStuff()
 
