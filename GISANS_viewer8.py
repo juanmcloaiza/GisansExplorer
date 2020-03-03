@@ -1,10 +1,10 @@
 #!/bin/env python
 
 #Qt stuff:
-from PyQt5.QtWidgets import QMainWindow, QFrame, QToolButton
+from PyQt5.QtWidgets import QMainWindow, QFrame, QToolButton, QTableWidgetItem
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QDoubleSpinBox, QPushButton, QFormLayout, QMessageBox, QListWidget
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QTableWidget, QTabWidget
-from PyQt5.QtCore import Qt, pyqtSlot, QTimer
+from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 
 #plot stuff:
 import pyqtgraph as pg
@@ -57,43 +57,126 @@ class FrozenClass(object):
         self.__isfrozen = True
 
 
-#class Canvas(pg.GraphicsLayoutWidget):
-class Canvas(gl.GLViewWidget):
+class Canvas(pg.GraphicsLayoutWidget, FrozenClass):
+#class Canvas(gl.GLViewWidget):
 
     def __init__(self):
         super().__init__()
-        #self.w2 = self.addViewBox()
-        #self.w2.setAspectLocked(True)
 
+        self.p1 = self.addPlot(title="P1")
+        #self.p2 = self.addPlot(title="P2")
+        self.nextRow()
+        self.p3 = self.addPlot(title="P3")
+        self.p4 = self.addPlot(title="P4")
+        self.lrx = pg.LinearRegionItem()
+        self.lry = pg.LinearRegionItem(orientation=pg.LinearRegionItem.Horizontal)
+        self._freeze()
         #self.test()
+        
+
+    
+
+    def scatter(self, xvals, yvals, zvals,
+                      uvals, vvals,
+                      pvals, qvals, n=1000):
+        
+        if len(xvals) > n:
+            choice = np.random.choice(range(len(xvals)),n)
+            x = np.take(xvals, choice)
+            y = np.take(yvals, choice)
+            z = np.take(zvals, choice)
+        else:
+            n = len(xvals)
+            x = xvals
+            y = yvals
+            z = zvals
+
+        spots =  [{'x':x[i], 'y':y[i], 'brush':pg.mkColor(i)} for i in range(n)]
+        #spots = [{'x':x[i], 'y':y[i] } for i in range(n)]
+
+        #self.p3.plot(spots, pen=None, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
+        self.p3.plot(spots, pen=None, symbol='t', symbolPen=None, symbolSize=10)
+        self.p3.setLabel('left', "Y Axis", units='A')
+        self.p3.setLabel('bottom', "Y Axis", units='s')
+        #self.lrx.val#([0.5,0.7]) 
+        self.p3.addItem(self.lrx)
+        self.p3.addItem(self.lry)
+        
+
+        p1 = self.p1 
+        p1.plot(pvals, qvals, pen='b')#, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
+        #self.lrx.sigRegionChanged.connect(self.updatePlot1)
+        #p1.sigXRangeChanged.connect(self.updateRegion1)
+        #self.updatePlot1()
+
+        p4 = self.p4
+        p4.plot(uvals, vvals, pen='r')#None, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
+        #self.lry.sigRegionChanged.connect(self.updatePlot4)
+        #p4.sigXRangeChanged.connect(self.updateRegion4)
+        #self.updatePlot4()
+
 
         return
+
+    def updatePlot1(self):
+        self.p1.setXRange(*self.lrx.getRegion(), padding=0)
+
+
+    def updateRegion1(self):
+        self.lrx.setRegion(self.p1.getViewBox().viewRange()[0])
+
+
+    def updatePlot4(self):
+        self.p4.setYRange(*self.lry.getRegion(), padding=0)
+
+
+    def updateRegion4(self):
+        self.lry.setRegion(self.p4.getViewBox().viewRange()[0])
 
 
     def test(self):
         n = 1000
-        x = np.random.normal(size=n)
-        y = np.random.normal(size=n)
+        x = np.random.normal(0,1,size=n)
+        y = np.random.normal(1,3,size=n)
+        #x = np.random.uniform(-10,10,size=n)
+        #y = np.random.uniform(-10,10,size=n)
         X,Y = np.meshgrid(x,y)
-        c = x**2 + y**2
-        #self.scatter(x,y,c)
-        self.surface(x,y,c)
+        c = np.sin(x) * np.cos(y)#1/(x**2 + y**2)
+        u = np.linspace(-1,1)
+        v = np.sin(u) 
+        p = np.linspace(-3,3)
+        q = np.sin(p)
+        self.scatter(x,y,c,u,v,p,q)
+        #self.surface(x,y,c)
 
         return True
 
 
-    def scatter(self, xvals, yvals, zvals):
-        print("Scatter plot...")
-        n = len(xvals)
-        curve = pg.ScatterPlotItem(x=xvals, y=yvals, size=5, pen=pg.mkPen(None), pxMode=True)
-        spots = [{'pos': (xvals[i],yvals[i]), 'brush':pg.mkColor(zvals[i])} for i in range(n)]
-        #curve.addPoints(spots)
-        self.w2.addItem(curve)
-        return True
+    # def scatter(self, xvals, yvals, zvals):
+    #     print("Scatter plot...")
+    #     n = 10000
+    #     choice = np.random.choice(range(len(xvals)),n)
+    #     x = np.take(xvals, choice)
+    #     y = np.take(yvals, choice)
+    #     z = np.take(zvals, choice)
+
+    #     cmap = plt.get_cmap('jet')
+    #     minZ=np.min(z)
+    #     maxZ=np.max(z)
+    #     rgba_img = cmap(((z-minZ)/(maxZ -minZ)))
+    #     print(rgba_img)
+
+    #     #surf = gl.GLSurfacePlotItem(x=y, y=x, z=temp_z, colors = rgba_img )
+    #     curve = pg.ScatterPlotItem(x=x, y=y, size=5, pen=pg.mkPen(None), pxMode=True)
+    #     spots = [{'pos': (x[i],y[i]), 'brush':pg.mkColor(z[i])} for i in range(n)]
+    #     #spots = [{'pos': (x[i],y[i])} for i in range(n)]
+    #     curve.addPoints(spots)
+
+    #     self.w2.addItem(curve)
+    #     return True
 
     def surface(self, xvals, yvals, zvals):
 
-        ###
         traces = dict()
         w = self
         w.show()
@@ -119,7 +202,6 @@ class Canvas(gl.GLViewWidget):
         surf = gl.GLSurfacePlotItem(x=y, y=x, z=temp_z, colors = rgba_img )
 
         self.addItem(surf)
-        ###
         return True
 
 
@@ -130,8 +212,8 @@ class Experiment(FrozenClass):
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
-        self.qyc = 528 #530
-        self.qzc = 211 #220 #zc=512
+        self.qyc = 528 
+        self.qzc = 211 
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
@@ -144,10 +226,8 @@ class Experiment(FrozenClass):
         self.qyrange = []
         self.qzrange = []
 
-        self.cut_qy_xaxis = []
-        self.cut_qy = []
-        self.cut_qz_xaxis = []
-        self.cut_qz = []
+        self.cut_Iz = []
+        self.cut_Iy = []
 
         self._freeze()
 
@@ -196,30 +276,44 @@ class Settings(FrozenClass):
 
 
     def datFilePath(self):
+        if self.dataPath is None:
+            return None
         return os.path.join(self.dataPath,self.datFileName)
 
 
     def yamlFilePath(self):
+        if self.dataPath is None:
+            return None
         return os.path.join(self.dataPath,self.yamlFileName)
 
 
     def gzFilePath(self):
+        if self.dataPath is None:
+            return None
         return os.path.join(self.dataPath,self.gzFileName)
 
 
     def sensFilePath(self):
+        if self.dataPath is None:
+            return None
         return os.path.join(self.dataPath, self.sensFileName)
 
 
     def basename(self):
+        if self.dataPath is None:
+            return None
         return os.path.splitext(self.datFilePath())[0]
 
 
     def gisans_map_filepath(self):
+        if self.dataPath is None:
+            return None
         return self.basename()+"_GISANS.map"
 
 
     def gisans_cut_filepath(self, y_or_z = "z"):
+        if self.dataPath is None:
+            return None
         return os.path.join(self.basename(),f"_line_cut_q{y_or_z}.out")
 
 
@@ -237,30 +331,79 @@ class App(QMainWindow,FrozenClass):
     def addTab(self):
         self.myTabs.addTab()
 
+    @staticmethod
+    def handle_exception(e):
+        msg = (f"Exception: {e}\n")
+        msg += ("-"*60+"\n")
+        msg += traceback.format_exc()
+        msg += ("-"*60+"\n")
+        print(msg)
+        pop_up = QMessageBox()
+        pop_up.setWindowTitle(f"Exception: {e}\n")
+        pop_up.setText(msg)
+        pop_up.setIcon(QMessageBox.Critical)
+        x = pop_up.exec_()
+        return
+
+
 
 class MyTabs(QTabWidget,FrozenClass):
     def __init__(self):
         super().__init__()
-        self.tabButton = QToolButton()
+        self.tabButton_add = QToolButton()
+        self.tabButton_rmv = QToolButton()
+        self.frameList =[]
+        self.last_num = 0
         self.addTab()
         self.initCornerButton()
         self._freeze()
 
-###
     def initCornerButton(self):
-        #self.setCornerWidget(self.tabButton)
-        self.setCornerWidget(self.tabButton,corner=Qt.TopLeftCorner)#setCornerWidget(self.tabButton)
-        self.tabButton.setText('+')
-        font = self.tabButton.font()
+        self.setCornerWidget(self.tabButton_add,corner=Qt.TopLeftCorner)
+        self.tabButton_add.setText('+')
+        font = self.tabButton_add.font()
         font.setBold(True)
-        self.tabButton.setFont(font)
-        self.tabButton.clicked.connect(self.addTab)
-###
+        self.tabButton_add.setFont(font)
+        self.tabButton_add.clicked.connect(self.addTab)
+
+        self.setCornerWidget(self.tabButton_rmv,corner=Qt.TopRightCorner)
+        self.tabButton_rmv.setText('-')
+        font = self.tabButton_rmv.font()
+        font.setBold(True)
+        self.tabButton_rmv.setFont(font)
+        self.tabButton_rmv.clicked.connect(self.removeTab)
+        return
+
+
 
     def addTab(self):
         frame = MyFrame()
-        super().addTab(frame, "tab" + str(self.count()))
+        super().addTab(frame, "New Experiment " + str(1 + self.last_num))
+        self.setCurrentIndex(self.last_num)
+        self.last_num += 1
+        self.frameList.append(frame)
+
+        for i, f in enumerate(self.frameList):
+            name = f.settings.datFileName
+            if name is not None:
+                self.setTabText(i,name)
+
+
         return
+
+
+    def removeTab(self):
+        idx = self.currentIndex()
+        del self.frameList[idx]
+        super().removeTab(idx)
+        if len(self.frameList) == 0:
+            self.last_num = 0
+            self.addTab()
+
+        return
+
+
+
 
 
 
@@ -280,6 +423,7 @@ class MyFrame(QFrame,FrozenClass):
         self.infoTable = QTableWidget()
         self.fileList = QListWidget()
         self.tabs = QTabWidget()
+        self.finishedDoingStuff = pyqtSignal()
         self.initFrame()
         self._freeze()
 
@@ -312,6 +456,8 @@ class MyFrame(QFrame,FrozenClass):
 
     def addExperimentInfo(self):
         self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
+        self.infoTable.setColumnCount(1)
+        self.infoTable.horizontalHeader().hide()
         self.rightpanel.addWidget(QLabel("Info:"))
         self.rightpanel.addWidget(self.infoTable)
         return
@@ -385,6 +531,13 @@ class MyFrame(QFrame,FrozenClass):
     def on_click_open_file(self):
         self.settings = Settings()
         self.doStuff()
+        self.populateWidgets()
+        sum1 = self.experiment.I2d.sum()
+        sum2 = self.experiment.cut_Iy.sum()
+        sum3 = self.experiment.cut_Iz.sum()
+        print("If the following three sums are not equal, there's an error:")
+        print(sum1, sum2, sum3)
+
 
 
     @pyqtSlot()
@@ -403,10 +556,27 @@ class MyFrame(QFrame,FrozenClass):
             return fileName
         return None
 
+    def populateWidgets(self):
+        x = self.settings.datFileName
+        y = self.experiment.__dict__
+
+        for i, k in enumerate(y.keys()):
+            if k[0] == "_":
+                continue
+            item_k = QTableWidgetItem(str(k))
+            item_v = QTableWidgetItem(str(y[k]))
+            self.infoTable.insertRow(i)
+            self.infoTable.setVerticalHeaderItem(i,item_k) 
+            self.infoTable.setItem(i,0,item_v)
+
+        
+
+        return True
+
 
     def doStuff(self):
-        self.canvas.test()
-        return
+        #self.canvas.test()
+        #return
         if not self.read_cbar_min_max():
             return
         if not self.read_dat_file():
@@ -417,12 +587,14 @@ class MyFrame(QFrame,FrozenClass):
             return
         if not self.read_intensity_file():
             return
-        if not self.line_cut_y():
+        if not self.line_cut_at_constant_y():
             return
-        if not self.line_cut_z():
+        if not self.line_cut_at_constant_z():
             return
         if not self.show_gisans_map():
             return
+
+        self.finishedDoingStuff
         return
 
 
@@ -439,7 +611,7 @@ class MyFrame(QFrame,FrozenClass):
             print(f" Parsed {file_path}")
             return tf
         except Exception as e:
-            self.handle_exception(e)
+            App.handle_exception(e)
             return False
 
 
@@ -452,34 +624,21 @@ class MyFrame(QFrame,FrozenClass):
             print(f" Parsed {file_path}")
             return tf
         except Exception as e:
-            self.handle_exception(e)
+            App.handle_exception(e)
             return False
 
-
-    @staticmethod
-    def handle_exception(e):
-        msg = (f"Exception: {e}\n")
-        msg += ("-"*60+"\n")
-        msg += traceback.format_exc()
-        msg += ("-"*60+"\n")
-        print(msg)
-        # traceback.#.print_exc(file=sys.stdout)
-        pop_up = QMessageBox()
-        pop_up.setWindowTitle(f"Exception: {e}\n")
-        pop_up.setText(msg)
-        pop_up.setIcon(QMessageBox.Critical)
-        x = pop_up.exec_()
-        return
 
 
     def read_dat_file(self):
         # Open and read the dat file
-        #datFilePath = self.openFileNameDialog()
-        datFilePath = "/home/juan/Development/git/imagesNICOS/datafiles/p15347_00001341.dat"
+        datFilePath = self.openFileNameDialog()
+        #datFilePath = "/home/juan/Development/git/imagesNICOS/datafiles/p15347_00001341.dat"
         if datFilePath:
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
             self.settings.dataPath = path
+            self.fileList.addItem(path)
+            self.fileList.addItem(filename)
             return self.safe_parse(self.parse_dat, self.settings.datFilePath())
         return False
 
@@ -488,12 +647,14 @@ class MyFrame(QFrame,FrozenClass):
         # Open and read the yaml file
         yamlFileName = self.settings.yamlFileName
         if yamlFileName:
+            self.fileList.addItem(yamlFileName)
             return self.safe_parse(self.parse_yaml, self.settings.yamlFilePath())
         return False
 
 
     def read_sensitivity_file(self):
         if self.settings.sensFileName:
+            self.fileList.addItem(self.settings.sensFileName)
             fpath = self.settings.sensFilePath()
             func = self.parse_sensitivity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
@@ -502,6 +663,7 @@ class MyFrame(QFrame,FrozenClass):
 
     def read_intensity_file(self):
         if self.settings.gzFileName:
+            self.fileList.addItem(self.settings.gzFileName)
             fpath = self.settings.gzFilePath()
             func = self.parse_intensity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
@@ -612,84 +774,41 @@ class MyFrame(QFrame,FrozenClass):
         self.experiment.qz = qz
         self.experiment.I = I
         self.experiment.I2d = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
-        self.experiment.qyrange = np.flip(two_pi_over_lambda *  cos_alpha_f[jpix_range-pix0] * sin_2theta_f[ipix_range-pix0])
+        self.experiment.qyrange = (two_pi_over_lambda *  cos_alpha_f[jpix_range-pix0] * sin_2theta_f[ipix_range-pix0])
         self.experiment.qzrange = (two_pi_over_lambda * (sin_alpha_f[jpix_range-pix0] + sin_alpha_i))
 
         return True
 
 
-    def line_cut_y(self, dqzvalue=None, qzvalue=None):
-        print("Performing line cut y")
+    def line_cut_at_constant_y(self, dqyvalue=None, qyvalue=None):
+        print("Performing line cut at constant qy")
+        qzrange = self.experiment.qzrange
+        I = self.experiment.I
+        qz = self.experiment.qz
+        Iz = np.zeros(len(qzrange))
 
-        self.experiment.cut_qy_xaxis = np.linspace(-1,1)
-        self.experiment.cut_qy = 10 + np.sin(self.experiment.cut_qy_xaxis)
+        for idx, qzbin in enumerate(qzrange):
+            indices_for_which_qz_is_equal_to_something = np.argwhere(qz == qzbin)
+            Iz[idx] = np.take(I, indices_for_which_qz_is_equal_to_something).sum()
+
+        self.experiment.cut_Iz = Iz
         return True
-#####TODO
-        sens = self.experiment.sens
-        meansens = self.experiment.meansens
-        monitor = self.experiment.monitor_counts
-        inputd = self.experiment.inputd
-        two_pi_over_lambda = self.experiment.two_pi_over_lambda
-        sin_alpha_i = self.experiment.sin_alpha_i
-        cos_alpha_f = self.experiment.cos_alpha_f
-        sin_alpha_f = self.experiment.sin_alpha_f
-        sin_2theta_f = self.experiment.sin_2theta_f
 
-        cut_qy       = np.zeros(len(self.experiment.qz))
-        cut_qy_xaxis = np.zeros(len(self.experiment.qz))
 
-        dqzvalue =       0.05         if dqzvalue is None else dqzvalue
-        qzvalue  = self.experiment.qzc if  qzvalue is None else  qzvalue
+    def line_cut_at_constant_z(self, dqzvalue=None, qzvalue=None):
+        print("Performing line cut at constant qz")
+        qyrange = self.experiment.qyrange
+        I = self.experiment.I
+        qy = self.experiment.qy
+        Iy = np.zeros(len(qyrange))
 
-        for i in range(162, 863):
-            for j in range(162,863):
-                cut_qy_xaxis[i] = two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i)
-                cqz = two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i)
-#                if cqz >= (qzvalue - dqzvalue) and cqz <= (qzvalue + dqzvalue):
-                cut_qy[i] += (meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
+        for idx, qybin in enumerate(qyrange):
+            indices_for_which_qy_is_equal_to_something = np.argwhere(qy == qybin)
+            Iy[idx] = np.take(I, indices_for_which_qy_is_equal_to_something).sum()
 
-        self.experiment.cut_qy_xaxis = cut_qy_xaxis
-        self.experiment.cut_qy = cut_qy
-
+        self.experiment.cut_Iy = Iy
         return True
-######
 
-
-    def line_cut_z(self, dqyvalue=None, qyvalue=None):
-        print("Performing line cut z")
-
-        self.experiment.cut_qz_xaxis = np.linspace(-1,1)
-        self.experiment.cut_qz = 10 + np.cos(self.experiment.cut_qz_xaxis)
-        return True
-###TODO
-        sens = self.experiment.sens
-        meansens = self.experiment.meansens
-        monitor = self.experiment.monitor_counts
-        inputd = self.experiment.inputd
-        two_pi_over_lambda = self.experiment.two_pi_over_lambda
-        sin_alpha_i = self.experiment.sin_alpha_i
-        cos_alpha_f = self.experiment.cos_alpha_f
-        sin_alpha_f = self.experiment.sin_alpha_f
-        sin_2theta_f = self.experiment.sin_2theta_f
-
-        cut_qz       = np.zeros(len(self.experiment.qy))
-        cut_qz_xaxis = np.zeros(len(self.experiment.qy))
-
-        dqyvalue =       0.05         if dqyvalue is None else dqyvalue
-        qyvalue  = self.experiment.qyc if  qyvalue is None else  qyvalue
-
-        for i in range(162, 863):
-            for j in range(162,863):
-                cut_qz_xaxis[j] = two_pi_over_lambda * (sin_alpha_f(j) + sin_alpha_i)
-                cqy = two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i)
-                #if cqy >= (qyvalue - dqyvalue) and cqy <= (qyvalue + dqyvalue):
-                cut_qz[j] += (meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
-
-        self.experiment.cut_qz_xaxis = cut_qz_xaxis
-        self.experiment.cut_qz = cut_qz
-
-        return True
-###
 
     def show_gisans_map(self):
         try:
@@ -706,10 +825,10 @@ class MyFrame(QFrame,FrozenClass):
             self.canvas.scatter(self.experiment.qy,
                             self.experiment.qz,
                             self.experiment.I,
-                            #self.experiment.cut_qy_xaxis,
-                            #self.experiment.cut_qz_xaxis,
-                            #self.experiment.cut_qy,
-                            #self.experiment.cut_qz,
+                            self.experiment.qyrange,
+                            self.experiment.cut_Iy,
+                            self.experiment.qzrange,
+                            self.experiment.cut_Iz,
                             #vmin=min_value,
                             #vmax=max_value
                             )
