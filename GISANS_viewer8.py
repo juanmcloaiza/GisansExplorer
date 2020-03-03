@@ -1,13 +1,15 @@
 #!/bin/env python
 
 #Qt stuff:
-from PyQt5.QtWidgets import QMainWindow, QFrame
+from PyQt5.QtWidgets import QMainWindow, QFrame, QToolButton
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QDoubleSpinBox, QPushButton, QFormLayout, QMessageBox, QListWidget
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QTableWidget, QTabWidget
 from PyQt5.QtCore import Qt, pyqtSlot, QTimer
 
 #plot stuff:
 import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+import matplotlib.pyplot as plt
 
 import numpy as np
 import sys
@@ -55,12 +57,13 @@ class FrozenClass(object):
         self.__isfrozen = True
 
 
-class Canvas(pg.GraphicsLayoutWidget):
+#class Canvas(pg.GraphicsLayoutWidget):
+class Canvas(gl.GLViewWidget):
 
     def __init__(self):
-        pg.GraphicsLayoutWidget.__init__(self)
-        self.w2 = self.addViewBox()
-        self.w2.setAspectLocked(True)
+        super().__init__()
+        #self.w2 = self.addViewBox()
+        #self.w2.setAspectLocked(True)
 
         #self.test()
 
@@ -73,18 +76,50 @@ class Canvas(pg.GraphicsLayoutWidget):
         y = np.random.normal(size=n)
         X,Y = np.meshgrid(x,y)
         c = x**2 + y**2
-        self.scatter(x,y,c)
+        #self.scatter(x,y,c)
+        self.surface(x,y,c)
 
         return True
 
 
-    def scatter(self, xvals, yvals, cvals):
+    def scatter(self, xvals, yvals, zvals):
         print("Scatter plot...")
         n = len(xvals)
         curve = pg.ScatterPlotItem(x=xvals, y=yvals, size=5, pen=pg.mkPen(None), pxMode=True)
-        spots = [{'pos': (xvals[i],yvals[i]), 'brush':pg.mkColor(cvals[i])} for i in range(n)]
+        spots = [{'pos': (xvals[i],yvals[i]), 'brush':pg.mkColor(zvals[i])} for i in range(n)]
         #curve.addPoints(spots)
         self.w2.addItem(curve)
+        return True
+
+    def surface(self, xvals, yvals, zvals):
+
+        ###
+        traces = dict()
+        w = self
+        w.show()
+
+        gx = gl.GLGridItem()
+        gz = gl.GLGridItem()
+        w.addItem(gx)
+        w.addItem(gz)
+
+        y = np.linspace(-2*np.pi, 2*np.pi, 128)
+        print(y)
+        x = np.linspace(-2*np.pi, 2*np.pi, 128)
+        print(x)
+        X, Y = np.meshgrid(x,y)
+        temp_z = np.sin(X) * np.cos(Y)
+
+        cmap = plt.get_cmap('jet')
+
+        minZ=np.min(temp_z)
+        maxZ=np.max(temp_z)
+        rgba_img = cmap((temp_z-minZ)/(maxZ -minZ))
+
+        surf = gl.GLSurfacePlotItem(x=y, y=x, z=temp_z, colors = rgba_img )
+
+        self.addItem(surf)
+        ###
         return True
 
 
@@ -206,9 +241,21 @@ class App(QMainWindow,FrozenClass):
 class MyTabs(QTabWidget,FrozenClass):
     def __init__(self):
         super().__init__()
+        self.tabButton = QToolButton()
         self.addTab()
-        q = QTabWidget()
+        self.initCornerButton()
+        self._freeze()
 
+###
+    def initCornerButton(self):
+        #self.setCornerWidget(self.tabButton)
+        self.setCornerWidget(self.tabButton,corner=Qt.TopLeftCorner)#setCornerWidget(self.tabButton)
+        self.tabButton.setText('+')
+        font = self.tabButton.font()
+        font.setBold(True)
+        self.tabButton.setFont(font)
+        self.tabButton.clicked.connect(self.addTab)
+###
 
     def addTab(self):
         frame = MyFrame()
@@ -313,7 +360,7 @@ class MyFrame(QFrame,FrozenClass):
 
     def addWelcomeMessage(self):
         message = QLabel(
-            "" + 
+            "" +
             "GISANS viewer for MARIA data - Jan 2019\n"+
             "for questions contact a.koutsioumpas@fz_juelich.de\n"+
             "\n"
@@ -353,13 +400,13 @@ class MyFrame(QFrame,FrozenClass):
         # self.openFileNamesDialog()
         # self.saveFileDialog()
         if fileName:
-            return fileName 
+            return fileName
         return None
 
 
     def doStuff(self):
-        #self.canvas.test()
-        #return
+        self.canvas.test()
+        return
         if not self.read_cbar_min_max():
             return
         if not self.read_dat_file():
@@ -418,7 +465,7 @@ class MyFrame(QFrame,FrozenClass):
         print(msg)
         # traceback.#.print_exc(file=sys.stdout)
         pop_up = QMessageBox()
-        pop_up.setWindowTitle(f"Exception: {e}\n")   
+        pop_up.setWindowTitle(f"Exception: {e}\n")
         pop_up.setText(msg)
         pop_up.setIcon(QMessageBox.Critical)
         x = pop_up.exec_()
@@ -525,7 +572,7 @@ class MyFrame(QFrame,FrozenClass):
                 meansens += float(sens[i,j])
                 num += 1.0
         meansens=meansens/num
-        self.experiment.sens = sens 
+        self.experiment.sens = sens
         self.experiment.meansens = meansens
         return True
 
@@ -552,7 +599,7 @@ class MyFrame(QFrame,FrozenClass):
 
         with open(self.settings.gisans_map_filepath(), "w") as fp:
             for i in ipix_range:
-                for j in jpix_range: 
+                for j in jpix_range:
                     if float(sens[i,j]) > 0.0:
                         I[idx] = ((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
                         qy[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
@@ -561,9 +608,9 @@ class MyFrame(QFrame,FrozenClass):
                         idx += 1
 
         self.experiment.inputd = inputd
-        self.experiment.qy = qy 
+        self.experiment.qy = qy
         self.experiment.qz = qz
-        self.experiment.I = I 
+        self.experiment.I = I
         self.experiment.I2d = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
         self.experiment.qyrange = np.flip(two_pi_over_lambda *  cos_alpha_f[jpix_range-pix0] * sin_2theta_f[ipix_range-pix0])
         self.experiment.qzrange = (two_pi_over_lambda * (sin_alpha_f[jpix_range-pix0] + sin_alpha_i))
@@ -590,7 +637,7 @@ class MyFrame(QFrame,FrozenClass):
 
         cut_qy       = np.zeros(len(self.experiment.qz))
         cut_qy_xaxis = np.zeros(len(self.experiment.qz))
-        
+
         dqzvalue =       0.05         if dqzvalue is None else dqzvalue
         qzvalue  = self.experiment.qzc if  qzvalue is None else  qzvalue
 
@@ -603,7 +650,7 @@ class MyFrame(QFrame,FrozenClass):
 
         self.experiment.cut_qy_xaxis = cut_qy_xaxis
         self.experiment.cut_qy = cut_qy
-        
+
         return True
 ######
 
@@ -627,7 +674,7 @@ class MyFrame(QFrame,FrozenClass):
 
         cut_qz       = np.zeros(len(self.experiment.qy))
         cut_qz_xaxis = np.zeros(len(self.experiment.qy))
-        
+
         dqyvalue =       0.05         if dqyvalue is None else dqyvalue
         qyvalue  = self.experiment.qyc if  qyvalue is None else  qyvalue
 
@@ -637,7 +684,7 @@ class MyFrame(QFrame,FrozenClass):
                 cqy = two_pi_over_lambda * cos_alpha_f(j) * sin_2theta_f(i)
                 #if cqy >= (qyvalue - dqyvalue) and cqy <= (qyvalue + dqyvalue):
                 cut_qz[j] += (meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor)
-        
+
         self.experiment.cut_qz_xaxis = cut_qz_xaxis
         self.experiment.cut_qz = cut_qz
 
