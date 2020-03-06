@@ -7,9 +7,11 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFil
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
 
 #plot stuff:
-import pyqtgraph as pg
-import pyqtgraph.opengl as gl
+from matplotlib.ticker import NullFormatter
+import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 import numpy as np
 import sys
@@ -19,6 +21,150 @@ import gzip
 
 # Modules for profiling:
 import cProfile, pstats, io
+
+class Canvas(FigureCanvas):
+    def __init__(self, parent=None, width=1000, height=28):
+        # definitions for the axes
+        left, width = 0.1, 0.65
+        bottom, height = 0.1, 0.65
+        spacing = 0.005
+        height_hist = 0.2
+        width_cbar = 0.05
+
+        rect_histx = [left + height_hist + spacing, bottom, width, height_hist]
+        rect_histy = [left, bottom + height_hist + spacing, height_hist, width]
+        rect_scatter = [left + height_hist + spacing, bottom + height_hist + spacing, width, height]
+        rect_cbar = [left + height_hist + spacing + width + spacing, bottom + height_hist + spacing, width_cbar, height]
+
+        # start with a rectangular Figure
+        fig = plt.figure(figsize=(10, 10))
+        
+        ax_center = plt.axes(rect_scatter)
+        ax_center.set_xticks([])
+        ax_center.set_yticks([])
+#       ax_center.tick_params(direction='in', top=True, right=True)
+
+        ax_histx = plt.axes(rect_histx)
+#       ax_histx.tick_params(direction='in', labelbottom=False)
+
+        ax_histy = plt.axes(rect_histy)
+#       ax_histy.tick_params(direction='in', labelleft=False)
+
+        ax_cbar = plt.axes(rect_cbar)
+        
+       
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+        self.ax_center = ax_center
+        self.ax_histx = ax_histx
+        self.ax_histy = ax_histy
+        self.ax_cbar = ax_cbar
+        self.colorbar = None
+        #self.test()
+        return
+
+
+    def test(self):
+        x = np.linspace(1,10,1025)
+        y = np.linspace(3,7,1025)
+        X, Y = np.meshgrid(x, y)
+        R = np.sqrt(X**2 + Y**2)
+        T = np.arctan(Y/X)
+        Z = (10 + 1. / (1 + (X - x[512])**2 + (Y - y[512])**2))
+        xcut = 10**np.cos(x)
+        ycut = 10**np.sin(y)
+        self.my_plot(R, T, Z, x, xcut, y, ycut)
+        return True
+
+
+    def my_plot(self, x_grid, y_grid, z_vals, x_range, zx_vals, y_range, zy_vals):
+        print("generating figure...")
+
+        fig = self.figure
+        ax_center = self.ax_center
+        ax_histx = self.ax_histx
+        ax_histy = self.ax_histy
+        z_vals += 1e-10
+
+        vmin = np.min(z_vals)
+        vmax = np.max(z_vals)
+
+        zcontours = ax_center.contourf(z_vals, 255,
+                                        norm = LogNorm(),#vmin=vmin, vmax=vmax),
+                                        linewidths = 0,
+        )
+
+        xcontours = ax_center.contour(x_grid.T, 10, colors='black', linewidth=.5, )
+        ycontours = ax_center.contour(y_grid.T, 10, colors='black', linewidth=.5)
+        ax_center.clabel(xcontours, fontsize=20, inline=1)
+        ax_center.clabel(ycontours, fontsize=20, inline=1)
+
+        ax_histx.plot(x_range, zx_vals)
+        ax_histx.set_yscale('log')
+        ax_histx.set_xlim(x_range.min(), x_range.max())
+        
+        ax_histy.plot(zy_vals, y_range)
+        ax_histy.set_xscale('log')
+        ax_histy.set_ylim(y_range.min(), y_range.max())
+ 
+        ax_center.set_title("GISANS map")
+
+        # Now adding the colorbar
+        self.colorbar = self.figure.colorbar(zcontours, cax = self.ax_cbar)
+        self.colorbar.set_label("Intensity")
+        ax_histx.set_xlabel(r'$Q_{y}(\AA^{-1})$', fontsize = 20)
+        ax_histy.set_ylabel(r'$Q_{z}(\AA^{-1})$', fontsize = 20) 
+        self.draw()
+        print("Figure Generated")
+
+        return True
+
+
+    def scatter(self, xarr, yarr, Iarr, xcutaxis, ycutaxis, xcut, ycut, vmin = None, vmax = None):
+        print("generating figure...")
+        if vmin is None:
+            vmin = min(Iarr)
+
+        if vmax is None:
+            vmax = min(Iarr)
+
+        fig = self.figure
+        ax_center = self.ax_center
+        ax_histx = self.ax_histx
+        ax_histy = self.ax_histy
+        #choice_size = 1024
+        #idx = np.random.choice(range(len(xarr)), size=choice_size, replace=False)
+        x = xarr
+        y = yarr
+        I = Iarr
+
+        # the scatter plot:
+        im = ax_center.scatter(x, y, edgecolors='none', c=I, 
+                            norm = LogNorm(vmin=vmin, vmax=vmax),
+                            marker = '.')
+
+        # now determine nice limits by hand:
+        ax_center.set_xlim((x.min(), x.max()))
+        ax_center.set_ylim((y.min(), y.max()))
+
+        ax_histx.scatter(xcutaxis, xcut)
+        ax_histx.set_yscale('log')
+        ax_histx.set_xlim(ax_center.get_xlim())
+        
+        ax_histy.scatter(ycut, ycutaxis)
+        ax_histy.set_xscale('log')
+        ax_histy.set_ylim(ax_center.get_ylim())
+ 
+        ax_center.set_title("GISANS map")
+        self.colorbar = self.figure.colorbar(im)
+        self.colorbar.set_label("Intensity")
+        ax_center.set_xlabel(r'$Q_{y}(\AA^{-1})$')
+        ax_center.set_ylabel(r'$Q_{z}(\AA^{-1})$') 
+        print("Figure Generated")
+
+        return True
+
+
 
 def profile_dec(fnc):
     """
@@ -57,153 +203,6 @@ class FrozenClass(object):
         self.__isfrozen = True
 
 
-class Canvas(pg.GraphicsLayoutWidget, FrozenClass):
-#class Canvas(gl.GLViewWidget):
-
-    def __init__(self):
-        super().__init__()
-
-        self.p1 = self.addPlot(title="P1")
-        #self.p2 = self.addPlot(title="P2")
-        self.nextRow()
-        self.p3 = self.addPlot(title="P3")
-        self.p4 = self.addPlot(title="P4")
-        self.lrx = pg.LinearRegionItem()
-        self.lry = pg.LinearRegionItem(orientation=pg.LinearRegionItem.Horizontal)
-        self._freeze()
-        #self.test()
-        
-
-    
-
-    def scatter(self, xvals, yvals, zvals,
-                      uvals, vvals,
-                      pvals, qvals, n=1000):
-        
-        if len(xvals) > n:
-            choice = np.random.choice(range(len(xvals)),n)
-            x = np.take(xvals, choice)
-            y = np.take(yvals, choice)
-            z = np.take(zvals, choice)
-        else:
-            n = len(xvals)
-            x = xvals
-            y = yvals
-            z = zvals
-
-        spots =  [{'x':x[i], 'y':y[i], 'brush':pg.mkColor(i)} for i in range(n)]
-        #spots = [{'x':x[i], 'y':y[i] } for i in range(n)]
-
-        #self.p3.plot(spots, pen=None, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
-        self.p3.plot(spots, pen=None, symbol='t', symbolPen=None, symbolSize=10)
-        self.p3.setLabel('left', "Y Axis", units='A')
-        self.p3.setLabel('bottom', "Y Axis", units='s')
-        #self.lrx.val#([0.5,0.7]) 
-        self.p3.addItem(self.lrx)
-        self.p3.addItem(self.lry)
-        
-
-        p1 = self.p1 
-        p1.plot(pvals, qvals, pen='b')#, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
-        #self.lrx.sigRegionChanged.connect(self.updatePlot1)
-        #p1.sigXRangeChanged.connect(self.updateRegion1)
-        #self.updatePlot1()
-
-        p4 = self.p4
-        p4.plot(uvals, vvals, pen='r')#None, symbol='t', symbolPen=None, symbolSize=10, symbolBrush=(100, 100, 255, 50))
-        #self.lry.sigRegionChanged.connect(self.updatePlot4)
-        #p4.sigXRangeChanged.connect(self.updateRegion4)
-        #self.updatePlot4()
-
-
-        return
-
-    def updatePlot1(self):
-        self.p1.setXRange(*self.lrx.getRegion(), padding=0)
-
-
-    def updateRegion1(self):
-        self.lrx.setRegion(self.p1.getViewBox().viewRange()[0])
-
-
-    def updatePlot4(self):
-        self.p4.setYRange(*self.lry.getRegion(), padding=0)
-
-
-    def updateRegion4(self):
-        self.lry.setRegion(self.p4.getViewBox().viewRange()[0])
-
-
-    def test(self):
-        n = 1000
-        x = np.random.normal(0,1,size=n)
-        y = np.random.normal(1,3,size=n)
-        #x = np.random.uniform(-10,10,size=n)
-        #y = np.random.uniform(-10,10,size=n)
-        X,Y = np.meshgrid(x,y)
-        c = np.sin(x) * np.cos(y)#1/(x**2 + y**2)
-        u = np.linspace(-1,1)
-        v = np.sin(u) 
-        p = np.linspace(-3,3)
-        q = np.sin(p)
-        self.scatter(x,y,c,u,v,p,q)
-        #self.surface(x,y,c)
-
-        return True
-
-
-    # def scatter(self, xvals, yvals, zvals):
-    #     print("Scatter plot...")
-    #     n = 10000
-    #     choice = np.random.choice(range(len(xvals)),n)
-    #     x = np.take(xvals, choice)
-    #     y = np.take(yvals, choice)
-    #     z = np.take(zvals, choice)
-
-    #     cmap = plt.get_cmap('jet')
-    #     minZ=np.min(z)
-    #     maxZ=np.max(z)
-    #     rgba_img = cmap(((z-minZ)/(maxZ -minZ)))
-    #     print(rgba_img)
-
-    #     #surf = gl.GLSurfacePlotItem(x=y, y=x, z=temp_z, colors = rgba_img )
-    #     curve = pg.ScatterPlotItem(x=x, y=y, size=5, pen=pg.mkPen(None), pxMode=True)
-    #     spots = [{'pos': (x[i],y[i]), 'brush':pg.mkColor(z[i])} for i in range(n)]
-    #     #spots = [{'pos': (x[i],y[i])} for i in range(n)]
-    #     curve.addPoints(spots)
-
-    #     self.w2.addItem(curve)
-    #     return True
-
-    def surface(self, xvals, yvals, zvals):
-
-        traces = dict()
-        w = self
-        w.show()
-
-        gx = gl.GLGridItem()
-        gz = gl.GLGridItem()
-        w.addItem(gx)
-        w.addItem(gz)
-
-        y = np.linspace(-2*np.pi, 2*np.pi, 128)
-        print(y)
-        x = np.linspace(-2*np.pi, 2*np.pi, 128)
-        print(x)
-        X, Y = np.meshgrid(x,y)
-        temp_z = np.sin(X) * np.cos(Y)
-
-        cmap = plt.get_cmap('jet')
-
-        minZ=np.min(temp_z)
-        maxZ=np.max(temp_z)
-        rgba_img = cmap((temp_z-minZ)/(maxZ -minZ))
-
-        surf = gl.GLSurfacePlotItem(x=y, y=x, z=temp_z, colors = rgba_img )
-
-        self.addItem(surf)
-        return True
-
 
 class Experiment(FrozenClass):
     def __init__(self):
@@ -222,9 +221,9 @@ class Experiment(FrozenClass):
         self.I = []
         self.inputd = []
 
-        self.I2d = []
-        self.qyrange = []
-        self.qzrange = []
+        self.Imatrix = []
+        self.qymatrix = []
+        self.qzmatrix = []
 
         self.cut_Iz = []
         self.cut_Iy = []
@@ -232,6 +231,11 @@ class Experiment(FrozenClass):
         self._freeze()
 
         return
+
+
+        #sin_alpha_f(j)        = px_size*(j-zc)/np.sqrt(sdd*sdd+(px_size*(zc-j))*(px_size*(zc-j)))
+        #sin_2theta_f(i)       = px_size*(i-yc)/np.sqrt(sdd*sdd+(px_size*(yc-i))*(px_size*(yc-i)))
+        #cos_alpha_f(j)        = sdd/np.sqrt(sdd*sdd+(px_size*(zc-j))*(px_size*(zc-j)))
 
 
     @property
@@ -250,7 +254,7 @@ class Experiment(FrozenClass):
 
 
     def sin_2theta_f(self, pixel_i):
-        return 0.5755*(self.qyc-pixel_i)/np.sqrt(1990*1990+(0.5755*(self.qyc-pixel_i))*(0.5755*(self.qyc-pixel_i)))
+        return 0.5755*(pixel_i-self.qyc)/np.sqrt(1990*1990+(0.5755*(self.qyc-pixel_i))*(0.5755*(self.qyc-pixel_i)))
 
 
     def sin_alpha_f(self, pixel_j):
@@ -259,6 +263,7 @@ class Experiment(FrozenClass):
 
     def cos_alpha_f(self, pixel_j):
         return np.sqrt(1 - self.sin_alpha_f(pixel_j)**2)
+
 
 
 class Settings(FrozenClass):
@@ -532,7 +537,7 @@ class MyFrame(QFrame,FrozenClass):
         self.settings = Settings()
         self.doStuff()
         self.populateWidgets()
-        sum1 = self.experiment.I2d.sum()
+        sum1 = self.experiment.Imatrix.sum()
         sum2 = self.experiment.cut_Iy.sum()
         sum3 = self.experiment.cut_Iz.sum()
         print("If the following three sums are not equal, there's an error:")
@@ -587,10 +592,10 @@ class MyFrame(QFrame,FrozenClass):
             return
         if not self.read_intensity_file():
             return
-        if not self.line_cut_at_constant_y():
-            return
-        if not self.line_cut_at_constant_z():
-            return
+        #if not self.line_cut_at_constant_y():
+        #    return
+        #if not self.line_cut_at_constant_z():
+        #    return
         if not self.show_gisans_map():
             return
 
@@ -754,6 +759,7 @@ class MyFrame(QFrame,FrozenClass):
         cos_alpha_f = self.experiment.cos_alpha_f(jpix_range)
         sin_alpha_f = self.experiment.sin_alpha_f(jpix_range)
 
+
         qy = np.zeros(len(ipix_range)*len(jpix_range))
         qz = np.zeros(len(ipix_range)*len(jpix_range))
         I = np.zeros(len(ipix_range)*len(jpix_range))
@@ -773,23 +779,35 @@ class MyFrame(QFrame,FrozenClass):
         self.experiment.qy = qy
         self.experiment.qz = qz
         self.experiment.I = I
-        self.experiment.I2d = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
-        self.experiment.qyrange = (two_pi_over_lambda *  cos_alpha_f[jpix_range-pix0] * sin_2theta_f[ipix_range-pix0])
-        self.experiment.qzrange = (two_pi_over_lambda * (sin_alpha_f[jpix_range-pix0] + sin_alpha_i))
+
+        self.experiment.Imatrix = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
+        self.experiment.cut_Iz = self.experiment.Imatrix.sum(axis=1)
+        self.experiment.cut_Iy = self.experiment.Imatrix.sum(axis=0)
+
+        QY_i, QY_j = sin_2theta_f[ipix_range-pix0], cos_alpha_f[jpix_range-pix0]
+        QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
+        self.experiment.qymatrix = two_pi_over_lambda * QYmatrix
+        
+        QZ_j = sin_alpha_f[jpix_range-pix0]
+        QZ_i = np.ones(ipix_range.shape)
+        QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
+        self.experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
 
         return True
 
 
     def line_cut_at_constant_y(self, dqyvalue=None, qyvalue=None):
         print("Performing line cut at constant qy")
-        qzrange = self.experiment.qzrange
-        I = self.experiment.I
+        qzmatrix = self.experiment.qzmatrix
+        Imatrix = self.experiment.Imatrix
         qz = self.experiment.qz
-        Iz = np.zeros(len(qzrange))
+        qzunique = np.unique(qzmatrix)
+        Iz = np.zeros(qzunique.shape)
 
-        for idx, qzbin in enumerate(qzrange):
-            indices_for_which_qz_is_equal_to_something = np.argwhere(qz == qzbin)
-            Iz[idx] = np.take(I, indices_for_which_qz_is_equal_to_something).sum()
+
+        for idx, qzbin in enumerate(qzunique):
+            indices_for_which_qz_is_equal_to_something = np.argwhere(qzmatrix == qzbin)
+            Iz[idx] = np.take(Imatrix, indices_for_which_qz_is_equal_to_something).sum()
 
         self.experiment.cut_Iz = Iz
         return True
@@ -797,14 +815,15 @@ class MyFrame(QFrame,FrozenClass):
 
     def line_cut_at_constant_z(self, dqzvalue=None, qzvalue=None):
         print("Performing line cut at constant qz")
-        qyrange = self.experiment.qyrange
-        I = self.experiment.I
+        qymatrix = self.experiment.qymatrix
+        Imatrix = self.experiment.Imatrix
         qy = self.experiment.qy
-        Iy = np.zeros(len(qyrange))
+        qyunique = np.unique(qymatrix)
+        Iy = np.zeros(qyunique.shape)
 
-        for idx, qybin in enumerate(qyrange):
-            indices_for_which_qy_is_equal_to_something = np.argwhere(qy == qybin)
-            Iy[idx] = np.take(I, indices_for_which_qy_is_equal_to_something).sum()
+#        for idx, qybin in enumerate(np.unique(qymatrix)):
+#            indices_for_which_qy_is_equal_to_something = np.argwhere(qy == qybin)
+#            Iy[idx] = np.take(Imatrix, indices_for_which_qy_is_equal_to_something).sum()
 
         self.experiment.cut_Iy = Iy
         return True
@@ -822,21 +841,21 @@ class MyFrame(QFrame,FrozenClass):
             else:
                 max_value = self.settings.cbar_max
 
-            self.canvas.scatter(self.experiment.qy,
-                            self.experiment.qz,
-                            self.experiment.I,
-                            self.experiment.qyrange,
+            self.canvas.my_plot(
+                            self.experiment.qymatrix,
+                            self.experiment.qzmatrix,
+                            self.experiment.Imatrix,
+                            self.experiment.qymatrix.T[0],
                             self.experiment.cut_Iy,
-                            self.experiment.qzrange,
-                            self.experiment.cut_Iz,
-                            #vmin=min_value,
-                            #vmax=max_value
+                            self.experiment.qzmatrix[0],
+                            self.experiment.cut_Iz
                             )
         except Exception as e:
             App.handle_exception(e)
             return False
 
         return True
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
