@@ -40,8 +40,6 @@ class Canvas(FigureCanvas):
         fig = plt.figure(figsize=(10, 10))
         
         ax_center = plt.axes(rect_scatter)
-        ax_center.set_xticks([])
-        ax_center.set_yticks([])
 #       ax_center.tick_params(direction='in', top=True, right=True)
 
         ax_histx = plt.axes(rect_histx)
@@ -77,22 +75,32 @@ class Canvas(FigureCanvas):
         return True
 
 
-    def my_plot(self, x_grid, y_grid, z_vals, x_range, zx_vals, y_range, zy_vals):
+    def my_plot(self, x_grid, y_grid, z_vals, x_range, zx_vals, y_range, zy_vals, use_logscale="true"):
+        self.ax_center.cla()
+        self.ax_histx.cla()
+        self.ax_histy.cla()
+        self.ax_cbar.cla()
         print("generating figure...")
 
         fig = self.figure
         ax_center = self.ax_center
         ax_histx = self.ax_histx
         ax_histy = self.ax_histy
+
+        ax_center.set_xticks([])
+        ax_center.set_yticks([])
         z_vals += 1e-10
 
         vmin = np.min(z_vals)
         vmax = np.max(z_vals)
 
-        zcontours = ax_center.contourf(z_vals, 255,
-                                        norm = LogNorm(),#vmin=vmin, vmax=vmax),
-                                        linewidths = 0,
-        )
+
+        if use_logscale:
+            zcontours = ax_center.imshow(z_vals, norm = LogNorm())
+            ax_histx.set_yscale('log')
+            ax_histy.set_xscale('log')
+        else:
+            zcontours = ax_center.imshow(z_vals)
 
         xcontours = ax_center.contour(x_grid.T, 10, colors='black', linewidth=.5, )
         ycontours = ax_center.contour(y_grid.T, 10, colors='black', linewidth=.5)
@@ -100,11 +108,9 @@ class Canvas(FigureCanvas):
         ax_center.clabel(ycontours, fontsize=20, inline=1)
 
         ax_histx.plot(x_range, zx_vals)
-        ax_histx.set_yscale('log')
         ax_histx.set_xlim(x_range.min(), x_range.max())
         
         ax_histy.plot(zy_vals, y_range)
-        ax_histy.set_xscale('log')
         ax_histy.set_ylim(y_range.min(), y_range.max())
  
         ax_center.set_title("GISANS map")
@@ -163,6 +169,9 @@ class Canvas(FigureCanvas):
         print("Figure Generated")
 
         return True
+
+    def save_png(self,filepath):
+        self.figure.savefig(filepath)
 
 
 
@@ -275,6 +284,7 @@ class Settings(FrozenClass):
         self.sensFileName = "sensitivity_map"
         self.cbar_min = None
         self.cbar_max = None
+        self.use_logscale = True
 
         self._freeze()
         return
@@ -474,15 +484,15 @@ class MyFrame(QFrame,FrozenClass):
         self.leftpanel.addWidget(buttonOpenDialog)
 
         buttonLogLinear = QPushButton("Log / Linear")
-        buttonLogLinear .clicked.connect(self.on_click)
+        buttonLogLinear .clicked.connect(self.on_click_loglinear)
         self.rightpanel.addWidget(buttonLogLinear)
 
-        buttonSavePng = QPushButton("Save png")
-        buttonSavePng.clicked.connect(self.on_click)
+        buttonSavePng = QPushButton("Save png or pdf")
+        buttonSavePng.clicked.connect(self.on_click_save_png)
         self.rightpanel.addWidget(buttonSavePng)
 
         buttonSaveAscii = QPushButton("Save ascii")
-        buttonSaveAscii.clicked.connect(self.on_click)
+        buttonSaveAscii.clicked.connect(self.on_click_save_ascii)
         self.rightpanel.addWidget(buttonSaveAscii)
 
         return
@@ -528,8 +538,47 @@ class MyFrame(QFrame,FrozenClass):
 
 
     @pyqtSlot()
-    def on_click(self):
-        print('PyQt5 button click')
+    def on_click_loglinear(self):
+        self.settings.use_logscale = not self.settings.use_logscale
+        self.show_gisans_map()
+
+
+    @pyqtSlot()
+    def on_click_save_png(self):
+        try:
+            filepath = self.saveFileNameDialog()
+            if filepath is None:
+                return
+
+            extension = os.path.splitext(filepath)[-1]
+            if extension != ".pdf" and extension != ".png":
+                filepath += ".png"
+
+            self.canvas.save_png(filepath)
+            print(f"Figure saved: {filepath}")
+        except Exception as e:
+            App.handle_exception(e)
+
+
+    @pyqtSlot()
+    def on_click_save_ascii(self):
+        try:
+            filepath = self.saveFileNameDialog()
+            if filepath is None:
+                return
+
+            noextpath, ext = os.path.splitext(filepath)
+            if ext == '': ext = ".txt"
+            file_qz = noextpath+"_qz_"+ext
+            file_qy = noextpath+"_qy_"+ext
+            file_Iyz = noextpath+"_Iyz_"+ext
+            np.savetxt(file_qz, self.experiment.qzmatrix)
+            np.savetxt(file_qy, self.experiment.qymatrix)
+            np.savetxt(file_Iyz,  self.experiment.Imatrix)
+
+            print(f"Arrays saved:\n {file_qz}\n {file_qy}\n {file_Iyz}\n")
+        except Exception as e:
+            App.handle_exception(e)
 
 
     @pyqtSlot()
@@ -551,15 +600,25 @@ class MyFrame(QFrame,FrozenClass):
         return
 
 
+    def saveFileNameDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getSaveFileName(self,"Save File", "","All Files (*);;png file (*.png);;pdf file (*.pdf)", options=options)
+        if fileName:
+            return fileName
+        return None
+
     def openFileNameDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Measurement dat file (*.dat)", options=options)
         # self.openFileNamesDialog()
-        # self.saveFileDialog()
         if fileName:
             return fileName
         return None
+
+
+
 
     def populateWidgets(self):
         x = self.settings.datFileName
@@ -848,7 +907,8 @@ class MyFrame(QFrame,FrozenClass):
                             self.experiment.qymatrix.T[0],
                             self.experiment.cut_Iy,
                             self.experiment.qzmatrix[0],
-                            self.experiment.cut_Iz
+                            self.experiment.cut_Iz,
+                            use_logscale=self.settings.use_logscale 
                             )
         except Exception as e:
             App.handle_exception(e)
