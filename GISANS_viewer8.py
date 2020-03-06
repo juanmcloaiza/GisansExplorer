@@ -12,6 +12,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.widgets import RectangleSelector
 
 import numpy as np
 import sys
@@ -59,7 +60,34 @@ class Canvas(FigureCanvas):
         self.ax_cbar = ax_cbar
         self.colorbar = None
         #self.test()
+
+        ####
+       
+
+
+        ####
         return
+
+    
+    def toogle_selector(self, event):
+        print(' Key pressed.')
+        if event.key in ['Q', 'q'] and toggle_selector.RS.active:
+            print(' RectangleSelector deactivated.')
+            toggle_selector.RS.set_active(False)
+        if event.key in ['A', 'a'] and not toggle_selector.RS.active:
+            print(' RectangleSelector activated.')
+            toggle_selector.RS.set_active(True)
+
+
+    def line_select_callback(self, eclick, erelease):
+        x1, y1 = eclick.xdata, eclick.ydata
+        x2, y2 = erelease.xdata, erelease.ydata
+        print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
+        print(" The button you used were: %s %s" % (eclick.button, erelease.button))
+        self.x1, self.x2, self.y1, self.y2 = x1, x2, y1, y2
+        floor = int
+        self.ax_histx.plot(self.z_vals[floor(x1):floor(x2),floor(y1):floor(y2)].sum(axis=1))
+        self.ax_histy.plot(self.z_vals[floor(x1):floor(x2),floor(y1):floor(y2)].sum(axis=0))
 
 
     def test(self):
@@ -93,6 +121,7 @@ class Canvas(FigureCanvas):
 
         vmin = np.min(z_vals)
         vmax = np.max(z_vals)
+        self.z_vals = z_vals
 
 
         if use_logscale:
@@ -124,6 +153,15 @@ class Canvas(FigureCanvas):
         ax_histy.set_ylabel(r'$Q_{z}(\AA^{-1})$', fontsize = 20) 
         self.draw()
         print("Figure Generated")
+
+        self.rs = RectangleSelector(self.ax_center, self.line_select_callback,
+                                                drawtype='box', useblit=False,
+                                                button=[1, 3],  # don't use middle button
+                                                minspanx=5, minspany=5,
+                                                spancoords='pixels',
+                                                interactive=True)
+
+ 
 
         return True
 
@@ -535,6 +573,7 @@ class MyFrame(QFrame,FrozenClass):
 
 
     def addCanvas(self):
+        self.canvas.mpl_connect('key_press_event', self.canvas.toogle_selector)
         self.centralpanel.addWidget(self.canvas)
         return
 
