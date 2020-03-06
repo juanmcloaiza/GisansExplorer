@@ -108,10 +108,12 @@ class Canvas(FigureCanvas):
         ax_center.clabel(ycontours, fontsize=20, inline=1)
 
         ax_histx.plot(x_range, zx_vals)
+        ax_histx.set_xticks(xcontours.levels)
         ax_histx.set_xlim(x_range.min(), x_range.max())
         
         ax_histy.plot(zy_vals, y_range)
-        ax_histy.set_ylim(y_range.min(), y_range.max())
+        ax_histy.set_yticks(ycontours.levels)
+        ax_histy.set_ylim(y_range.max(), y_range.min())
  
         ax_center.set_title("GISANS map")
 
