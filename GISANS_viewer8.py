@@ -1,219 +1,28 @@
 #!/bin/env python
 
 #Qt stuff:
-from PyQt5.QtWidgets import QMainWindow, QFrame, QToolButton, QTableWidgetItem
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QDoubleSpinBox, QPushButton, QFormLayout, QMessageBox, QListWidget
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QTableWidget, QTabWidget
+import PyQt5.QtWidgets as qtw
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
+from PyQt5.QtGui import QValidator
 
 #plot stuff:
 from matplotlib.ticker import NullFormatter
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.widgets import RectangleSelector
+from matplotlib.figure import Figure
 
 import numpy as np
 import sys
 import os
+import re
 import traceback
 import gzip
 
 # Modules for profiling:
 import cProfile, pstats, io
-
-class Canvas(FigureCanvas):
-    def __init__(self, parent=None, width=1000, height=28):
-        # definitions for the axes
-        left, width = 0.1, 0.65
-        bottom, height = 0.1, 0.65
-        spacing = 0.005
-        height_hist = 0.2
-        width_cbar = 0.05
-
-        rect_histx = [left + height_hist + spacing, bottom, width, height_hist]
-        rect_histy = [left, bottom + height_hist + spacing, height_hist, width]
-        rect_scatter = [left + height_hist + spacing, bottom + height_hist + spacing, width, height]
-        rect_cbar = [left + height_hist + spacing + width + spacing, bottom + height_hist + spacing, width_cbar, height]
-
-        # start with a rectangular Figure
-        fig = plt.figure(figsize=(10, 10))
-        
-        ax_center = plt.axes(rect_scatter)
-#       ax_center.tick_params(direction='in', top=True, right=True)
-
-        ax_histx = plt.axes(rect_histx)
-#       ax_histx.tick_params(direction='in', labelbottom=False)
-
-        ax_histy = plt.axes(rect_histy)
-#       ax_histy.tick_params(direction='in', labelleft=False)
-
-        ax_cbar = plt.axes(rect_cbar)
-        
-       
-        FigureCanvas.__init__(self, fig)
-        self.setParent(parent)
-        self.ax_center = ax_center
-        self.ax_histx = ax_histx
-        self.ax_histy = ax_histy
-        self.ax_cbar = ax_cbar
-        self.colorbar = None
-        #self.test()
-
-        ####
-       
-
-
-        ####
-        return
-
-    
-    def toogle_selector(self, event):
-        print(' Key pressed.')
-        if event.key in ['Q', 'q'] and toggle_selector.RS.active:
-            print(' RectangleSelector deactivated.')
-            toggle_selector.RS.set_active(False)
-        if event.key in ['A', 'a'] and not toggle_selector.RS.active:
-            print(' RectangleSelector activated.')
-            toggle_selector.RS.set_active(True)
-
-
-    def line_select_callback(self, eclick, erelease):
-        x1, y1 = eclick.xdata, eclick.ydata
-        x2, y2 = erelease.xdata, erelease.ydata
-        print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
-        print(" The button you used were: %s %s" % (eclick.button, erelease.button))
-        self.x1, self.x2, self.y1, self.y2 = x1, x2, y1, y2
-        floor = int
-        self.ax_histx.plot(self.z_vals[floor(x1):floor(x2),floor(y1):floor(y2)].sum(axis=1))
-        self.ax_histy.plot(self.z_vals[floor(x1):floor(x2),floor(y1):floor(y2)].sum(axis=0))
-
-
-    def test(self):
-        x = np.linspace(1,10,1025)
-        y = np.linspace(3,7,1025)
-        X, Y = np.meshgrid(x, y)
-        R = np.sqrt(X**2 + Y**2)
-        T = np.arctan(Y/X)
-        Z = (10 + 1. / (1 + (X - x[512])**2 + (Y - y[512])**2))
-        xcut = 10**np.cos(x)
-        ycut = 10**np.sin(y)
-        self.my_plot(R, T, Z, x, xcut, y, ycut)
-        return True
-
-
-    def my_plot(self, x_grid, y_grid, z_vals, x_range, zx_vals, y_range, zy_vals, use_logscale="true"):
-        self.ax_center.cla()
-        self.ax_histx.cla()
-        self.ax_histy.cla()
-        self.ax_cbar.cla()
-        print("generating figure...")
-
-        fig = self.figure
-        ax_center = self.ax_center
-        ax_histx = self.ax_histx
-        ax_histy = self.ax_histy
-
-        ax_center.set_xticks([])
-        ax_center.set_yticks([])
-        z_vals += 1e-10
-
-        vmin = np.min(z_vals)
-        vmax = np.max(z_vals)
-        self.z_vals = z_vals
-
-
-        if use_logscale:
-            zcontours = ax_center.imshow(z_vals, norm = LogNorm())
-            ax_histx.set_yscale('log')
-            ax_histy.set_xscale('log')
-        else:
-            zcontours = ax_center.imshow(z_vals)
-
-        xcontours = ax_center.contour(x_grid.T, 10, colors='black', linewidth=.5, )
-        ycontours = ax_center.contour(y_grid.T, 10, colors='black', linewidth=.5)
-        ax_center.clabel(xcontours, fontsize=20, inline=1)
-        ax_center.clabel(ycontours, fontsize=20, inline=1)
-
-        ax_histx.plot(x_range, zx_vals)
-        ax_histx.set_xticks(xcontours.levels)
-        ax_histx.set_xlim(x_range.min(), x_range.max())
-        
-        ax_histy.plot(zy_vals, y_range)
-        ax_histy.set_yticks(ycontours.levels)
-        ax_histy.set_ylim(y_range.max(), y_range.min())
- 
-        ax_center.set_title("GISANS map")
-
-        # Now adding the colorbar
-        self.colorbar = self.figure.colorbar(zcontours, cax = self.ax_cbar)
-        self.colorbar.set_label("Intensity")
-        ax_histx.set_xlabel(r'$Q_{y}(\AA^{-1})$', fontsize = 20)
-        ax_histy.set_ylabel(r'$Q_{z}(\AA^{-1})$', fontsize = 20) 
-        self.draw()
-        print("Figure Generated")
-
-        self.rs = RectangleSelector(self.ax_center, self.line_select_callback,
-                                                drawtype='box', useblit=False,
-                                                button=[1, 3],  # don't use middle button
-                                                minspanx=5, minspany=5,
-                                                spancoords='pixels',
-                                                interactive=True)
-
- 
-
-        return True
-
-
-    def scatter(self, xarr, yarr, Iarr, xcutaxis, ycutaxis, xcut, ycut, vmin = None, vmax = None):
-        print("generating figure...")
-        if vmin is None:
-            vmin = min(Iarr)
-
-        if vmax is None:
-            vmax = min(Iarr)
-
-        fig = self.figure
-        ax_center = self.ax_center
-        ax_histx = self.ax_histx
-        ax_histy = self.ax_histy
-        #choice_size = 1024
-        #idx = np.random.choice(range(len(xarr)), size=choice_size, replace=False)
-        x = xarr
-        y = yarr
-        I = Iarr
-
-        # the scatter plot:
-        im = ax_center.scatter(x, y, edgecolors='none', c=I, 
-                            norm = LogNorm(vmin=vmin, vmax=vmax),
-                            marker = '.')
-
-        # now determine nice limits by hand:
-        ax_center.set_xlim((x.min(), x.max()))
-        ax_center.set_ylim((y.min(), y.max()))
-
-        ax_histx.scatter(xcutaxis, xcut)
-        ax_histx.set_yscale('log')
-        ax_histx.set_xlim(ax_center.get_xlim())
-        
-        ax_histy.scatter(ycut, ycutaxis)
-        ax_histy.set_xscale('log')
-        ax_histy.set_ylim(ax_center.get_ylim())
- 
-        ax_center.set_title("GISANS map")
-        self.colorbar = self.figure.colorbar(im)
-        self.colorbar.set_label("Intensity")
-        ax_center.set_xlabel(r'$Q_{y}(\AA^{-1})$')
-        ax_center.set_ylabel(r'$Q_{z}(\AA^{-1})$') 
-        print("Figure Generated")
-
-        return True
-
-    def save_png(self,filepath):
-        self.figure.savefig(filepath)
-
-
 
 def profile_dec(fnc):
     """
@@ -234,11 +43,81 @@ def profile_dec(fnc):
 
     return inner
 
+
 @profile_dec
 def profile_function_with_arguments(function, *args, **kwargs):
     return function(*args, **kwargs)
 
 
+#### sciSpinBox
+
+# Regular expression to find floats. Match groups are the whole string, the
+# whole coefficient, the decimal part of the coefficient, and the exponent
+# part.
+_float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
+
+def valid_float_string(string):
+    match = _float_re.search(string)
+    return match.groups()[0] == string if match else False
+
+
+class FloatValidator(QValidator):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def validate(self, string, position):
+        if valid_float_string(string):
+            return QValidator.Acceptable, string, position
+        if string == "" or string[position-1] in 'e.-+':
+            return QValidator.Intermediate, string, position
+        return QValidator.Invalid, string, position
+
+    def fixup(self, text):
+        match = _float_re.search(text)
+        return match.groups()[0] if match else ""
+
+
+class mySciSpinBox(qtw.QDoubleSpinBox):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setMinimum(-np.inf)
+        self.setMaximum(np.inf)
+        self.validator = FloatValidator()
+        self.setDecimals(10)
+
+    def validate(self, text, position):
+        try:
+            asdf = self.validator.validate(text, position)
+        except Exception as e:
+            App.handle_exception(e)
+        return asdf
+
+    def fixup(self, text):
+        return self.validator.fixup(text)
+
+    def valueFromText(self, text):
+        return float(text)
+
+    def textFromValue(self, value):
+        return format_float(value)
+
+    def stepBy(self, steps):
+        text = self.cleanText()
+        groups = _float_re.search(text).groups()
+        decimal = float(groups[1])
+        decimal += steps
+        new_string = "{:g}".format(decimal) + (groups[3] if groups[3] else "")
+        self.lineEdit().setText(new_string)
+
+
+def format_float(value):
+    """Modified form of the 'g' format specifier."""
+    string = "{:g}".format(value).replace("e+", "e")
+    string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
+    return string
+
+#### sciSpinBox end
 
 class FrozenClass(object):
     __isfrozen = False
@@ -253,6 +132,326 @@ class FrozenClass(object):
 
 
 
+
+class AreaSelector(FrozenClass):
+    def __init__(self, ax, line_select_callback):
+        self.ax = ax
+        self.rs = RectangleSelector(ax, line_select_callback,
+                                                drawtype='box' , useblit=False,
+                                                button=[1, 3],  # don't use middle button
+                                                minspanx=0, minspany=0,
+                                                spancoords='pixels',
+                                                interactive=True)
+
+
+    def __call__(self, event):
+        self.rs.update()
+        if self.ax == event.inaxes:
+            if event.key in ['Q', 'q']:
+                self.rs.to_draw.set_visible(False)
+                self.rs.set_active(False)
+            if event.key in ['A', 'a']:
+                self.rs.to_draw.set_visible(True)
+                self.rs.set_active(True)
+
+        return #__call__
+
+
+class PlotData(FrozenClass):
+    def __init__(self):
+        self.X = np.zeros((10,10))
+        self.Y = np.zeros((10,10))
+        self.Z = np.zeros((10,10))
+        self.Zzoom = np.zeros((10,10))
+        return
+
+
+class PlotParams(FrozenClass):
+    def __init__(self):
+        self.x1 = 0
+        self.x2 = 10
+        self.y1 = 0
+        self.y2 = 10
+
+        self.xmin = -1
+        self.xmax = 1
+        self.ymin = -1
+        self.ymax = 1
+
+        self.zmin = -1
+        self.zmax = 1
+
+        self.log_scale = False
+        self.reset_limits_required = True
+
+        self.title = ""
+        return
+
+
+class MyGraphView(qtw.QWidget):
+    finishedUpdating = pyqtSignal()
+    def __init__(self, graph_title, parent = None):
+        super(MyGraphView, self).__init__(parent)
+
+        self.graph_title = graph_title
+
+        self.dpi = 100
+        self.fig = Figure((10.0, 5.0), dpi = self.dpi, facecolor = (1,1,1), edgecolor = (0,0,0))
+        self.canvas = FigureCanvas(self.fig)
+        self.define_axes()
+
+        self.init_data_and_parameters()
+        self.init_xyzLabel()
+        #self.commands = MyGraphCommands(self.update_graph)
+        self.define_layout()
+        self.init_canvas_connections()
+        self.canvas.draw()
+        self.test_show()
+        return #__init__()
+
+
+    def init_xyzLabel(self):
+        self.xyzLabel = qtw.QLabel(self)
+        self.xyzLabel.setText("")
+        return #init_xyzLabel
+
+
+    def define_layout(self):
+        self.layout = qtw.QVBoxLayout()
+        self.layout.addWidget(self.xyzLabel)
+        self.layout.addWidget(self.canvas)
+        self.layout.setStretchFactor(self.canvas, 1)
+        self.setLayout(self.layout)
+        return #define_layout
+
+
+    def define_axes(self):
+        self.ax =  self.canvas.figure.add_axes([0.1,0.1,0.30,0.7])
+        self.cax = self.canvas.figure.add_axes([0.505,0.1,0.025,0.7])
+        self.zoom_ax = self.canvas.figure.add_axes([0.55,0.25,0.25,0.5])
+        self.xax = self.canvas.figure.add_axes([0.55,0.1,0.25,0.1])
+        self.yax = self.canvas.figure.add_axes([0.85,0.25,0.05,0.5])
+        self.area_selector = AreaSelector(self.ax, self.line_select_callback)
+        return #define_axes
+
+
+    def init_canvas_connections(self):
+        # connect mouse events to canvas
+        self.canvas.mpl_connect('scroll_event', self.on_mouse_wheel)
+        self.canvas.mpl_connect('key_press_event', self.area_selector)
+        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+        #self.canvas.mpl_connect('draw_event', self.area_selector.mycallback)
+        self.canvas.setFocusPolicy( Qt.ClickFocus)
+        self.canvas.setFocus()
+
+        return #init_canvas_connections
+
+
+    def init_data_and_parameters(self):
+        self.data = PlotData()
+        self.params = PlotParams()
+        return #init_data_and_parameters
+
+
+    def on_mouse_wheel(self, event):
+        if self.cax == event.inaxes:
+            if event.button == 'up':
+                func = lambda c: c**0.9 if self.params.log_scale else 0.9*c
+            elif event.button == 'down':
+                func = lambda c: c**1.1 if self.params.log_scale else 1.1*c
+            else:
+                return
+
+            vmin, vmax = (func(c) for c in self.cbar.get_clim())
+            print(vmin,vmax)
+            self.update_graph(zmin=vmin, zmax=vmax)
+        return #on_mouse_wheel
+
+
+    def on_mouse_move(self, event):
+        x, y = event.xdata,event.ydata
+        if x is None or y is None:
+            return
+        z = self.data.Z[int(y), int(x)]
+        self.xyzLabel.setText(f"(x, y; z) = ({x:3.2g}, {y:3.2g}; {z:3.2g})")
+        return #on_mouse_move
+
+
+    def line_select_callback(self, eclick, erelease):
+        x1, y1 = int(eclick.xdata), int(eclick.ydata)
+        x2, y2 = int(erelease.xdata), int(erelease.ydata)
+        print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
+        print(" The button you used were: %s %s" % (eclick.button, erelease.button))
+
+
+        self.update_graph(x1=x1, x2=x2, y1=y1, y2=y2)
+        return #line_select_callback
+
+
+    def update_data(self, **kwargs):
+        for k in self.data.__dict__.keys():
+            if k in kwargs.keys():
+                self.data.__setattr__(k,kwargs[k])
+        return #update_data
+
+
+    def update_params(self, **kwargs):
+        for k in self.params.__dict__.keys():
+            if k in kwargs.keys():
+                self.params.__setattr__(k,kwargs[k])
+
+        if self.params.reset_limits_required:
+            self.params.zmin = self.data.Z.min()
+            self.params.zmax = self.data.Z.max()
+            self.params.reset_limits_required = False
+        return #update_params
+
+
+    def update_axes(self, **kwargs):
+        self.update_ax(**kwargs)
+        self.update_cax()
+        self.update_zoom_ax()
+        self.update_xax()
+        self.update_yax()
+        return #update_axes
+
+
+    def update_graph(self, **kwargs):
+        self.canvas.figure.clear()
+        self.define_axes()
+        self.update_data(**kwargs)
+        self.update_params(**kwargs)
+        self.build_norm(**kwargs)
+        self.update_axes(**kwargs)
+        self.update_area_selector(**kwargs)
+        self.canvas.figure.suptitle(self.params.title)
+        self.canvas.draw()
+        self.save(**kwargs)
+        print(self.params.__dict__)
+        self.finishedUpdating.emit()
+        #cont_x = self.ax.contour(X,colors='k', linestyles='solid')
+        #cont_y = self.ax.contour(Y,colors='k', linestyles='solid')
+        return
+
+
+    def save(self, **kwargs):
+        savekey = "save_to_file"
+        if savekey in kwargs.keys():
+            filePath = kwargs[savekey]
+            extension = os.path.splitext(filePath)[-1]
+            if extension in [".png", ".pdf"]:
+                self.canvas.figure.savefig(filePath)
+            elif extension in [".txt"]:
+                np.savetxt(filePath,self.data.Z)
+            else:
+                raise NotImplementedError
+        return
+
+
+    def build_norm(self, **kwargs):
+        if self.params.log_scale:
+            self.take_care_of_negative_values()
+            self.norm = mpl.colors.LogNorm(vmin=self.params.zmin, vmax=self.params.zmax)
+        else:
+            self.norm = mpl.colors.Normalize(vmin=self.params.zmin, vmax=self.params.zmax)
+        return #build_norm
+
+
+    def take_care_of_negative_values(self):
+        if self.params.zmin <= 0:
+            self.params.zmin = np.abs(self.data.Z.mean()/1e3)
+        if self.params.zmax <= 0:
+            self.params.zmax = 1+np.abs(self.data.Z.mean()/1e3)
+        return #take_care_of_negative_values
+
+
+    def update_ax(self, **kwargs):
+        self.ax_imshow = self.ax.imshow(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        return #update_ax
+
+
+    def update_area_selector(self, **kwargs):
+        self.area_selector.rs.to_draw.set_visible(True)
+        self.area_selector.rs.extents = (self.params.x1, self.params.x2, self.params.y1, self.params.y2)
+        #self.area_selector.rs.update()
+        return #update_area_selector
+
+
+    def update_cax(self):
+        self.build_cbar()
+        return #update_cax
+
+    def update_zoom_ax(self):
+        x1, x2 = self.params.x1, self.params.x2
+        y1, y2 = self.params.y1, self.params.y2
+        self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
+        self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
+                                            extent=[x1, x2, y2, y1])
+        self.zoom_ax.set_aspect("auto")
+        self.zoom_ax.set_xticks([])
+        self.zoom_ax.set_yticks([])
+        return #update_zoom_ax
+
+
+    def update_xax(self):
+        if self.params.log_scale:
+            self.xax.set_yscale('log')
+
+        integration_x = self.data.Zzoom.sum(axis=0)
+        rangex = np.linspace(self.params.x1, self.params.x2, len(integration_x))
+        self.xax_line = self.xax.plot(rangex, integration_x)
+        self.xax.set_xlim((self.params.x1, self.params.x2))
+        self.xax.xaxis.set_ticks(np.floor(np.linspace(self.params.x1, self.params.x2, 5)))
+        zero = integration_x.min()
+        mu =  integration_x.mean()
+        sig = integration_x.std()
+        self.xax.set_yticks([zero, mu, mu+2*sig])
+        self.xax.yaxis.tick_right()
+        self.xax.grid(which='both', axis='both')#, xdata=rangex)
+        return #update_xax
+
+
+    def update_yax(self):
+        if self.params.log_scale:
+            self.yax.set_xscale('log')
+
+        integration_y =  self.data.Zzoom.sum(axis=1)
+        rangey = np.linspace(self.params.y2, self.params.y1, len(integration_y))
+        self.yax_line = self.yax.plot(np.flip(integration_y, axis=0), rangey)
+
+        self.yax.set_ylim((self.params.y2, self.params.y1))
+        self.yax.set_yticks(np.floor(np.linspace(self.params.y2, self.params.y1, 5)))
+        zero = integration_y.min()
+        mu =  integration_y.mean()
+        sig = integration_y.std()
+        self.yax.set_xticks([zero, mu, mu+2*sig])
+        #self.yax.locator_params(axis='x', numticks=3)
+        self.yax.yaxis.tick_right()
+        self.yax.xaxis.tick_top()
+        self.yax.tick_params(axis='x', labelrotation=270)
+        self.yax.grid(which='both', axis='both')#, xdata=rangex)
+        return #update_yax
+
+
+    def build_cbar(self):
+        self.cbar = self.canvas.figure.colorbar(self.ax_imshow, cax=self.cax, orientation='vertical', norm = self.norm)
+        self.cax.tick_params(axis='y', direction='in')
+        self.cax.yaxis.tick_left()
+        self.cbar.set_clim(self.norm.vmin, self.norm.vmax)
+        return #build_cbar
+
+
+    def test_show(self):
+        t = np.linspace(-np.pi,np.pi, 1025)
+        y = t#np.sin(t)
+        x = t#np.cos(t)
+        X, Y = np.meshgrid(x,y)
+        Z = np.sin(X) * np.cos(Y)
+        self.update_graph(Z = Z)
+        np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+        np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+        return
+
 class Experiment(FrozenClass):
     def __init__(self):
         self.selector_lambda = None
@@ -260,22 +459,22 @@ class Experiment(FrozenClass):
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
-        self.qyc = 528 
-        self.qzc = 211 
+        self.qyc = 528
+        self.qzc = 211
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
-        self.qy = []
-        self.qz = []
-        self.I = []
-        self.inputd = []
+        self.qy = np.asarray([])
+        self.qz = np.asarray([])
+        self.I = np.asarray([])
+        self.inputd = np.asarray([])
 
-        self.Imatrix = []
-        self.qymatrix = []
-        self.qzmatrix = []
+        self.Imatrix = np.asarray([])
+        self.qymatrix = np.asarray([])
+        self.qzmatrix = np.asarray([])
 
-        self.cut_Iz = []
-        self.cut_Iy = []
+        self.cut_Iz = np.asarray([])
+        self.cut_Iy = np.asarray([])
 
         self._freeze()
 
@@ -317,62 +516,58 @@ class Experiment(FrozenClass):
 
 class Settings(FrozenClass):
     def __init__(self):
-        self.dataPath = None
+        self.dataDirPath = None
         self.datFileName = None
         self.yamlFileName = None
         self.gzFileName = None
         self.sensFileName = "sensitivity_map"
-        self.cbar_min = None
-        self.cbar_max = None
-        self.use_logscale = True
-
         self._freeze()
         return
 
 
     def datFilePath(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataPath,self.datFileName)
+        return os.path.join(self.dataDirPath,self.datFileName)
 
 
     def yamlFilePath(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataPath,self.yamlFileName)
+        return os.path.join(self.dataDirPath,self.yamlFileName)
 
 
     def gzFilePath(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataPath,self.gzFileName)
+        return os.path.join(self.dataDirPath,self.gzFileName)
 
 
     def sensFilePath(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataPath, self.sensFileName)
+        return os.path.join(self.dataDirPath, self.sensFileName)
 
 
     def basename(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
         return os.path.splitext(self.datFilePath())[0]
 
 
     def gisans_map_filepath(self):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
         return self.basename()+"_GISANS.map"
 
 
     def gisans_cut_filepath(self, y_or_z = "z"):
-        if self.dataPath is None:
+        if self.dataDirPath is None:
             return None
         return os.path.join(self.basename(),f"_line_cut_q{y_or_z}.out")
 
 
-class App(QMainWindow,FrozenClass):
+class App(qtw.QMainWindow,FrozenClass):
     def __init__(self):
         super().__init__()
         self.title = 'Alexandros GISANS Viewer'
@@ -393,20 +588,20 @@ class App(QMainWindow,FrozenClass):
         msg += traceback.format_exc()
         msg += ("-"*60+"\n")
         print(msg)
-        pop_up = QMessageBox()
+        pop_up = qtw.QMessageBox()
         pop_up.setWindowTitle(f"Exception: {e}\n")
         pop_up.setText(msg)
-        pop_up.setIcon(QMessageBox.Critical)
+        pop_up.setIcon(qtw.QMessageBox.Critical)
         x = pop_up.exec_()
         return
 
 
 
-class MyTabs(QTabWidget,FrozenClass):
+class MyTabs(qtw.QTabWidget,FrozenClass):
     def __init__(self):
         super().__init__()
-        self.tabButton_add = QToolButton()
-        self.tabButton_rmv = QToolButton()
+        self.tabButton_add = qtw.QToolButton()
+        self.tabButton_rmv = qtw.QToolButton()
         self.frameList =[]
         self.last_num = 0
         self.addTab()
@@ -431,6 +626,7 @@ class MyTabs(QTabWidget,FrozenClass):
 
 
 
+    @pyqtSlot()
     def addTab(self):
         frame = MyFrame()
         super().addTab(frame, "New Experiment " + str(1 + self.last_num))
@@ -447,6 +643,7 @@ class MyTabs(QTabWidget,FrozenClass):
         return
 
 
+    @pyqtSlot()
     def removeTab(self):
         idx = self.currentIndex()
         del self.frameList[idx]
@@ -462,23 +659,22 @@ class MyTabs(QTabWidget,FrozenClass):
 
 
 
-class MyFrame(QFrame,FrozenClass):
+class MyFrame(qtw.QFrame,FrozenClass):
 
     def __init__(self):
         super().__init__()
-        self.layout = QHBoxLayout()
-        self.centralpanel = QVBoxLayout()
-        self.leftpanel = QVBoxLayout()
-        self.rightpanel = QVBoxLayout()
-        self.minSpinBox = QDoubleSpinBox()
-        self.maxSpinBox = QDoubleSpinBox()
+        self.layout = qtw.QHBoxLayout()
+        self.centralpanel = qtw.QVBoxLayout()
+        self.leftpanel = qtw.QVBoxLayout()
+        self.rightpanel = qtw.QVBoxLayout()
+        self.minSpinBox = mySciSpinBox()
+        self.maxSpinBox = mySciSpinBox()
         self.settings = Settings()
         self.experiment = Experiment()
-        self.canvas = Canvas()
-        self.infoTable = QTableWidget()
-        self.fileList = QListWidget()
-        self.tabs = QTabWidget()
-        self.finishedDoingStuff = pyqtSignal()
+        self.graphView = MyGraphView("Title")
+        self.infoTable = qtw.QTableWidget()
+        self.fileList = qtw.QListWidget()
+        self.tabs = qtw.QTabWidget()
         self.initFrame()
         self._freeze()
 
@@ -488,16 +684,16 @@ class MyFrame(QFrame,FrozenClass):
         self.addExperimentInfo()
         self.addFileList()
         self.addWelcomeMessage()
-        self.addCanvas()
         self.addMinMaxSpinBoxes()
         self.addFunctionalityButtons()
+        self.addCanvas()
         self.addPanels()
         self.setLayout(self.layout)
 
 
     def addFileList(self):
         self.fileList.setMaximumWidth(self.fileList.width()/2.)
-        self.leftpanel.addWidget(QLabel("File:"))
+        self.leftpanel.addWidget(qtw.QLabel("File:"))
         self.leftpanel.addWidget(self.fileList)
         return
 
@@ -513,92 +709,78 @@ class MyFrame(QFrame,FrozenClass):
         self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
         self.infoTable.setColumnCount(1)
         self.infoTable.horizontalHeader().hide()
-        self.rightpanel.addWidget(QLabel("Info:"))
+        self.rightpanel.addWidget(qtw.QLabel("Info:"))
         self.rightpanel.addWidget(self.infoTable)
         return
 
 
     def addFunctionalityButtons(self):
-        buttonOpenDialog = QPushButton("Press here")
+        buttonOpenDialog = qtw.QPushButton("Press here")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
         self.leftpanel.addWidget(buttonOpenDialog)
 
-        buttonLogLinear = QPushButton("Log / Linear")
+        buttonLogLinear = qtw.QPushButton("Log / Linear")
         buttonLogLinear .clicked.connect(self.on_click_loglinear)
         self.rightpanel.addWidget(buttonLogLinear)
 
-        buttonSavePng = QPushButton("Save png or pdf")
+        buttonSavePng = qtw.QPushButton("Save png or pdf")
         buttonSavePng.clicked.connect(self.on_click_save_png)
         self.rightpanel.addWidget(buttonSavePng)
 
-        buttonSaveAscii = QPushButton("Save ascii")
+        buttonSaveAscii = qtw.QPushButton("Save ascii")
         buttonSaveAscii.clicked.connect(self.on_click_save_ascii)
         self.rightpanel.addWidget(buttonSaveAscii)
 
         return
 
 
+    @pyqtSlot()
+    def on_click_open_file(self):
+        try:
+            self.settings = Settings()
+            self.doStuff()
+            sum1 = self.experiment.Imatrix.sum()
+            sum2 = self.experiment.cut_Iy.sum()
+            sum3 = self.experiment.cut_Iz.sum()
+            print("If the following three sums are not equal, there's an error:")
+            print(sum1, sum2, sum3)
+        except Exception as e:
+            App.handle_exception(e)
 
-    @staticmethod
-    def init_spinbox(spinbox, slot):
-        spinbox.setMinimum(-1.0)
-        spinbox.setMaximum(1000000)
-        spinbox.setValue(-1.0)
-        spinbox.valueChanged.connect(slot)
-        return
-
-
-    def addMinMaxSpinBoxes(self):
-        self.init_spinbox(self.minSpinBox, self.on_value_change)
-        self.init_spinbox(self.maxSpinBox, self.on_value_change)
-        formLayout = QFormLayout()
-        formLayout.addRow(self.tr("&Min Intensity"), self.minSpinBox)
-        formLayout.addRow(self.tr("&Max Intensity"), self.maxSpinBox)
-        formLayout.setFormAlignment(Qt.AlignBottom)
-        self.rightpanel.addLayout(formLayout)
-        return
-
-
-    def addWelcomeMessage(self):
-        message = QLabel(
-            "" +
-            "GISANS viewer for MARIA data - Jan 2019\n"+
-            "for questions contact a.koutsioumpas@fz_juelich.de\n"+
-            "\n"
-        )
-        message.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        message.setAlignment(Qt.AlignCenter)
-        self.centralpanel.addWidget(message)
-        return
-
-
-    def addCanvas(self):
-        self.canvas.mpl_connect('key_press_event', self.canvas.toogle_selector)
-        self.centralpanel.addWidget(self.canvas)
-        return
 
 
     @pyqtSlot()
     def on_click_loglinear(self):
-        self.settings.use_logscale = not self.settings.use_logscale
-        self.show_gisans_map()
+        self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=True)
+        return
 
 
     @pyqtSlot()
     def on_click_save_png(self):
         try:
-            filepath = self.saveFileNameDialog()
-            if filepath is None:
-                return
 
-            extension = os.path.splitext(filepath)[-1]
-            if extension != ".pdf" and extension != ".png":
-                filepath += ".png"
+            fmt_choices = {"All Files(*)":".png", #default
+                            "png (*.png)":".png",
+                            "pdf (*.pdf)": ".pdf",
+                            "ascii (*.txt)": ".txt"}
+            choices_str = ";;".join([]+[k for k in fmt_choices.keys()])
+            options = qtw.QFileDialog.Options()
+            options |= qtw.QFileDialog.DontUseNativeDialog
+            filePath, fmtChoice = qtw.QFileDialog.getSaveFileName(self,"Save File", "",
+                                                          choices_str, options=options)
+            if not filePath:
+                return None
 
-            self.canvas.save_png(filepath)
-            print(f"Figure saved: {filepath}")
+            extension = os.path.splitext(filePath)[-1]
+            if extension not in fmt_choices.values():
+                extension = fmt_choices[fmtChoice]
+                filePath+=extension
+
+            self.graphView.update_graph(save_to_file=filePath)
+            print(f"Figure saved: {filePath}")
         except Exception as e:
             App.handle_exception(e)
+        return #on_click_save_png
 
 
     @pyqtSlot()
@@ -623,67 +805,113 @@ class MyFrame(QFrame,FrozenClass):
 
 
     @pyqtSlot()
-    def on_click_open_file(self):
-        self.settings = Settings()
-        self.doStuff()
-        self.populateWidgets()
-        sum1 = self.experiment.Imatrix.sum()
-        sum2 = self.experiment.cut_Iy.sum()
-        sum3 = self.experiment.cut_Iz.sum()
-        print("If the following three sums are not equal, there's an error:")
-        print(sum1, sum2, sum3)
-
-
-
-    @pyqtSlot()
-    def on_value_change(self):
-        pass
+    def on_spinbox_edit(self):
+        try:
+            self.graphView.update_graph(zmax=self.maxSpinBox.value(), zmin=self.minSpinBox.value())
+        except Exception as e:
+            App.handle_exception(e)
         return
 
 
+    @pyqtSlot()
+    def on_graph_updated(self):
+        try:
+            self.minSpinBox.setValue(self.graphView.params.zmin)
+            self.maxSpinBox.setValue(self.graphView.params.zmax)
+        except Exception as e:
+            App.handle_exception(e)
+        return
+
+
+
+
+
+
+    @staticmethod
+    def init_spinbox(spinbox, slot):
+        spinbox.editingFinished.connect(slot)
+        return
+
+
+    def addMinMaxSpinBoxes(self):
+        self.init_spinbox(self.minSpinBox, self.on_spinbox_edit)
+        self.init_spinbox(self.maxSpinBox, self.on_spinbox_edit)
+        formLayout = qtw.QFormLayout()
+        formLayout.addRow(self.tr("&Min Intensity"), self.minSpinBox)
+        formLayout.addRow(self.tr("&Max Intensity"), self.maxSpinBox)
+        formLayout.setFormAlignment(Qt.AlignBottom)
+        self.rightpanel.addLayout(formLayout)
+        return
+
+
+    def addWelcomeMessage(self):
+        message = qtw.QLabel(
+            "" +
+            "GISANS viewer for MARIA data - Jan 2019\n"+
+            "for questions contact a.koutsioumpas@fz_juelich.de\n"+
+            "\n"
+        )
+        message.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        message.setAlignment(Qt.AlignCenter)
+        self.centralpanel.addWidget(message)
+        return
+
+
+    def addCanvas(self):
+        self.centralpanel.addWidget(self.graphView)
+        self.graphView.finishedUpdating.connect(self.on_graph_updated)
+        self.graphView.update_graph()
+        return
+
     def saveFileNameDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self,"Save File", "","All Files (*);;png file (*.png);;pdf file (*.pdf)", options=options)
-        if fileName:
-            return fileName
+        try:
+            options = qtw.QFileDialog.Options()
+            options |= qtw.QFileDialog.DontUseNativeDialog
+            fileName, _ = qtw.QFileDialog.getSaveFileName(self,"Save File", "","All Files (*);;png file (*.png);;pdf file (*.pdf)", options=options)
+            if fileName:
+                return fileName
+        except Exception as e:
+            App.handle_exception(e)
         return None
 
     def openFileNameDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Measurement dat file (*.dat)", options=options)
-        # self.openFileNamesDialog()
-        if fileName:
-            return fileName
+        try:
+            options = qtw.QFileDialog.Options()
+            options |= qtw.QFileDialog.DontUseNativeDialog
+            fileName, _ = qtw.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Measurement dat file (*.dat)", options=options)
+            # self.openFileNamesDialog()
+            if fileName:
+                return fileName
+        except Exception as e:
+            App.handle_exception(e)
         return None
 
 
 
 
-    def populateWidgets(self):
+
+    def update_widgets(self):
         x = self.settings.datFileName
         y = self.experiment.__dict__
 
         for i, k in enumerate(y.keys()):
             if k[0] == "_":
                 continue
-            item_k = QTableWidgetItem(str(k))
-            item_v = QTableWidgetItem(str(y[k]))
+            item_k = qtw.QTableWidgetItem(str(k))
+            item_v = qtw.QTableWidgetItem(str(y[k]))
             self.infoTable.insertRow(i)
-            self.infoTable.setVerticalHeaderItem(i,item_k) 
+            self.infoTable.setVerticalHeaderItem(i,item_k)
             self.infoTable.setItem(i,0,item_v)
 
-        
+        self.minSpinBox.setValue(self.graphView.params.zmin)
+        self.maxSpinBox.setValue(self.graphView.params.zmax)
 
         return True
 
 
     def doStuff(self):
-        #self.canvas.test()
+        #self.graphView.test()
         #return
-        if not self.read_cbar_min_max():
-            return
         if not self.read_dat_file():
             return
         if not self.read_yaml_file():
@@ -696,17 +924,9 @@ class MyFrame(QFrame,FrozenClass):
         #    return
         #if not self.line_cut_at_constant_z():
         #    return
-        if not self.show_gisans_map():
+        if not self.update_gui():
             return
-
-        self.finishedDoingStuff
         return
-
-
-    def read_cbar_min_max(self):
-        self.settings.cbar_min = self.minSpinBox.value()
-        self.settings.cbar_max = self.maxSpinBox.value()
-        return True
 
 
     def safe_parse(self, parse_func, file_path):
@@ -741,7 +961,7 @@ class MyFrame(QFrame,FrozenClass):
         if datFilePath:
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
-            self.settings.dataPath = path
+            self.settings.dataDirPath = path
             self.fileList.addItem(path)
             self.fileList.addItem(filename)
             return self.safe_parse(self.parse_dat, self.settings.datFilePath())
@@ -887,7 +1107,7 @@ class MyFrame(QFrame,FrozenClass):
         QY_i, QY_j = sin_2theta_f[ipix_range-pix0], cos_alpha_f[jpix_range-pix0]
         QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
         self.experiment.qymatrix = two_pi_over_lambda * QYmatrix
-        
+
         QZ_j = sin_alpha_f[jpix_range-pix0]
         QZ_i = np.ones(ipix_range.shape)
         QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
@@ -929,28 +1149,14 @@ class MyFrame(QFrame,FrozenClass):
         return True
 
 
-    def show_gisans_map(self):
+    def update_gui(self):
         try:
-            if self.settings.cbar_min < 0:
-                min_value = min(self.experiment.I)+float(1)/float(self.experiment.monitor_counts)
-            else:
-                min_value = self.settings.cbar_min
-
-            if self.settings.cbar_max < 0:
-                max_value=max(self.experiment.I)
-            else:
-                max_value = self.settings.cbar_max
-
-            self.canvas.my_plot(
-                            self.experiment.qymatrix,
-                            self.experiment.qzmatrix,
-                            self.experiment.Imatrix,
-                            self.experiment.qymatrix.T[0],
-                            self.experiment.cut_Iy,
-                            self.experiment.qzmatrix[0],
-                            self.experiment.cut_Iz,
-                            use_logscale=self.settings.use_logscale 
+            self.graphView.update_graph(
+                            Y = self.experiment.qymatrix,
+                            X = self.experiment.qzmatrix,
+                            Z = self.experiment.Imatrix,
                             )
+            self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
             return False
@@ -959,7 +1165,7 @@ class MyFrame(QFrame,FrozenClass):
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    app = qtw.QApplication(sys.argv)
     ex = App()
     #sys.exit(app.exec_())
     x = profile_function_with_arguments(app.exec_)
