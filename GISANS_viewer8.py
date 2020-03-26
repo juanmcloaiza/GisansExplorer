@@ -162,6 +162,9 @@ class PlotData(FrozenClass):
         self.X = np.zeros((10,10))
         self.Y = np.zeros((10,10))
         self.Z = np.zeros((10,10))
+
+        self.Xzoom = np.zeros((10,10))
+        self.Yzoom = np.zeros((10,10))
         self.Zzoom = np.zeros((10,10))
         return
 
@@ -256,14 +259,14 @@ class MyGraphView(qtw.QWidget):
     def on_mouse_wheel(self, event):
         if self.cax == event.inaxes:
             if event.button == 'up':
-                func = lambda c: c**0.9 if self.params.log_scale else 0.9*c
+                func = lambda c: (np.sign(c) * abs(c)**0.9) if self.params.log_scale else 0.9*c
             elif event.button == 'down':
-                func = lambda c: c**1.1 if self.params.log_scale else 1.1*c
+                func = lambda c: (np.sign(c) * abs(c)**1.1) if self.params.log_scale else 1.1*c
             else:
                 return
 
             vmin, vmax = (func(c) for c in self.cbar.get_clim())
-            print(vmin,vmax)
+            print("Rescaling colorbar:", vmin,vmax)
             self.update_graph(zmin=vmin, zmax=vmax)
         return #on_mouse_wheel
 
@@ -282,8 +285,6 @@ class MyGraphView(qtw.QWidget):
         x2, y2 = int(erelease.xdata), int(erelease.ydata)
         print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
         print(" The button you used were: %s %s" % (eclick.button, erelease.button))
-
-
         self.update_graph(x1=x1, x2=x2, y1=y1, y2=y2)
         return #line_select_callback
 
@@ -329,8 +330,6 @@ class MyGraphView(qtw.QWidget):
         self.save(**kwargs)
         print(self.params.__dict__)
         self.finishedUpdating.emit()
-        #cont_x = self.ax.contour(X,colors='k', linestyles='solid')
-        #cont_y = self.ax.contour(Y,colors='k', linestyles='solid')
         return
 
 
@@ -350,8 +349,10 @@ class MyGraphView(qtw.QWidget):
 
     def build_norm(self, **kwargs):
         if self.params.log_scale:
-            self.take_care_of_negative_values()
-            self.norm = mpl.colors.LogNorm(vmin=self.params.zmin, vmax=self.params.zmax)
+            #self.take_care_of_negative_values()
+            #self.norm = mpl.colors.LogNorm(vmin=self.params.zmin, vmax=self.params.zmax)
+            thres = np.abs(self.data.Z.std()/1000)
+            self.norm = mpl.colors.SymLogNorm(vmin=self.params.zmin, vmax=self.params.zmax, linthresh=thres)
         else:
             self.norm = mpl.colors.Normalize(vmin=self.params.zmin, vmax=self.params.zmax)
         return #build_norm
@@ -367,6 +368,8 @@ class MyGraphView(qtw.QWidget):
 
     def update_ax(self, **kwargs):
         self.ax_imshow = self.ax.imshow(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.cont_x = self.ax.contour(self.data.X,colors='k', linestyles='solid')
+        self.cont_y = self.ax.contour(self.data.Y,colors='k', linestyles='solid')
         return #update_ax
 
 
@@ -381,12 +384,15 @@ class MyGraphView(qtw.QWidget):
         self.build_cbar()
         return #update_cax
 
+
     def update_zoom_ax(self):
         x1, x2 = self.params.x1, self.params.x2
         y1, y2 = self.params.y1, self.params.y2
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
+
+        self.params.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
         self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
-                                            extent=[x1, x2, y2, y1])
+                                            extent=self.params.zoom_extent)
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
         self.zoom_ax.set_yticks([])
@@ -395,41 +401,44 @@ class MyGraphView(qtw.QWidget):
 
     def update_xax(self):
         if self.params.log_scale:
-            self.xax.set_yscale('log')
+            self.xax.set_yscale('symlog')
 
         integration_x = self.data.Zzoom.sum(axis=0)
-        rangex = np.linspace(self.params.x1, self.params.x2, len(integration_x))
+        x0, xf = self.params.zoom_extent[0:2]
+        rangex = np.linspace(x0, xf, len(integration_x))
         self.xax_line = self.xax.plot(rangex, integration_x)
-        self.xax.set_xlim((self.params.x1, self.params.x2))
-        self.xax.xaxis.set_ticks(np.floor(np.linspace(self.params.x1, self.params.x2, 5)))
+        self.xax.set_xlim((x0, xf))
+
+        self.xax.xaxis.set_ticks(np.linspace(x0, xf, 5))
+
         zero = integration_x.min()
         mu =  integration_x.mean()
         sig = integration_x.std()
         self.xax.set_yticks([zero, mu, mu+2*sig])
         self.xax.yaxis.tick_right()
-        self.xax.grid(which='both', axis='both')#, xdata=rangex)
+        self.xax.grid(which='both', axis='both')
         return #update_xax
 
 
     def update_yax(self):
         if self.params.log_scale:
-            self.yax.set_xscale('log')
+            self.yax.set_xscale('symlog')
 
         integration_y =  self.data.Zzoom.sum(axis=1)
-        rangey = np.linspace(self.params.y2, self.params.y1, len(integration_y))
-        self.yax_line = self.yax.plot(np.flip(integration_y, axis=0), rangey)
+        y0, yf = self.params.zoom_extent[2:4]
+        rangey = np.linspace(y0, yf, len(integration_y))
+        self.yax_line = self.yax.plot(integration_y, rangey)
 
-        self.yax.set_ylim((self.params.y2, self.params.y1))
-        self.yax.set_yticks(np.floor(np.linspace(self.params.y2, self.params.y1, 5)))
+        self.yax.set_ylim((yf, y0))
+        self.yax.set_yticks(np.linspace(yf,y0,5))
         zero = integration_y.min()
         mu =  integration_y.mean()
         sig = integration_y.std()
         self.yax.set_xticks([zero, mu, mu+2*sig])
-        #self.yax.locator_params(axis='x', numticks=3)
         self.yax.yaxis.tick_right()
         self.yax.xaxis.tick_top()
         self.yax.tick_params(axis='x', labelrotation=270)
-        self.yax.grid(which='both', axis='both')#, xdata=rangex)
+        self.yax.grid(which='both', axis='both')
         return #update_yax
 
 
@@ -446,8 +455,8 @@ class MyGraphView(qtw.QWidget):
         y = t#np.sin(t)
         x = t#np.cos(t)
         X, Y = np.meshgrid(x,y)
-        Z = np.sin(X) * np.cos(Y)
-        self.update_graph(Z = Z)
+        Z = np.sin(Y) * np.cos(X)
+        self.update_graph(X = X, Y = Y, Z = Z)
         np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         return
@@ -461,6 +470,8 @@ class Experiment(FrozenClass):
         # and the sensitivity map file
         self.qyc = 528
         self.qzc = 211
+        self.pix0 = 162
+        self.pixf = 862
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
@@ -751,7 +762,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     @pyqtSlot()
     def on_click_loglinear(self):
-        self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=True)
+        try:
+            self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=True)
+        except Exception as e:
+            App.handle_exception(e)
         return
 
 
@@ -823,10 +837,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return
 
 
-
-
-
-
     @staticmethod
     def init_spinbox(spinbox, slot):
         spinbox.editingFinished.connect(slot)
@@ -878,7 +888,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
         try:
             options = qtw.QFileDialog.Options()
             options |= qtw.QFileDialog.DontUseNativeDialog
-            fileName, _ = qtw.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Measurement dat file (*.dat)", options=options)
+            fileName, _ = qtw.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",
+            "Measurement dat file (*.dat);;All Files (*)",
+            options=options)
             # self.openFileNamesDialog()
             if fileName:
                 return fileName
@@ -1049,8 +1061,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def parse_sensitivity_map(self, sens):
         num=0.0
         meansens=0.0
-        pix0 = 162
-        pixf = 862
+        pix0 = self.experiment.pix0
+        pixf = self.experiment.pixf
         ipix_range = np.asarray(range(pix0, pixf+1))
         jpix_range = np.asarray(range(pix0, pixf+1))
 
@@ -1065,8 +1077,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def parse_intensity_map(self, inputd):
-        pix0 = 162
-        pixf = 862
+        pix0 = self.experiment.pix0
+        pixf = self.experiment.pixf
         ipix_range = np.asarray(range(pix0, pixf+1))
         jpix_range = np.asarray(range(pix0, pixf+1))
 
@@ -1155,6 +1167,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
                             Z = self.experiment.Imatrix,
+                            reset_limits_required=True
                             )
             self.update_widgets()
         except Exception as e:
