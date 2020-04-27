@@ -24,6 +24,19 @@ import gzip
 # Modules for profiling:
 import cProfile, pstats, io
 
+_DEBUG_ = False
+
+
+def enable_high_dpi_scaling():
+    if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+        qtw.QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+    if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+        qtw.QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
+    return
+
+
 def profile_dec(fnc):
     """
     A decorator that uses cProfile to profile a function
@@ -351,7 +364,7 @@ class MyGraphView(qtw.QWidget):
         if self.params.log_scale:
             #self.take_care_of_negative_values()
             #self.norm = mpl.colors.LogNorm(vmin=self.params.zmin, vmax=self.params.zmax)
-            thres = np.abs(self.data.Z.std()/1000)
+            thres = np.abs(self.data.Z.std()/1e8)
             self.norm = mpl.colors.SymLogNorm(vmin=self.params.zmin, vmax=self.params.zmax, linthresh=thres)
         else:
             self.norm = mpl.colors.Normalize(vmin=self.params.zmin, vmax=self.params.zmax)
@@ -401,7 +414,7 @@ class MyGraphView(qtw.QWidget):
 
     def update_xax(self):
         if self.params.log_scale:
-            self.xax.set_yscale('symlog')
+            self.xax.set_yscale('log')
 
         integration_x = self.data.Zzoom.sum(axis=0)
         x0, xf = self.params.zoom_extent[0:2]
@@ -422,7 +435,7 @@ class MyGraphView(qtw.QWidget):
 
     def update_yax(self):
         if self.params.log_scale:
-            self.yax.set_xscale('symlog')
+            self.yax.set_xscale('log')
 
         integration_y =  self.data.Zzoom.sum(axis=1)
         y0, yf = self.params.zoom_extent[2:4]
@@ -457,8 +470,9 @@ class MyGraphView(qtw.QWidget):
         X, Y = np.meshgrid(x,y)
         Z = np.sin(Y) * np.cos(X)
         self.update_graph(X = X, Y = Y, Z = Z)
-        np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
-        np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+        if _DEBUG_:
+            np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+            np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         return
 
 class Experiment(FrozenClass):
@@ -726,7 +740,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addFunctionalityButtons(self):
-        buttonOpenDialog = qtw.QPushButton("Press here")
+        buttonOpenDialog = qtw.QPushButton("Load data")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
         self.leftpanel.addWidget(buttonOpenDialog)
 
@@ -968,8 +982,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def read_dat_file(self):
         # Open and read the dat file
-        datFilePath = self.openFileNameDialog()
-        #datFilePath = "/home/juan/Development/git/imagesNICOS/datafiles/p15347_00001341.dat"
+        if _DEBUG_: 
+            datFilePath = os.path.join(".","notToVersion","Archive","p15347_00001341.dat")
+        else:
+            datFilePath = self.openFileNameDialog()
+
         if datFilePath:
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
@@ -1178,6 +1195,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
 if __name__ == '__main__':
+    enable_high_dpi_scaling()
     app = qtw.QApplication(sys.argv)
     ex = App()
     #sys.exit(app.exec_())
