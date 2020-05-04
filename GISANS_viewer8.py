@@ -459,7 +459,7 @@ class MyGraphView(qtw.QWidget):
         self.cbar = self.canvas.figure.colorbar(self.ax_imshow, cax=self.cax, orientation='vertical', norm = self.norm)
         self.cax.tick_params(axis='y', direction='in')
         self.cax.yaxis.tick_left()
-        self.cbar.set_clim(self.norm.vmin, self.norm.vmax)
+        self.cbar.mappable.set_clim(self.norm.vmin, self.norm.vmax)
         return #build_cbar
 
 
