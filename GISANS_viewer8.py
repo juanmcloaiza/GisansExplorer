@@ -179,6 +179,9 @@ class PlotData(FrozenClass):
         self.Xzoom = np.zeros((10,10))
         self.Yzoom = np.zeros((10,10))
         self.Zzoom = np.zeros((10,10))
+
+        self.Xc = 0
+        self.Yc = 0
         return
 
 
@@ -242,11 +245,13 @@ class MyGraphView(qtw.QWidget):
 
 
     def define_axes(self):
-        self.ax =  self.canvas.figure.add_axes([0.1,0.1,0.30,0.7])
-        self.cax = self.canvas.figure.add_axes([0.505,0.1,0.025,0.7])
-        self.zoom_ax = self.canvas.figure.add_axes([0.55,0.25,0.25,0.5])
-        self.xax = self.canvas.figure.add_axes([0.55,0.1,0.25,0.1])
-        self.yax = self.canvas.figure.add_axes([0.85,0.25,0.05,0.5])
+        #[left, bottom, width, height] 
+        self.ax =  self.canvas.figure.add_axes([0.1,0.1,0.3,0.5])
+        self.cax = self.canvas.figure.add_axes([0.1,0.61,0.3,0.03])
+        #self.cax = self.canvas.figure.add_axes([0.55,0.76,0.25,0.025])
+        self.zoom_ax = self.canvas.figure.add_axes([0.5,0.1,0.3,0.5])
+        self.xax = self.canvas.figure.add_axes([0.5,0.61,0.3,0.1])
+        self.yax = self.canvas.figure.add_axes([0.81,0.1,0.05,0.5])
         self.area_selector = AreaSelector(self.ax, self.line_select_callback)
         return #define_axes
 
@@ -381,8 +386,11 @@ class MyGraphView(qtw.QWidget):
 
     def update_ax(self, **kwargs):
         self.ax_imshow = self.ax.imshow(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
-        self.cont_x = self.ax.contour(self.data.X,colors='k', linestyles='solid')
-        self.cont_y = self.ax.contour(self.data.Y,colors='k', linestyles='solid')
+        self.cont_x = self.ax.contour(self.data.X,colors='k', linestyles='solid', linewidths=0.5)
+        self.cont_y = self.ax.contour(self.data.Y,colors='k', linestyles='solid', linewidths=0.5)
+        self.ax.scatter(self.data.Xc, self.data.Yc, marker='x', c='r')
+        self.ax.set_aspect("auto")
+        self.ax.set_title("Detector View", pad=50)
         return #update_ax
 
 
@@ -409,6 +417,8 @@ class MyGraphView(qtw.QWidget):
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
         self.zoom_ax.set_yticks([])
+        self.zoom_ax.set_xlabel("$Q_{y}$")
+        self.zoom_ax.set_ylabel("$Q_{z}$")
         return #update_zoom_ax
 
 
@@ -430,6 +440,8 @@ class MyGraphView(qtw.QWidget):
         self.xax.set_yticks([zero, mu, mu+2*sig])
         self.xax.yaxis.tick_right()
         self.xax.grid(which='both', axis='both')
+        self.xax.tick_params(axis='x', labelrotation=270)
+        self.xax.xaxis.tick_top()
         return #update_xax
 
 
@@ -449,17 +461,16 @@ class MyGraphView(qtw.QWidget):
         sig = integration_y.std()
         self.yax.set_xticks([zero, mu, mu+2*sig])
         self.yax.yaxis.tick_right()
-        self.yax.xaxis.tick_top()
         self.yax.tick_params(axis='x', labelrotation=270)
         self.yax.grid(which='both', axis='both')
         return #update_yax
 
 
     def build_cbar(self):
-        self.cbar = self.canvas.figure.colorbar(self.ax_imshow, cax=self.cax, orientation='vertical', norm = self.norm)
-        self.cax.tick_params(axis='y', direction='in')
-        self.cax.yaxis.tick_left()
+        self.cax.tick_params(axis='x', direction='in', labeltop=True, top=True)
+        self.cbar = self.canvas.figure.colorbar(self.ax_imshow, cax=self.cax, orientation='horizontal', norm = self.norm)
         self.cbar.mappable.set_clim(self.norm.vmin, self.norm.vmax)
+        self.cax.xaxis.tick_top()
         return #build_cbar
 
 
@@ -469,7 +480,7 @@ class MyGraphView(qtw.QWidget):
         x = t#np.cos(t)
         X, Y = np.meshgrid(x,y)
         Z = np.sin(Y) * np.cos(X)
-        self.update_graph(X = X, Y = Y, Z = Z)
+        self.update_graph(X = X, Y = Y, Z = Z, Xc = 512, Yc = 512)
         if _DEBUG_:
             np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
             np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
@@ -1184,6 +1195,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
                             Z = self.experiment.Imatrix,
+                            Xc = self.experiment.qzc - self.experiment.pix0,
+                            Yc = self.experiment.qyc - self.experiment.pix0,
                             reset_limits_required=True
                             )
             self.update_widgets()
