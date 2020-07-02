@@ -409,16 +409,22 @@ class MyGraphView(qtw.QWidget):
     def update_zoom_ax(self):
         x1, x2 = self.params.x1, self.params.x2
         y1, y2 = self.params.y1, self.params.y2
+        xc, yc = self.data.Xc, self.data.Yc
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
 
-        self.params.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
+        self.params.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y2,x2], self.data.Y[y1,x1])
         self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
                                             extent=self.params.zoom_extent)
+        if xc > x1 and xc < x2:
+            if yc > y1 and yc < y2:
+                self.zoom_ax.scatter(self.data.X[yc,xc], self.data.Y[yc,xc], marker='x', c='r')
+
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
         self.zoom_ax.set_yticks([])
         self.zoom_ax.set_xlabel("$Q_{y}$")
         self.zoom_ax.set_ylabel("$Q_{z}$")
+
         return #update_zoom_ax
 
 
@@ -449,13 +455,13 @@ class MyGraphView(qtw.QWidget):
         if self.params.log_scale:
             self.yax.set_xscale('log')
 
-        integration_y =  self.data.Zzoom.sum(axis=1)
+        integration_y =  self.data.Zzoom.sum(axis=1)[::-1]
         y0, yf = self.params.zoom_extent[2:4]
         rangey = np.linspace(y0, yf, len(integration_y))
         self.yax_line = self.yax.plot(integration_y, rangey)
 
-        self.yax.set_ylim((yf, y0))
-        self.yax.set_yticks(np.linspace(yf,y0,5))
+        self.yax.set_ylim((y0, yf))
+        self.yax.set_yticks(np.linspace(y0,yf,5))
         zero = integration_y.min()
         mu =  integration_y.mean()
         sig = integration_y.std()
