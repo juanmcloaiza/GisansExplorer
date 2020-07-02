@@ -24,7 +24,7 @@ import gzip
 # Modules for profiling:
 import cProfile, pstats, io
 
-_DEBUG_ = False
+_DEBUG_ = True
 
 
 def enable_high_dpi_scaling():
@@ -506,10 +506,10 @@ class Experiment(FrozenClass):
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
-        self.qy = np.asarray([])
-        self.qz = np.asarray([])
-        self.I = np.asarray([])
-        self.inputd = np.asarray([])
+        #self.qy = np.asarray([])
+        #self.qz = np.asarray([])
+        #self.I = np.asarray([])
+        #self.inputd = np.asarray([])
 
         self.Imatrix = np.asarray([])
         self.qymatrix = np.asarray([])
@@ -734,14 +734,30 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addFileList(self):
-        self.fileList.setMaximumWidth(self.fileList.width()/2.)
-        self.leftpanel.addWidget(qtw.QLabel("File:"))
-        self.leftpanel.addWidget(self.fileList)
+        self.model = qtw.QFileSystemModel()
+        self.model.setRootPath('')
+        self.tree = qtw.QTreeView()
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index('./'))
+        
+        self.tree.setAnimated(False)
+        self.tree.setIndentation(20)
+        self.tree.setSortingEnabled(True)
+        
+        self.tree.setWindowTitle("Dir View")
+        self.tree.resize(1000, 480)
+        self.leftpanel.addWidget(self.tree)
+        self.leftpanel.SetNoConstraint = True
+
+        #self.fileList.setMaximumWidth(self.fileList.width())
+        #self.fileList.resize
+        #self.leftpanel.addWidget(qtw.QLabel("File:"))
+        #self.leftpanel.addWidget(self.fileList)
         return
 
 
     def addPanels(self):
-        self.layout.addLayout(self.leftpanel)
+        self.centralpanel.addLayout(self.leftpanel)
         self.layout.addLayout(self.centralpanel)
         self.layout.addLayout(self.rightpanel)
         return
@@ -750,7 +766,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def addExperimentInfo(self):
         self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
         self.infoTable.setColumnCount(1)
+        self.infoTable.setRowCount(0)
         self.infoTable.horizontalHeader().hide()
+        self.infoTable.cellDoubleClicked.connect(self.update_from_table)
         self.rightpanel.addWidget(qtw.QLabel("Info:"))
         self.rightpanel.addWidget(self.infoTable)
         return
@@ -930,13 +948,26 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return None
 
 
+    def update_from_table(self):
+        y = self.experiment.__dict__
 
+        for i in range(self.infoTable.rowCount()):
+            key = self.infoTable.verticalHeaderItem(i).text()
+            if key in ['qyc', 'qzc']:
+               value = int(self.infoTable.item(i,0).text())
+               self.experiment.__dict__[key] = value
+        
+        self.update_gui()
+            
+
+        return True
 
 
     def update_widgets(self):
         x = self.settings.datFileName
         y = self.experiment.__dict__
 
+        self.infoTable.setRowCount(0)
         for i, k in enumerate(y.keys()):
             if k[0] == "_":
                 continue
@@ -945,6 +976,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.infoTable.insertRow(i)
             self.infoTable.setVerticalHeaderItem(i,item_k)
             self.infoTable.setItem(i,0,item_v)
+        
 
         self.minSpinBox.setValue(self.graphView.params.zmin)
         self.maxSpinBox.setValue(self.graphView.params.zmax)
@@ -1008,8 +1040,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
             self.settings.dataDirPath = path
-            self.fileList.addItem(path)
             self.fileList.addItem(filename)
+            #self.fileList.addItem(filename)
             return self.safe_parse(self.parse_dat, self.settings.datFilePath())
         return False
 
@@ -1018,14 +1050,14 @@ class MyFrame(qtw.QFrame,FrozenClass):
         # Open and read the yaml file
         yamlFileName = self.settings.yamlFileName
         if yamlFileName:
-            self.fileList.addItem(yamlFileName)
+            #self.fileList.addItem(yamlFileName)
             return self.safe_parse(self.parse_yaml, self.settings.yamlFilePath())
         return False
 
 
     def read_sensitivity_file(self):
         if self.settings.sensFileName:
-            self.fileList.addItem(self.settings.sensFileName)
+            #self.fileList.addItem(self.settings.sensFileName)
             fpath = self.settings.sensFilePath()
             func = self.parse_sensitivity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
@@ -1034,7 +1066,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def read_intensity_file(self):
         if self.settings.gzFileName:
-            self.fileList.addItem(self.settings.gzFileName)
+            #self.fileList.addItem(self.settings.gzFileName)
             fpath = self.settings.gzFilePath()
             func = self.parse_intensity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
@@ -1122,20 +1154,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
         I = np.zeros(len(ipix_range)*len(jpix_range))
         idx = 0
 
-        with open(self.settings.gisans_map_filepath(), "w") as fp:
-            for i in ipix_range:
-                for j in jpix_range:
-                    if float(sens[i,j]) > 0.0:
-                        I[idx] = ((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
-                        qy[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
-                        qz[idx] = (two_pi_over_lambda * (sin_alpha_f[j-pix0] + sin_alpha_i))
-                        fp.write(str(qy[idx])+' '+str(qz[idx])+' '+str(I[idx])+'\n')
-                        idx += 1
-
-        self.experiment.inputd = inputd
-        self.experiment.qy = qy
-        self.experiment.qz = qz
-        self.experiment.I = I
 
         self.experiment.Imatrix = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
         self.experiment.cut_Iz = self.experiment.Imatrix.sum(axis=1)
@@ -1151,6 +1169,31 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
 
         return True
+
+
+    def save_gisans_map_filepath(self, inputd):
+        raise NotImplementedError
+#        with open(self.settings.gisans_map_filepath(), "w") as fp:
+#            for i in ipix_range:
+#                for j in jpix_range:
+#                    if float(sens[i,j]) > 0.0:
+#                        I[idx] = ((meansens*float(inputd[i,j])/float(sens[i,j]))/float(monitor))
+#                        qy[idx] = (two_pi_over_lambda *  cos_alpha_f[j-pix0] * sin_2theta_f[i-pix0])
+#                        qz[idx] = (two_pi_over_lambda * (sin_alpha_f[j-pix0] + sin_alpha_i))
+#                        fp.write(str(qy[idx])+' '+str(qz[idx])+' '+str(I[idx])+'\n')
+#                        idx += 1
+#
+#        self.experiment.inputd = inputd
+#        self.experiment.qy = qy
+#        self.experiment.qz = qz
+#        self.experiment.I = I
+#
+##
+#
+#        I  = ((meansens*float(inputd[pix0:pixf+1,pix0:pixf+1])/float(sens[pix0:pixf+1,pix0:pixf+1]))/float(monitor))
+#        qy = (two_pi_over_lambda *  cos_alpha_f[0:pixf+1-pix0] * sin_2theta_f[0:pixf+1-pix0])
+#        qz = (two_pi_over_lambda * (sin_alpha_f[0:pixf+1-pix0] + sin_alpha_i))
+        return
 
 
     def line_cut_at_constant_y(self, dqyvalue=None, qyvalue=None):
