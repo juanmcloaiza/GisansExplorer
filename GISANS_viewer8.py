@@ -1093,18 +1093,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def parse_sensitivity_map(self, sens):
-        num=0.0
-        meansens=0.0
         pix0 = self.experiment.pix0
         pixf = self.experiment.pixf
-        ipix_range = np.asarray(range(pix0, pixf+1))
-        jpix_range = np.asarray(range(pix0, pixf+1))
-
-        for i in ipix_range:
-            for j in jpix_range:
-                meansens += float(sens[i,j])
-                num += 1.0
-        meansens=meansens/num
+        meansens = sens[pix0:pixf+1,pix0:pixf+1].astype(float).mean()
         self.experiment.sens = sens
         self.experiment.meansens = meansens
         return True
