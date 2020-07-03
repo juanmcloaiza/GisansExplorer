@@ -24,7 +24,7 @@ import gzip
 # Modules for profiling:
 import cProfile, pstats, io
 
-_DEBUG_ = True
+_DEBUG_ = False
 
 
 def enable_high_dpi_scaling():
@@ -246,12 +246,12 @@ class MyGraphView(qtw.QWidget):
 
     def define_axes(self):
         #[left, bottom, width, height] 
-        self.ax =  self.canvas.figure.add_axes([0.1,0.1,0.3,0.5])
-        self.cax = self.canvas.figure.add_axes([0.1,0.61,0.3,0.03])
+        self.ax =  self.canvas.figure.add_axes([0.1,0.2,0.3,0.5])
+        self.cax = self.canvas.figure.add_axes([0.1,0.71,0.3,0.03])
         #self.cax = self.canvas.figure.add_axes([0.55,0.76,0.25,0.025])
-        self.zoom_ax = self.canvas.figure.add_axes([0.5,0.1,0.3,0.5])
-        self.xax = self.canvas.figure.add_axes([0.5,0.61,0.3,0.1])
-        self.yax = self.canvas.figure.add_axes([0.81,0.1,0.05,0.5])
+        self.zoom_ax = self.canvas.figure.add_axes([0.5,0.2,0.3,0.5])
+        self.xax = self.canvas.figure.add_axes([0.5,0.71,0.3,0.1])
+        self.yax = self.canvas.figure.add_axes([0.81,0.2,0.05,0.5])
         self.area_selector = AreaSelector(self.ax, self.line_select_callback)
         return #define_axes
 
@@ -386,8 +386,8 @@ class MyGraphView(qtw.QWidget):
 
     def update_ax(self, **kwargs):
         self.ax_imshow = self.ax.imshow(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
-        self.cont_x = self.ax.contour(self.data.X,colors='k', linestyles='solid', linewidths=0.5)
-        self.cont_y = self.ax.contour(self.data.Y,colors='k', linestyles='solid', linewidths=0.5)
+        self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid', linewidths=0.5)
+        self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid', linewidths=0.5)
         self.ax.scatter(self.data.Xc, self.data.Yc, marker='x', c='r')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
@@ -415,15 +415,21 @@ class MyGraphView(qtw.QWidget):
         self.params.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y2,x2], self.data.Y[y1,x1])
         self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
                                             extent=self.params.zoom_extent)
+        is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
-            if yc > y1 and yc < y2:
-                self.zoom_ax.scatter(self.data.X[yc,xc], self.data.Y[yc,xc], marker='x', c='r')
+            self.zoom_ax.axvline(x=0, c='k', ls='solid', lw=0.5)
+            is_x_in = True
+        if yc > y1 and yc < y2:
+            self.zoom_ax.axhline(y=0, c='k', ls='solid', lw=0.5)
+            is_y_in = True
+        if is_x_in and is_y_in:
+            self.zoom_ax.scatter(self.data.X[yc,xc], self.data.Y[yc,xc], marker='x', c='r')
 
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
         self.zoom_ax.set_yticks([])
-        self.zoom_ax.set_xlabel("$Q_{y}$")
-        self.zoom_ax.set_ylabel("$Q_{z}$")
+        self.zoom_ax.set_xlabel("$Q_{z}$")
+        self.zoom_ax.set_ylabel("$Q_{y}$")
 
         return #update_zoom_ax
 
@@ -706,6 +712,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def __init__(self):
         super().__init__()
         self.layout = qtw.QHBoxLayout()
+        self.splitter = qtw.QSplitter()
         self.centralpanel = qtw.QVBoxLayout()
         self.leftpanel = qtw.QVBoxLayout()
         self.rightpanel = qtw.QVBoxLayout()
@@ -716,6 +723,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.graphView = MyGraphView("Title")
         self.infoTable = qtw.QTableWidget()
         self.fileList = qtw.QListWidget()
+        self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
         self.initFrame()
         self._freeze()
@@ -734,32 +742,36 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addFileList(self):
-        self.model = qtw.QFileSystemModel()
-        self.model.setRootPath('')
-        self.tree = qtw.QTreeView()
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index('./'))
+        model = qtw.QFileSystemModel()
+        model.setRootPath('')
+        filters = ["*.dat"]
+        model.setNameFilters(filters)
+
+        self.dirtree.setModel(model)
+        self.dirtree.setRootIndex(model.index('./'))
         
-        self.tree.setAnimated(False)
-        self.tree.setIndentation(20)
-        self.tree.setSortingEnabled(True)
-        
-        self.tree.setWindowTitle("Dir View")
-        self.tree.resize(1000, 480)
-        self.leftpanel.addWidget(self.tree)
+        self.dirtree.setAnimated(False)
+        self.dirtree.setIndentation(20)
+        self.dirtree.setSortingEnabled(True)
+        self.dirtree.doubleClicked.connect(self.on_click_open_file)
+        self.dirtree.setMaximumWidth(self.fileList.width())
+        self.dirtree.resize(800,600)
+
+        self.leftpanel.addWidget(self.dirtree)
         self.leftpanel.SetNoConstraint = True
 
-        #self.fileList.setMaximumWidth(self.fileList.width())
-        #self.fileList.resize
         #self.leftpanel.addWidget(qtw.QLabel("File:"))
         #self.leftpanel.addWidget(self.fileList)
         return
 
 
     def addPanels(self):
-        self.centralpanel.addLayout(self.leftpanel)
-        self.layout.addLayout(self.centralpanel)
-        self.layout.addLayout(self.rightpanel)
+        self.splitter.addWidget(self.dirtree)
+        self.splitter.addWidget(self.graphView)
+        rightlayoutwidget = qtw.QWidget()
+        rightlayoutwidget.setLayout(self.rightpanel)
+        self.splitter.addWidget(rightlayoutwidget)
+        self.layout.addWidget(self.splitter)
         return
 
 
@@ -971,12 +983,14 @@ class MyFrame(qtw.QFrame,FrozenClass):
         for i, k in enumerate(y.keys()):
             if k[0] == "_":
                 continue
-            item_k = qtw.QTableWidgetItem(str(k))
-            item_v = qtw.QTableWidgetItem(str(y[k]))
-            self.infoTable.insertRow(i)
-            self.infoTable.setVerticalHeaderItem(i,item_k)
-            self.infoTable.setItem(i,0,item_v)
-        
+
+            if k in ["qyc", "qzc", "pix0", "pixf", "meansens", "monitor_counts", "angle_of_incidence", "selector_lambda"]:
+
+                item_k = qtw.QTableWidgetItem(str(k))
+                item_v = qtw.QTableWidgetItem(str(y[k]))
+                self.infoTable.insertRow(i)
+                self.infoTable.setVerticalHeaderItem(i,item_k)
+                self.infoTable.setItem(i,0,item_v)
 
         self.minSpinBox.setValue(self.graphView.params.zmin)
         self.maxSpinBox.setValue(self.graphView.params.zmax)
@@ -1034,7 +1048,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
         if _DEBUG_: 
             datFilePath = os.path.join(".","notToVersion","Archive","p15347_00001341.dat")
         else:
-            datFilePath = self.openFileNameDialog()
+            #datFilePath = self.openFileNameDialog()
+            #if self.dirtree.selectedIndexes().size() > 0:
+            datFilePath = self.dirtree.model().filePath(self.dirtree.currentIndex())
 
         if datFilePath:
             path, filename = os.path.split(datFilePath)
