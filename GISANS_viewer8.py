@@ -215,7 +215,7 @@ class MyGraphView(qtw.QWidget):
         self.graph_title = graph_title
 
         self.dpi = 100
-        self.fig = Figure((10.0, 5.0), dpi = self.dpi, facecolor = (1,1,1), edgecolor = (0,0,0))
+        self.fig = Figure((10.0, 5.0), dpi = self.dpi, facecolor = (1,1,1), edgecolor = (0,0,0), linewidth=1)
         self.canvas = FigureCanvas(self.fig)
         self.define_axes()
 
@@ -505,10 +505,10 @@ class Experiment(FrozenClass):
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
-        self.qyc = 528
-        self.qzc = 211
-        self.pix0 = 162
-        self.pixf = 862
+        self.qyc = 0
+        self.qzc = 0
+        self.pix0 = 0
+        self.pixf = -1
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
@@ -750,23 +750,31 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.dirtree.setModel(model)
         self.dirtree.setRootIndex(model.index('./'))
         
-        self.dirtree.setAnimated(False)
+        self.dirtree.setAnimated(True)
         self.dirtree.setIndentation(20)
         self.dirtree.setSortingEnabled(True)
         self.dirtree.doubleClicked.connect(self.on_click_open_file)
-        self.dirtree.setMaximumWidth(self.fileList.width())
-        self.dirtree.resize(800,600)
+        #self.dirtree.setMaximumWidth(self.fileList.width())
+        #self.dirtree.resize(800,600)
 
-        self.leftpanel.addWidget(self.dirtree)
+        self.leftpanel.addWidget(qtw.QLabel("Select file:"))
+        leftSplitter = qtw.QSplitter()
+        leftSplitter.setOrientation(Qt.Vertical)
+        leftSplitter.addWidget(self.dirtree)
+        leftSplitter.addWidget(self.fileList)
+        self.leftpanel.addWidget(leftSplitter)
         self.leftpanel.SetNoConstraint = True
 
-        #self.leftpanel.addWidget(qtw.QLabel("File:"))
-        #self.leftpanel.addWidget(self.fileList)
         return
 
 
     def addPanels(self):
-        self.splitter.addWidget(self.dirtree)
+        leftLayoutWidget = qtw.QWidget()
+        leftLayoutWidget.setLayout(self.leftpanel)
+        self.splitter.addWidget(leftLayoutWidget)
+
+
+        #self.splitter.addWidget(self.dirtree)
         self.splitter.addWidget(self.graphView)
         rightlayoutwidget = qtw.QWidget()
         rightlayoutwidget.setLayout(self.rightpanel)
@@ -776,7 +784,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addExperimentInfo(self):
-        self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
+        #self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
         self.infoTable.setColumnCount(1)
         self.infoTable.setRowCount(0)
         self.infoTable.horizontalHeader().hide()
@@ -968,10 +976,13 @@ class MyFrame(qtw.QFrame,FrozenClass):
             if key in ['qyc', 'qzc']:
                value = int(self.infoTable.item(i,0).text())
                self.experiment.__dict__[key] = value
-        
-        self.update_gui()
-            
 
+        try:
+            self.compute_Q()
+            self.update_gui()
+        except Exception as e:
+            App.handle_exception(e)
+            return False
         return True
 
 
@@ -1008,6 +1019,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
         if not self.read_sensitivity_file():
             return
         if not self.read_intensity_file():
+            return
+        if not self.compute_Q():
             return
         #if not self.line_cut_at_constant_y():
         #    return
@@ -1093,12 +1106,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         for line in file:
             if line.find('omega_value')>0:
                 omega_line_list = line.split()
-                omega=omega_line_list[3]
+                omega = omega_line_list[3]
                 self.experiment.angle_of_incidence = omega
                 print('Angle of incidence (degrees): '+str(omega))
                 print(f"Original qzc = {self.experiment.qzc}")
-                self.experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(omega) / 180.0 ) ) / 0.5755 )
-                print(f"Corrected qzc = {self.experiment.qzc}")
             if line.find('selector_lambda_value')>0:
                 lambda_line_list = line.split()
                 selector_lambda=lambda_line_list[3]
@@ -1143,21 +1154,31 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def parse_sensitivity_map(self, sens):
         pix0 = self.experiment.pix0
         pixf = self.experiment.pixf
-        meansens = sens[pix0:pixf+1,pix0:pixf+1].astype(float).mean()
+        #meansens = sens[pix0:pixf+1,pix0:pixf+1].astype(float).mean()
+        meansens = sens.astype(float).mean()
         self.experiment.sens = sens
         self.experiment.meansens = meansens
         return True
 
 
     def parse_intensity_map(self, inputd):
-        pix0 = self.experiment.pix0
-        pixf = self.experiment.pixf
-        ipix_range = np.asarray(range(pix0, pixf+1))
-        jpix_range = np.asarray(range(pix0, pixf+1))
-
         sens = self.experiment.sens
         meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
+        quotient = np.divide(inputd, sens, out=np.zeros_like(inputd), where=sens!=0)
+        self.experiment.Imatrix = float(meansens) * quotient / float(monitor)
+        self.experiment.cut_Iz = self.experiment.Imatrix.sum(axis=1)
+        self.experiment.cut_Iy = self.experiment.Imatrix.sum(axis=0)
+        return True
+
+    def compute_Q(self):
+        self.experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(self.experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+        print(f"Corrected qzc = {self.experiment.qzc}")
+
+        Imatrix = self.experiment.Imatrix
+        ipix_range = np.asarray(range(Imatrix.shape[0]))
+        jpix_range = np.asarray(range(Imatrix.shape[1]))
+
         two_pi_over_lambda = self.experiment.two_pi_over_lambda
         sin_alpha_i = self.experiment.sin_alpha_i
         sin_2theta_f = self.experiment.sin_2theta_f(ipix_range)
@@ -1165,30 +1186,24 @@ class MyFrame(qtw.QFrame,FrozenClass):
         sin_alpha_f = self.experiment.sin_alpha_f(jpix_range)
 
 
-        qy = np.zeros(len(ipix_range)*len(jpix_range))
-        qz = np.zeros(len(ipix_range)*len(jpix_range))
-        I = np.zeros(len(ipix_range)*len(jpix_range))
-        idx = 0
-
-
-        self.experiment.Imatrix = np.nan_to_num(float(meansens) * inputd[pix0:pixf+1,pix0:pixf+1] / sens[pix0:pixf+1,pix0:pixf+1] / float(monitor))
-        self.experiment.cut_Iz = self.experiment.Imatrix.sum(axis=1)
-        self.experiment.cut_Iy = self.experiment.Imatrix.sum(axis=0)
-
-        QY_i, QY_j = sin_2theta_f[ipix_range-pix0], cos_alpha_f[jpix_range-pix0]
+        QY_i, QY_j = sin_2theta_f[ipix_range], cos_alpha_f[jpix_range]
         QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
         self.experiment.qymatrix = two_pi_over_lambda * QYmatrix
 
-        QZ_j = sin_alpha_f[jpix_range-pix0]
+        QZ_j = sin_alpha_f[jpix_range]
         QZ_i = np.ones(ipix_range.shape)
         QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
         self.experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
-
+        
         return True
 
 
     def save_gisans_map_filepath(self, inputd):
         raise NotImplementedError
+#        qy = np.zeros(len(ipix_range)*len(jpix_range))
+#        qz = np.zeros(len(ipix_range)*len(jpix_range))
+#        I = np.zeros(len(ipix_range)*len(jpix_range))
+#        idx = 0
 #        with open(self.settings.gisans_map_filepath(), "w") as fp:
 #            for i in ipix_range:
 #                for j in jpix_range:
@@ -1251,8 +1266,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
                             Z = self.experiment.Imatrix,
-                            Xc = self.experiment.qzc - self.experiment.pix0,
-                            Yc = self.experiment.qyc - self.experiment.pix0,
+                            Xc = self.experiment.qzc,
+                            Yc = self.experiment.qyc,
                             reset_limits_required=True
                             )
             self.update_widgets()
@@ -1268,5 +1283,6 @@ if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     ex = App()
     #sys.exit(app.exec_())
-    x = profile_function_with_arguments(app.exec_)
+    #x = profile_function_with_arguments(app.exec_)
+    x = app.exec()
     sys.exit(x)
