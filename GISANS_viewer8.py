@@ -15,6 +15,7 @@ from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
 
 import numpy as np
+import copy
 import sys
 import os
 import re
@@ -719,7 +720,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.minSpinBox = mySciSpinBox()
         self.maxSpinBox = mySciSpinBox()
         self.settings = Settings()
+        self.settings_dict = {}
         self.experiment = Experiment()
+        self.experiment_dict = {}
         self.graphView = MyGraphView("Title")
         self.infoTable = qtw.QTableWidget()
         self.fileList = qtw.QListWidget()
@@ -732,7 +735,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def initFrame(self):
         self.layout.setAlignment(Qt.AlignCenter)
         self.addExperimentInfo()
-        self.addFileList()
+        self.addFileTreeAndList()
         self.addWelcomeMessage()
         self.addMinMaxSpinBoxes()
         self.addFunctionalityButtons()
@@ -741,7 +744,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.setLayout(self.layout)
 
 
-    def addFileList(self):
+    def addFileTreeAndList(self):
         model = qtw.QFileSystemModel()
         model.setRootPath('')
         filters = ["*.dat"]
@@ -754,8 +757,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.dirtree.setIndentation(20)
         self.dirtree.setSortingEnabled(True)
         self.dirtree.doubleClicked.connect(self.on_click_open_file)
-        #self.dirtree.setMaximumWidth(self.fileList.width())
-        #self.dirtree.resize(800,600)
+        self.fileList.itemSelectionChanged.connect(self.on_file_selection_changed)
 
         self.leftpanel.addWidget(qtw.QLabel("Select file:"))
         leftSplitter = qtw.QSplitter()
@@ -818,12 +820,30 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def on_click_open_file(self):
         try:
             self.settings = Settings()
+            self.experiment = Experiment()
             self.doStuff()
             sum1 = self.experiment.Imatrix.sum()
             sum2 = self.experiment.cut_Iy.sum()
             sum3 = self.experiment.cut_Iz.sum()
             print("If the following three sums are not equal, there's an error:")
             print(sum1, sum2, sum3)
+            self.experiment_dict[self.settings.datFileName] = copy.deepcopy(self.experiment)
+            self.settings_dict[self.settings.datFileName] = copy.deepcopy(self.settings)
+        except Exception as e:
+            App.handle_exception(e)
+
+
+    @pyqtSlot()
+    def on_file_selection_changed(self):
+        currentListEntry = self.fileList.currentItem().text()
+        print(f"\n-- Calculating map for {currentListEntry} --")
+        self.settings = self.settings_dict[currentListEntry]
+        self.experiment = self.experiment_dict[currentListEntry]
+        try:
+            if not self.compute_Q():
+                return
+            if not self.update_gui():
+                return
         except Exception as e:
             App.handle_exception(e)
 
@@ -1070,7 +1090,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.settings.datFileName = filename
             self.settings.dataDirPath = path
             self.fileList.addItem(filename)
-            #self.fileList.addItem(filename)
             return self.safe_parse(self.parse_dat, self.settings.datFilePath())
         return False
 
@@ -1079,14 +1098,12 @@ class MyFrame(qtw.QFrame,FrozenClass):
         # Open and read the yaml file
         yamlFileName = self.settings.yamlFileName
         if yamlFileName:
-            #self.fileList.addItem(yamlFileName)
             return self.safe_parse(self.parse_yaml, self.settings.yamlFilePath())
         return False
 
 
     def read_sensitivity_file(self):
         if self.settings.sensFileName:
-            #self.fileList.addItem(self.settings.sensFileName)
             fpath = self.settings.sensFilePath()
             func = self.parse_sensitivity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
@@ -1095,7 +1112,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def read_intensity_file(self):
         if self.settings.gzFileName:
-            #self.fileList.addItem(self.settings.gzFileName)
             fpath = self.settings.gzFilePath()
             func = self.parse_intensity_map
             return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
