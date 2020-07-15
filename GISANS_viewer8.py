@@ -734,7 +734,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.settings = Settings()
         self.settings_dict = {}
         self.experiment = Experiment()
-        self.experiment_dict = {}
+        self.experiment_dict = {"show_sum": False}
         self.graphView = MyGraphView("Title")
         self.infoTable = qtw.QTableWidget()
         self.fileList = qtw.QListWidget()
@@ -809,9 +809,13 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addFunctionalityButtons(self):
-        buttonOpenDialog = qtw.QPushButton("Load data")
+        buttonOpenDialog = qtw.QPushButton("Add data")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
         self.leftpanel.addWidget(buttonOpenDialog)
+
+        buttonToggleSum = qtw.QPushButton("Sum all / Show single")
+        buttonToggleSum.clicked.connect(self.on_click_toggle_sum)
+        self.leftpanel.addWidget(buttonToggleSum)
 
         buttonUpdateFromTable = qtw.QPushButton("Update")
         buttonUpdateFromTable.clicked.connect(self.on_click_update)
@@ -850,6 +854,25 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     @pyqtSlot()
+    def on_click_toggle_sum(self):
+        self.experiment_dict["show_sum"] = not self.experiment_dict["show_sum"]
+        if not self.experiment_dict["show_sum"]:
+            self.on_file_selection_changed()
+            return
+        try:
+            expdict = copy.deepcopy(self.experiment_dict)
+            expdict.pop("show_sum")
+            keys = list(expdict.keys())
+            Isum = expdict[keys.pop()].Imatrix
+            while keys:
+                Isum += expdict[keys.pop()].Imatrix
+            self.graphView.update_graph(Z = Isum)
+
+        except Exception as e:
+            App.handle_exception(e)
+
+
+    @pyqtSlot()
     def on_file_selection_changed(self):
         currentListEntry = self.fileList.currentItem().text()
         print(f"\n-- Calculating map for {currentListEntry} --")
@@ -865,8 +888,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     @pyqtSlot()
     def on_click_update(self):
-        y = self.experiment.__dict__
-
         try:
             self.loop_update_values()
             self.color_outdated()
@@ -1032,20 +1053,22 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
     def loop_update_values(self):
+        expdict = self.experiment.__dict__
         for i in range(self.infoTable.rowCount()):
             key = self.infoTable.verticalHeaderItem(i).text()
             current_item = self.infoTable.item(i,0)
             if key in ['qyc', 'qzc', 'pix0', 'pixf']:
                 value = int(current_item.text())
-                self.experiment.__dict__[key] = value
             elif key in ["min_intensity", "max_intensity"]:
                 value = float(current_item.text())
-                self.experiment.__dict__[key] = value
+            else: 
+                continue
+            expdict[key] = value
         return True
 
     
     def color_outdated(self):
-        y = self.experiment.__dict__
+        expdict = self.experiment.__dict__
 
         try:
             for i in range(self.infoTable.rowCount()):
@@ -1059,7 +1082,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                     else:
                         continue
                 
-                    self.color_validate(current_item, value, self.experiment.__dict__[key])
+                    self.color_validate(current_item, value, expdict[key])
                 except Exception as e:
                     current_item.setBackground(Qt.red)
                     return False
@@ -1071,10 +1094,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def update_widgets(self):
-        y = self.experiment.__dict__
+        expdict = self.experiment.__dict__
 
         self.infoTable.setRowCount(0)
-        for i, k in enumerate(y.keys()):
+        for i, k in enumerate(expdict.keys()):
             if k[0] == "_":
                 continue
 
@@ -1084,7 +1107,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                      "angle_of_incidence", "selector_lambda"]:
 
                 item_k = qtw.QTableWidgetItem(str(k))
-                item_v = qtw.QTableWidgetItem(str(y[k]))
+                item_v = qtw.QTableWidgetItem(str(expdict[k]))
                 self.infoTable.insertRow(i)
                 self.infoTable.setVerticalHeaderItem(i,item_k)
                 self.infoTable.setItem(i,0,item_v)
