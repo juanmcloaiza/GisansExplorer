@@ -3,7 +3,7 @@
 #Qt stuff:
 import PyQt5.QtWidgets as qtw
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
-from PyQt5.QtGui import QValidator
+from PyQt5.QtGui import QValidator, QColor
 
 #plot stuff:
 from matplotlib.ticker import NullFormatter
@@ -520,6 +520,8 @@ class Experiment(FrozenClass):
         self.qzc = 0
         self.pix0 = 0
         self.pixf = -1
+        self.min_intensity = 0
+        self.max_intensity = 0
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
@@ -727,8 +729,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.centralpanel = qtw.QVBoxLayout()
         self.leftpanel = qtw.QVBoxLayout()
         self.rightpanel = qtw.QVBoxLayout()
-        self.minSpinBox = mySciSpinBox()
-        self.maxSpinBox = mySciSpinBox()
+        #self.minSpinBox = mySciSpinBox()
+        #self.maxSpinBox = mySciSpinBox()
         self.settings = Settings()
         self.settings_dict = {}
         self.experiment = Experiment()
@@ -747,7 +749,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.addExperimentInfo()
         self.addFileTreeAndList()
         self.addWelcomeMessage()
-        self.addMinMaxSpinBoxes()
+        #self.addMinMaxSpinBoxes()
         self.addFunctionalityButtons()
         self.addCanvas()
         self.addPanels()
@@ -800,7 +802,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.infoTable.setColumnCount(1)
         self.infoTable.setRowCount(0)
         self.infoTable.horizontalHeader().hide()
-        self.infoTable.cellDoubleClicked.connect(self.update_from_table)
+        self.infoTable.cellChanged.connect(self.on_cell_changed)
         self.rightpanel.addWidget(qtw.QLabel("Info:"))
         self.rightpanel.addWidget(self.infoTable)
         return
@@ -810,6 +812,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonOpenDialog = qtw.QPushButton("Load data")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
         self.leftpanel.addWidget(buttonOpenDialog)
+
+        buttonUpdateFromTable = qtw.QPushButton("Update")
+        buttonUpdateFromTable.clicked.connect(self.on_click_update)
+        self.rightpanel.addWidget(buttonUpdateFromTable)
 
         buttonLogLinear = qtw.QPushButton("Log / Linear")
         buttonLogLinear .clicked.connect(self.on_click_loglinear)
@@ -852,17 +858,34 @@ class MyFrame(qtw.QFrame,FrozenClass):
         try:
             if not self.compute_Q():
                 return
-            if not self.update_gui():
+            if not self.update_gui(reset_limits_required=False):
                 return
         except Exception as e:
             App.handle_exception(e)
 
+    @pyqtSlot()
+    def on_click_update(self):
+        y = self.experiment.__dict__
+
+        try:
+            self.loop_update_values()
+            self.color_outdated()
+            self.compute_Q()
+            self.update_gui(reset_limits_required=False)
+        except Exception as e:
+            App.handle_exception(e)
+            return False
+        return True
+
+    @pyqtSlot()
+    def on_cell_changed(self):
+        self.color_outdated()
 
 
     @pyqtSlot()
     def on_click_loglinear(self):
         try:
-            self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=True)
+            self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=False)
         except Exception as e:
             App.handle_exception(e)
         return
@@ -917,40 +940,41 @@ class MyFrame(qtw.QFrame,FrozenClass):
             App.handle_exception(e)
 
 
-    @pyqtSlot()
-    def on_spinbox_edit(self):
-        try:
-            self.graphView.update_graph(zmax=self.maxSpinBox.value(), zmin=self.minSpinBox.value())
-        except Exception as e:
-            App.handle_exception(e)
-        return
+#     @pyqtSlot()
+#     def on_spinbox_edit(self):
+#         try:
+#             self.graphView.update_graph(zmax=self.maxSpinBox.value(), zmin=self.minSpinBox.value())
+#         except Exception as e:
+#             App.handle_exception(e)
+#         return
 
 
     @pyqtSlot()
     def on_graph_updated(self):
         try:
-            self.minSpinBox.setValue(self.graphView.params.zmin)
-            self.maxSpinBox.setValue(self.graphView.params.zmax)
+            self.experiment.min_intensity = self.graphView.params.zmin
+            self.experiment.max_intensity = self.graphView.params.zmax
+            self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
         return
 
 
-    @staticmethod
-    def init_spinbox(spinbox, slot):
-        spinbox.editingFinished.connect(slot)
-        return
+#    @staticmethod
+#    def init_spinbox(spinbox, slot):
+#        spinbox.editingFinished.connect(slot)
+#        return
 
 
-    def addMinMaxSpinBoxes(self):
-        self.init_spinbox(self.minSpinBox, self.on_spinbox_edit)
-        self.init_spinbox(self.maxSpinBox, self.on_spinbox_edit)
-        formLayout = qtw.QFormLayout()
-        formLayout.addRow(self.tr("&Min Intensity"), self.minSpinBox)
-        formLayout.addRow(self.tr("&Max Intensity"), self.maxSpinBox)
-        formLayout.setFormAlignment(Qt.AlignBottom)
-        self.rightpanel.addLayout(formLayout)
-        return
+#     def addMinMaxSpinBoxes(self):
+#         self.init_spinbox(self.minSpinBox, self.on_spinbox_edit)
+#         self.init_spinbox(self.maxSpinBox, self.on_spinbox_edit)
+#         formLayout = qtw.QFormLayout()
+#         formLayout.addRow(self.tr("&Min Intensity"), self.minSpinBox)
+#         formLayout.addRow(self.tr("&Max Intensity"), self.maxSpinBox)
+#         formLayout.setFormAlignment(Qt.AlignBottom)
+#         self.rightpanel.addLayout(formLayout)
+#         return
 
 
     def addWelcomeMessage(self):
@@ -998,18 +1022,48 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return None
 
 
-    def update_from_table(self):
-        y = self.experiment.__dict__
+    @staticmethod
+    def color_validate(table_item, value_a, value_b):
+        pink = QColor(255, 0, 0, 127)
+        if value_a != value_b:
+            table_item.setBackground(pink)
+        else:
+            table_item.setBackground(Qt.white)
+        return True
 
+    def loop_update_values(self):
         for i in range(self.infoTable.rowCount()):
             key = self.infoTable.verticalHeaderItem(i).text()
-            if key in ['qyc', 'qzc']:
-               value = int(self.infoTable.item(i,0).text())
-               self.experiment.__dict__[key] = value
+            current_item = self.infoTable.item(i,0)
+            if key in ['qyc', 'qzc', 'pix0', 'pixf']:
+                value = int(current_item.text())
+                self.experiment.__dict__[key] = value
+            elif key in ["min_intensity", "max_intensity"]:
+                value = float(current_item.text())
+                self.experiment.__dict__[key] = value
+        return True
+
+    
+    def color_outdated(self):
+        y = self.experiment.__dict__
 
         try:
-            self.compute_Q()
-            self.update_gui()
+            for i in range(self.infoTable.rowCount()):
+                key = self.infoTable.verticalHeaderItem(i).text()
+                current_item = self.infoTable.item(i,0)
+                try:
+                    if key in ['qyc', 'qzc', 'pix0', 'pixf']:
+                        value = int(current_item.text())
+                    elif key in ["min_intensity", "max_intensity"]:
+                        value = float(current_item.text())
+                    else:
+                        continue
+                
+                    self.color_validate(current_item, value, self.experiment.__dict__[key])
+                except Exception as e:
+                    current_item.setBackground(Qt.red)
+                    return False
+
         except Exception as e:
             App.handle_exception(e)
             return False
@@ -1017,7 +1071,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def update_widgets(self):
-        x = self.settings.datFileName
         y = self.experiment.__dict__
 
         self.infoTable.setRowCount(0)
@@ -1025,7 +1078,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
             if k[0] == "_":
                 continue
 
-            if k in ["qyc", "qzc", "pix0", "pixf", "meansens", "monitor_counts", "angle_of_incidence", "selector_lambda"]:
+            if k in ["qyc", "qzc", "pix0", "pixf",
+                     "min_intensity", "max_intensity",
+                     "meansens", "monitor_counts",
+                     "angle_of_incidence", "selector_lambda"]:
 
                 item_k = qtw.QTableWidgetItem(str(k))
                 item_v = qtw.QTableWidgetItem(str(y[k]))
@@ -1033,8 +1089,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 self.infoTable.setVerticalHeaderItem(i,item_k)
                 self.infoTable.setItem(i,0,item_v)
 
-        self.minSpinBox.setValue(self.graphView.params.zmin)
-        self.maxSpinBox.setValue(self.graphView.params.zmax)
+        #self.minSpinBox.setValue(self.graphView.params.zmin)
+        #self.maxSpinBox.setValue(self.graphView.params.zmax)
 
         return True
 
@@ -1286,7 +1342,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
 
-    def update_gui(self):
+    def update_gui(self, reset_limits_required=True):
         try:
             self.graphView.update_graph(
                             Y = self.experiment.qymatrix,
@@ -1294,7 +1350,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Z = self.experiment.Imatrix,
                             Xc = self.experiment.qzc,
                             Yc = self.experiment.qyc,
-                            reset_limits_required=True
+                            zmin = self.experiment.min_intensity,
+                            zmax = self.experiment.max_intensity,
+                            reset_limits_required=reset_limits_required
                             )
             self.update_widgets()
         except Exception as e:
