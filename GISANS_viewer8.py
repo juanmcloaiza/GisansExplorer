@@ -27,7 +27,6 @@ import cProfile, pstats, io
 
 _DEBUG_ = False
 
-
 def enable_high_dpi_scaling():
     if hasattr(Qt, 'AA_EnableHighDpiScaling'):
         qtw.QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -238,8 +237,8 @@ class MyGraphView(qtw.QWidget):
 
     def define_layout(self):
         self.layout = qtw.QVBoxLayout()
-        self.layout.addWidget(self.xyzLabel)
         self.layout.addWidget(self.canvas)
+        self.layout.addWidget(self.xyzLabel)
         self.layout.setStretchFactor(self.canvas, 1)
         self.setLayout(self.layout)
         return #define_layout
@@ -291,11 +290,22 @@ class MyGraphView(qtw.QWidget):
 
 
     def on_mouse_move(self, event):
-        x, y = event.xdata,event.ydata
-        if x is None or y is None:
+        if not event.inaxes:
             return
-        z = self.data.Z[int(y), int(x)]
-        self.xyzLabel.setText(f"(x, y; z) = ({x:3.2g}, {y:3.2g}; {z:3.2g})")
+        xd, yd = event.xdata, event.ydata
+        xarr = self.data.X[0,:]
+        yarr = self.data.Y[:,0]
+        if event.inaxes == self.zoom_ax:
+            col = np.searchsorted(xarr, xd)-1
+            row = np.searchsorted(yarr, yd)-1
+        else:
+            row, col = int(yd + 0.5), int(xd + 0.5)
+
+        zd = self.data.Z[row, col]
+        coord_text = f'x={xd:1.4f}, y={yd:1.4f}, z={zd:1.4f}   [{row},{col}]'
+        self.xyzLabel.setText(coord_text)
+        #self.xyzLabel.setText(f"(x, y; z) = ({xd:3.2g}, {yd:3.2g}; {z:3.2g})")
+
         return #on_mouse_move
 
 
