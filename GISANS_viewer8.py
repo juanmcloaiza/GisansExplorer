@@ -644,14 +644,15 @@ class App(qtw.QMainWindow,FrozenClass):
 
     @staticmethod
     def handle_exception(e):
-        msg = (f"Exception: {e}\n")
-        msg += ("-"*60+"\n")
+        msg0= (f"Exception: {e}\n")
+        msg = ("-"*60+"\n")
         msg += traceback.format_exc()
         msg += ("-"*60+"\n")
-        print(msg)
+        print(msg0, msg)
         pop_up = qtw.QMessageBox()
         pop_up.setWindowTitle(f"Exception: {e}\n")
-        pop_up.setText(msg)
+        pop_up.setText(msg0)
+        pop_up.setInformativeText(msg)
         pop_up.setIcon(qtw.QMessageBox.Critical)
         x = pop_up.exec_()
         return
@@ -1391,6 +1392,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
 if __name__ == '__main__':
     enable_high_dpi_scaling()
     app = qtw.QApplication(sys.argv)
+    app.setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5;}")
+    
     ex = App()
     #sys.exit(app.exec_())
     #x = profile_function_with_arguments(app.exec_)
