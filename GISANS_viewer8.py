@@ -179,14 +179,11 @@ class PlotData(FrozenClass):
         self.Xzoom = np.zeros((10,10))
         self.Yzoom = np.zeros((10,10))
         self.Zzoom = np.zeros((10,10))
+        self.zoom_extent = (0., 1., 0., 1.)
 
         self.Xc = 0
         self.Yc = 0
-        return
 
-
-class PlotParams(FrozenClass):
-    def __init__(self):
         self.x1 = 0
         self.x2 = 10
         self.y1 = 0
@@ -204,6 +201,7 @@ class PlotParams(FrozenClass):
         self.reset_limits_required = True
 
         self.title = ""
+        self._freeze()
         return
 
 
@@ -270,16 +268,15 @@ class MyGraphView(qtw.QWidget):
 
     def init_data_and_parameters(self):
         self.data = PlotData()
-        self.params = PlotParams()
         return #init_data_and_parameters
 
 
     def on_mouse_wheel(self, event):
         if self.cax == event.inaxes:
             if event.button == 'up':
-                func = lambda c: (np.sign(c) * abs(c)**0.9) if self.params.log_scale else 0.9*c
+                func = lambda c: (np.sign(c) * abs(c)**0.9) if self.data.log_scale else 0.9*c
             elif event.button == 'down':
-                func = lambda c: (np.sign(c) * abs(c)**1.1) if self.params.log_scale else 1.1*c
+                func = lambda c: (np.sign(c) * abs(c)**1.1) if self.data.log_scale else 1.1*c
             else:
                 return
 
@@ -322,19 +319,12 @@ class MyGraphView(qtw.QWidget):
         for k in self.data.__dict__.keys():
             if k in kwargs.keys():
                 self.data.__setattr__(k,kwargs[k])
+        
+        if self.data.reset_limits_required:
+            self.data.zmin = self.data.Z.min()
+            self.data.zmax = self.data.Z.max()
+            self.data.reset_limits_required = False
         return #update_data
-
-
-    def update_params(self, **kwargs):
-        for k in self.params.__dict__.keys():
-            if k in kwargs.keys():
-                self.params.__setattr__(k,kwargs[k])
-
-        if self.params.reset_limits_required:
-            self.params.zmin = self.data.Z.min()
-            self.params.zmax = self.data.Z.max()
-            self.params.reset_limits_required = False
-        return #update_params
 
 
     def update_axes(self, **kwargs):
@@ -350,14 +340,13 @@ class MyGraphView(qtw.QWidget):
         self.canvas.figure.clear()
         self.define_axes()
         self.update_data(**kwargs)
-        self.update_params(**kwargs)
         self.build_norm(**kwargs)
         self.update_axes(**kwargs)
         self.update_area_selector(**kwargs)
-        self.canvas.figure.suptitle(self.params.title)
+        self.canvas.figure.suptitle(self.data.title)
         self.canvas.draw()
         self.save(**kwargs)
-        print(self.params.__dict__)
+        print(self.data.__dict__)
         self.finishedUpdating.emit()
         return
 
@@ -377,21 +366,20 @@ class MyGraphView(qtw.QWidget):
 
 
     def build_norm(self, **kwargs):
-        if self.params.log_scale:
-            #self.take_care_of_negative_values()
-            #self.norm = mpl.colors.LogNorm(vmin=self.params.zmin, vmax=self.params.zmax)
+        if self.data.log_scale:
+            #self.norm = mpl.colors.LogNorm(vmin=self.data.zmin, vmax=self.data.zmax)
             thres = np.abs(self.data.Z.std()/1e8)
-            self.norm = mpl.colors.SymLogNorm(vmin=self.params.zmin, vmax=self.params.zmax, linthresh=thres)
+            self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres)
         else:
-            self.norm = mpl.colors.Normalize(vmin=self.params.zmin, vmax=self.params.zmax)
+            self.norm = mpl.colors.Normalize(vmin=self.data.zmin, vmax=self.data.zmax)
         return #build_norm
 
 
     def take_care_of_negative_values(self):
-        if self.params.zmin <= 0:
-            self.params.zmin = np.abs(self.data.Z.mean()/1e3)
-        if self.params.zmax <= 0:
-            self.params.zmax = 1+np.abs(self.data.Z.mean()/1e3)
+        if self.data.zmin <= 0:
+            self.data.zmin = np.abs(self.data.Z.mean()/1e3)
+        if self.data.zmax <= 0:
+            self.data.zmax = 1+np.abs(self.data.Z.mean()/1e3)
         return #take_care_of_negative_values
 
 
@@ -407,7 +395,7 @@ class MyGraphView(qtw.QWidget):
 
     def update_area_selector(self, **kwargs):
         self.area_selector.rs.to_draw.set_visible(True)
-        self.area_selector.rs.extents = (self.params.x1, self.params.x2, self.params.y1, self.params.y2)
+        self.area_selector.rs.extents = (self.data.x1, self.data.x2, self.data.y1, self.data.y2)
         #self.area_selector.rs.update()
         return #update_area_selector
 
@@ -418,14 +406,14 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_zoom_ax(self):
-        x1, x2 = self.params.x1, self.params.x2
-        y1, y2 = self.params.y1, self.params.y2
+        x1, x2 = self.data.x1, self.data.x2
+        y1, y2 = self.data.y1, self.data.y2
         xc, yc = self.data.Xc, self.data.Yc
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
 
-        self.params.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y2,x2], self.data.Y[y1,x1])
+        self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y2,x2], self.data.Y[y1,x1])
         self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
-                                            extent=self.params.zoom_extent)
+                                            extent=self.data.zoom_extent)
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
             self.zoom_ax.axvline(x=0, c='k', ls='solid', lw=0.5)
@@ -446,11 +434,11 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_xax(self):
-        if self.params.log_scale:
+        if self.data.log_scale:
             self.xax.set_yscale('log')
 
         integration_x = self.data.Zzoom.sum(axis=0)
-        x0, xf = self.params.zoom_extent[0:2]
+        x0, xf = self.data.zoom_extent[0:2]
         rangex = np.linspace(x0, xf, len(integration_x))
         self.xax_line = self.xax.plot(rangex, integration_x)
         self.xax.set_xlim((x0, xf))
@@ -469,11 +457,11 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_yax(self):
-        if self.params.log_scale:
+        if self.data.log_scale:
             self.yax.set_xscale('log')
 
         integration_y =  self.data.Zzoom.sum(axis=1)[::-1]
-        y0, yf = self.params.zoom_extent[2:4]
+        y0, yf = self.data.zoom_extent[2:4]
         rangey = np.linspace(y0, yf, len(integration_y))
         self.yax_line = self.yax.plot(integration_y, rangey)
 
@@ -735,7 +723,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.settings = Settings()
         self.settings_dict = {}
         self.experiment = Experiment()
-        self.experiment_dict = {"show_sum": False}
+        self.experiment_dict = {}
         self.graphView = MyGraphView("Title")
         self.infoTable = qtw.QTableWidget()
         self.fileList = qtw.QListWidget()
@@ -771,6 +759,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.dirtree.setSortingEnabled(True)
         self.dirtree.doubleClicked.connect(self.on_click_open_file)
         self.fileList.itemSelectionChanged.connect(self.on_file_selection_changed)
+        self.fileList.setSelectionMode(3) #https://doc.qt.io/archives/qt-5.11/qabstractitemview.html#SelectionMode-enum
 
         self.leftpanel.addWidget(qtw.QLabel("Select file:"))
         leftSplitter = qtw.QSplitter()
@@ -803,6 +792,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.infoTable.setColumnCount(1)
         self.infoTable.setRowCount(0)
         self.infoTable.horizontalHeader().hide()
+        self.infoTable.horizontalHeader().setStretchLastSection(True)
         self.infoTable.cellChanged.connect(self.on_cell_changed)
         self.rightpanel.addWidget(qtw.QLabel("Info:"))
         self.rightpanel.addWidget(self.infoTable)
@@ -813,10 +803,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonOpenDialog = qtw.QPushButton("Add data")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
         self.leftpanel.addWidget(buttonOpenDialog)
-
-        buttonToggleSum = qtw.QPushButton("Sum all / Show single")
-        buttonToggleSum.clicked.connect(self.on_click_toggle_sum)
-        self.leftpanel.addWidget(buttonToggleSum)
 
         buttonUpdateFromTable = qtw.QPushButton("Update")
         buttonUpdateFromTable.clicked.connect(self.on_click_update)
@@ -842,62 +828,28 @@ class MyFrame(qtw.QFrame,FrozenClass):
         try:
             self.settings = Settings()
             self.experiment = Experiment()
-            self.doStuff()
-            sum1 = self.experiment.Imatrix.sum()
-            sum2 = self.experiment.cut_Iy.sum()
-            sum3 = self.experiment.cut_Iz.sum()
-            print("If the following three sums are not equal, there's an error:")
-            print(sum1, sum2, sum3)
-            self.experiment_dict[self.settings.datFileName] = copy.deepcopy(self.experiment)
-            self.settings_dict[self.settings.datFileName] = copy.deepcopy(self.settings)
-        except Exception as e:
-            App.handle_exception(e)
-
-
-    @pyqtSlot()
-    def on_click_toggle_sum(self):
-        self.experiment_dict["show_sum"] = not self.experiment_dict["show_sum"]
-        if not self.experiment_dict["show_sum"]:
-            self.on_file_selection_changed()
-            return
-        try:
-            expdict = copy.deepcopy(self.experiment_dict)
-            expdict.pop("show_sum")
-            keys = list(expdict.keys())
-            Isum = expdict[keys.pop()].Imatrix
-            while keys:
-                Isum += expdict[keys.pop()].Imatrix
-            self.graphView.update_graph(Z = Isum)
-
+            did_stuff, why_not = self.doStuff()
+            if did_stuff:
+                sum1 = self.experiment.Imatrix.sum()
+                sum2 = self.experiment.cut_Iy.sum()
+                sum3 = self.experiment.cut_Iz.sum()
+                print("If the following three sums are not equal, there's an error:")
+                print(sum1, sum2, sum3)
+                self.experiment_dict[self.settings.datFileName] = copy.deepcopy(self.experiment)
+                self.settings_dict[self.settings.datFileName] = copy.deepcopy(self.settings)
+            else: 
+                raise Exception(f"Did not complete data processing: {why_not}")
         except Exception as e:
             App.handle_exception(e)
 
 
     @pyqtSlot()
     def on_file_selection_changed(self):
-        currentListEntry = self.fileList.currentItem().text()
-        print(f"\n-- Calculating map for {currentListEntry} --")
-        self.settings = self.settings_dict[currentListEntry]
-        self.experiment = self.experiment_dict[currentListEntry]
-        try:
-            if not self.compute_Q():
-                return
-            if not self.update_gui(reset_limits_required=False):
-                return
-        except Exception as e:
-            App.handle_exception(e)
+        self.update_from_selection_list()
 
     @pyqtSlot()
     def on_click_update(self):
-        try:
-            self.loop_update_values()
-            self.color_outdated()
-            self.compute_Q()
-            self.update_gui(reset_limits_required=False)
-        except Exception as e:
-            App.handle_exception(e)
-            return False
-        return True
+        self.update_from_info_table()
 
     @pyqtSlot()
     def on_cell_changed(self):
@@ -907,7 +859,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_click_loglinear(self):
         try:
-            self.graphView.update_graph(log_scale = not self.graphView.params.log_scale, reset_limits_required=False)
+            self.graphView.update_graph(log_scale = not self.graphView.data.log_scale, reset_limits_required=False)
         except Exception as e:
             App.handle_exception(e)
         return
@@ -974,8 +926,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_graph_updated(self):
         try:
-            self.experiment.min_intensity = self.graphView.params.zmin
-            self.experiment.max_intensity = self.graphView.params.zmax
+            self.experiment.min_intensity = self.graphView.data.zmin
+            self.experiment.max_intensity = self.graphView.data.zmax
             self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
@@ -1116,9 +1068,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 self.infoTable.setVerticalHeaderItem(i,item_k)
                 self.infoTable.setItem(i,0,item_v)
 
-        #self.minSpinBox.setValue(self.graphView.params.zmin)
-        #self.maxSpinBox.setValue(self.graphView.params.zmax)
-
         return True
 
 
@@ -1126,22 +1075,22 @@ class MyFrame(qtw.QFrame,FrozenClass):
         #self.graphView.test()
         #return
         if not self.read_dat_file():
-            return
+            return False, "dat file not read"
         if not self.read_yaml_file():
-            return
+            return False, "yaml file not read"
         if not self.read_sensitivity_file():
-            return
+            return False, "Sensitivity file not read"
         if not self.read_intensity_file():
-            return
+            return False, "Intensity file not read"
         if not self.compute_Q():
-            return
+            return False, "Q not computed"
         #if not self.line_cut_at_constant_y():
         #    return
         #if not self.line_cut_at_constant_z():
         #    return
         if not self.update_gui():
-            return
-        return
+            return False, "GUI not updated"
+        return True, None
 
 
     def safe_parse(self, parse_func, file_path):
@@ -1174,9 +1123,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         if _DEBUG_: 
             datFilePath = os.path.join(".","notToVersion","Archive","p15347_00001341.dat")
         else:
-            #datFilePath = self.openFileNameDialog()
-            #if self.dirtree.selectedIndexes().size() > 0:
-            datFilePath = self.dirtree.model().filePath(self.dirtree.currentIndex())
+            if len(self.dirtree.selectedIndexes()) < 1:
+                datFilePath = self.openFileNameDialog()
+            else:
+                datFilePath = self.dirtree.model().filePath(self.dirtree.currentIndex())
 
         if datFilePath:
             path, filename = os.path.split(datFilePath)
@@ -1367,6 +1317,35 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         self.experiment.cut_Iy = Iy
         return True
+
+    def update_from_info_table(self):
+        try:
+            self.loop_update_values()
+            self.color_outdated()
+            self.compute_Q()
+            self.update_from_selection_list()
+        except Exception as e:
+            App.handle_exception(e)
+            return False
+        return True
+
+
+    def update_from_selection_list(self):
+        selectedListEntries = self.fileList.selectedItems()
+        Isum = []
+        for currentListItem in selectedListEntries:
+            currentListEntry = currentListItem.text()
+            self.settings = self.settings_dict[currentListEntry]
+            self.experiment = self.experiment_dict[currentListEntry]
+            print(f"\n-- Calculating map for {currentListEntry} --")
+            Isum += [self.experiment.Imatrix]
+
+        Isum = np.asarray(Isum).sum(axis=0)
+        try:
+            self.update_gui(reset_limits_required=False)
+            self.graphView.update_graph(Z = Isum)
+        except Exception as e:
+            App.handle_exception(e)
 
 
     def update_gui(self, reset_limits_required=True):
