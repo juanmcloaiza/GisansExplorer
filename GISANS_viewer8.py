@@ -1045,9 +1045,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     @staticmethod
     def color_validate(table_item, value_a, value_b):
-        pink = QColor(255, 0, 0, 127)
+        green = QColor(000, 255, 0, 127)
         if value_a != value_b:
-            table_item.setBackground(pink)
+            table_item.setBackground(green)
+            table_item.setSelected(False)
         else:
             table_item.setBackground(Qt.white)
         return True
@@ -1084,7 +1085,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 
                     self.color_validate(current_item, value, expdict[key])
                 except Exception as e:
-                    current_item.setBackground(Qt.red)
+                    red = QColor(255, 000, 0, 127)
+                    current_item.setBackground(red)
+                    current_item.setSelected(False)
                     return False
 
         except Exception as e:
