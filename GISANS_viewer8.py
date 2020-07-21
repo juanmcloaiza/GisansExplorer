@@ -268,6 +268,13 @@ class MyGraphView(qtw.QWidget):
 
     def init_data_and_parameters(self):
         self.data = PlotData()
+        x = np.random.normal(1024,1024)
+        self.data.X = x
+        self.data.Y = x
+        self.data.x1 = 256
+        self.data.x2 = 1024-256
+        self.data.y1 = 256
+        self.data.y2 = 1024-256
         return #init_data_and_parameters
 
 
@@ -346,7 +353,6 @@ class MyGraphView(qtw.QWidget):
         self.canvas.figure.suptitle(self.data.title)
         self.canvas.draw()
         self.save(**kwargs)
-        print(self.data.__dict__)
         self.finishedUpdating.emit()
         return
 
@@ -506,8 +512,6 @@ class Experiment(FrozenClass):
         # and the sensitivity map file
         self.qyc = 0
         self.qzc = 0
-        self.pix0 = 0
-        self.pixf = -1
         self.min_intensity = 0
         self.max_intensity = 0
         self.sens = None
@@ -1006,18 +1010,28 @@ class MyFrame(qtw.QFrame,FrozenClass):
             table_item.setBackground(Qt.white)
         return True
 
-    def loop_update_values(self):
-        expdict = self.experiment.__dict__
+    def update_single_experiment_values(self, experiment):
+        expdict = experiment.__dict__
         for i in range(self.infoTable.rowCount()):
             key = self.infoTable.verticalHeaderItem(i).text()
             current_item = self.infoTable.item(i,0)
-            if key in ['qyc', 'qzc', 'pix0', 'pixf']:
+            if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf']:
                 value = int(current_item.text())
             elif key in ["min_intensity", "max_intensity"]:
                 value = float(current_item.text())
             else: 
                 continue
             expdict[key] = value
+        return True
+
+    def update_multi_experiment_values(self):
+        selectedListEntries = self.fileList.selectedItems()
+        for currentListItem in selectedListEntries:
+            currentListEntry = currentListItem.text()
+            self.settings = self.settings_dict[currentListEntry]
+            self.experiment = self.experiment_dict[currentListEntry]
+            self.update_single_experiment_values(self.experiment)
+            self.compute_Q()
         return True
 
     
@@ -1029,7 +1043,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 key = self.infoTable.verticalHeaderItem(i).text()
                 current_item = self.infoTable.item(i,0)
                 try:
-                    if key in ['qyc', 'qzc', 'pix0', 'pixf']:
+                    if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf']:
                         value = int(current_item.text())
                     elif key in ["min_intensity", "max_intensity"]:
                         value = float(current_item.text())
@@ -1057,7 +1071,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             if k[0] == "_":
                 continue
 
-            if k in ["qyc", "qzc", "pix0", "pixf",
+            if k in ["qyc", "qzc", "x0", "y0", "xf", "yf",
                      "min_intensity", "max_intensity",
                      "meansens", "monitor_counts",
                      "angle_of_incidence", "selector_lambda"]:
@@ -1211,9 +1225,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def parse_sensitivity_map(self, sens):
-        pix0 = self.experiment.pix0
-        pixf = self.experiment.pixf
-        #meansens = sens[pix0:pixf+1,pix0:pixf+1].astype(float).mean()
         meansens = sens.astype(float).mean()
         self.experiment.sens = sens
         self.experiment.meansens = meansens
@@ -1320,9 +1331,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def update_from_info_table(self):
         try:
-            self.loop_update_values()
+            self.update_multi_experiment_values()
             self.color_outdated()
-            self.compute_Q()
             self.update_from_selection_list()
         except Exception as e:
             App.handle_exception(e)
@@ -1342,8 +1352,17 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         Isum = np.asarray(Isum).sum(axis=0)
         try:
-            self.update_gui(reset_limits_required=False)
-            self.graphView.update_graph(Z = Isum)
+            self.graphView.update_graph(
+                            Y = self.experiment.qymatrix,
+                            X = self.experiment.qzmatrix,
+                            Z = Isum,
+                            Xc = self.experiment.qzc,
+                            Yc = self.experiment.qyc,
+                            zmin = self.experiment.min_intensity,
+                            zmax = self.experiment.max_intensity,
+                            reset_limits_required=False
+                        )
+            self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
 
@@ -1359,7 +1378,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             zmin = self.experiment.min_intensity,
                             zmax = self.experiment.max_intensity,
                             reset_limits_required=reset_limits_required
-                            )
+                        )
             self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
