@@ -390,7 +390,7 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_ax(self, **kwargs):
-        self.ax_imshow = self.ax.pcolormesh(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
         self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid', linewidths=0.5)
         self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid', linewidths=0.5)
         self.ax.scatter(self.data.Xc, self.data.Yc, marker='x', c='r')
@@ -415,12 +415,12 @@ class MyGraphView(qtw.QWidget):
         x1, x2 = self.data.x1, self.data.x2
         y1, y2 = self.data.y1, self.data.y2
         xc, yc = self.data.Xc, self.data.Yc
-        self.data.Xzoom = self.data.X[y1:y2,x1:x2]
-        self.data.Yzoom = self.data.Y[y1:y2,x1:x2]
+        self.data.Xzoom = self.data.X[y1:y2+1,x1:x2+1]
+        self.data.Yzoom = self.data.Y[y1:y2+1,x1:x2+1]
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
 
         self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
-        self.zoom_ax_imshow = self.zoom_ax.pcolormesh(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.zoom_ax_imshow = self.zoom_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
 
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
