@@ -390,7 +390,7 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_ax(self, **kwargs):
-        self.ax_imshow = self.ax.imshow(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.ax_imshow = self.ax.pcolormesh(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
         self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid', linewidths=0.5)
         self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid', linewidths=0.5)
         self.ax.scatter(self.data.Xc, self.data.Yc, marker='x', c='r')
@@ -415,11 +415,13 @@ class MyGraphView(qtw.QWidget):
         x1, x2 = self.data.x1, self.data.x2
         y1, y2 = self.data.y1, self.data.y2
         xc, yc = self.data.Xc, self.data.Yc
+        self.data.Xzoom = self.data.X[y1:y2,x1:x2]
+        self.data.Yzoom = self.data.Y[y1:y2,x1:x2]
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
 
-        self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y2,x2], self.data.Y[y1,x1])
-        self.zoom_ax_imshow = self.zoom_ax.imshow(self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax,
-                                            extent=self.data.zoom_extent)
+        self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
+        self.zoom_ax_imshow = self.zoom_ax.pcolormesh(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
             self.zoom_ax.axvline(x=0, c='k', ls='solid', lw=0.5)
@@ -466,7 +468,7 @@ class MyGraphView(qtw.QWidget):
         if self.data.log_scale:
             self.yax.set_xscale('log')
 
-        integration_y =  self.data.Zzoom.sum(axis=1)[::-1]
+        integration_y =  self.data.Zzoom.sum(axis=1)
         y0, yf = self.data.zoom_extent[2:4]
         rangey = np.linspace(y0, yf, len(integration_y))
         self.yax_line = self.yax.plot(integration_y, rangey)
