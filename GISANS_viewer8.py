@@ -820,7 +820,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonSavePng.clicked.connect(self.on_click_save_png)
         self.rightpanel.addWidget(buttonSavePng)
 
-        buttonSaveAscii = qtw.QPushButton("Save ascii")
+        buttonSaveAscii = qtw.QPushButton("Save ROI as ascii columns")
         buttonSaveAscii.clicked.connect(self.on_click_save_ascii)
         self.rightpanel.addWidget(buttonSaveAscii)
 
@@ -906,14 +906,20 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
             noextpath, ext = os.path.splitext(filepath)
             if ext == '': ext = ".txt"
-            file_qz = noextpath+"_qz_"+ext
-            file_qy = noextpath+"_qy_"+ext
-            file_Iyz = noextpath+"_Iyz_"+ext
-            np.savetxt(file_qz, self.experiment.qzmatrix)
-            np.savetxt(file_qy, self.experiment.qymatrix)
-            np.savetxt(file_Iyz,  self.experiment.Imatrix)
 
-            print(f"Arrays saved:\n {file_qz}\n {file_qy}\n {file_Iyz}\n")
+            x1, x2 = self.graphView.data.x1, self.graphView.data.x2
+            y1, y2 = self.graphView.data.y1, self.graphView.data.y2
+            original_shape = self.graphView.data.X[y1:y2,x1:x2].shape
+            x_to_save = self.graphView.data.X[y1:y2,x1:x2].flatten()
+            y_to_save = self.graphView.data.Y[y1:y2,x1:x2].flatten()
+            z_to_save = self.graphView.data.Z[y1:y2,x1:x2].flatten()
+
+            columns = np.vstack((x_to_save, y_to_save, z_to_save)).T
+
+            filename = noextpath+ext
+            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
+
+            print(f"Arrays saved:\n {filename}\n")
         except Exception as e:
             App.handle_exception(e)
 
