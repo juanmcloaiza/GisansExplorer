@@ -514,6 +514,10 @@ class Experiment(FrozenClass):
         # and the sensitivity map file
         self.qyc = 0
         self.qzc = 0
+        self.x0 = 128
+        self.y0 = 128
+        self.xf = 256
+        self.yf = 256
         self.min_intensity = 0
         self.max_intensity = 0
         self.sens = None
@@ -940,6 +944,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         try:
             self.experiment.min_intensity = self.graphView.data.zmin
             self.experiment.max_intensity = self.graphView.data.zmax
+            self.experiment.x0 = self.graphView.data.x1
+            self.experiment.y0 = self.graphView.data.y1
+            self.experiment.xf = self.graphView.data.x2
+            self.experiment.yf = self.graphView.data.y2
             self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
@@ -1079,10 +1087,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
             if k[0] == "_":
                 continue
 
-            if k in ["qyc", "qzc", "x0", "y0", "xf", "yf",
+            if k in ["selector_lambda", "qyc", "qzc", "x0", "y0", "xf", "yf",
                      "min_intensity", "max_intensity",
                      "meansens", "monitor_counts",
-                     "angle_of_incidence", "selector_lambda"]:
+                     "angle_of_incidence"]:
 
                 item_k = qtw.QTableWidgetItem(str(k))
                 item_v = qtw.QTableWidgetItem(str(expdict[k]))
@@ -1368,7 +1376,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Yc = self.experiment.qyc,
                             zmin = self.experiment.min_intensity,
                             zmax = self.experiment.max_intensity,
-                            reset_limits_required=False
+                            reset_limits_required=False,
+                            x1=self.experiment.x0,
+                            y1=self.experiment.y0,
+                            x2=self.experiment.xf,
+                            y2=self.experiment.yf
                         )
             self.update_widgets()
         except Exception as e:
@@ -1385,7 +1397,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Yc = self.experiment.qyc,
                             zmin = self.experiment.min_intensity,
                             zmax = self.experiment.max_intensity,
-                            reset_limits_required=reset_limits_required
+                            reset_limits_required=reset_limits_required,
+                            x1=self.experiment.x0,
+                            y1=self.experiment.y0,
+                            x2=self.experiment.xf,
+                            y2=self.experiment.yf
                         )
             self.update_widgets()
         except Exception as e:
