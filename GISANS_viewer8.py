@@ -500,9 +500,9 @@ class MyGraphView(qtw.QWidget):
         X, Y = np.meshgrid(x,y)
         Z = np.sin(Y) * np.cos(X)
         self.update_graph(X = X, Y = Y, Z = Z, Xc = 512, Yc = 512)
-        if _DEBUG_:
-            np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
-            np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+        #if _DEBUG_:
+        #    np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
+        #    np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         return
 
 class Experiment(FrozenClass):
@@ -577,8 +577,8 @@ class Settings(FrozenClass):
     def __init__(self):
         self.dataDirPath = None
         self.datFileName = None
-        self.yamlFileName = None
-        self.gzFileName = None
+        self.yamlFileNames = []
+        self.gzFileNames = []
         self.sensFileName = "sensitivity_map"
         self._freeze()
         return
@@ -590,16 +590,16 @@ class Settings(FrozenClass):
         return os.path.join(self.dataDirPath,self.datFileName)
 
 
-    def yamlFilePath(self):
+    def yamlFilePaths(self):
         if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataDirPath,self.yamlFileName)
+        return [os.path.join(self.dataDirPath,f) for f in self.yamlFileNames]
 
 
-    def gzFilePath(self):
+    def gzFilePaths(self):
         if self.dataDirPath is None:
             return None
-        return os.path.join(self.dataDirPath,self.gzFileName)
+        return [os.path.join(self.dataDirPath,f) for f in self.gzFileNames]
 
 
     def sensFilePath(self):
@@ -840,13 +840,13 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.experiment = Experiment()
             did_stuff, why_not = self.doStuff()
             if did_stuff:
-                sum1 = self.experiment.Imatrix.sum()
-                sum2 = self.experiment.cut_Iy.sum()
-                sum3 = self.experiment.cut_Iz.sum()
-                print("If the following three sums are not equal, there's an error:")
-                print(sum1, sum2, sum3)
-                self.experiment_dict[self.settings.datFileName] = copy.deepcopy(self.experiment)
-                self.settings_dict[self.settings.datFileName] = copy.deepcopy(self.settings)
+                for gzfn in self.settings.gzFileNames:
+                    self.fileList.addItem(gzfn)
+                    sum1 = self.experiment_dict[gzfn].Imatrix.sum()
+                    sum2 = self.experiment_dict[gzfn].cut_Iy.sum()
+                    sum3 = self.experiment_dict[gzfn].cut_Iz.sum()
+                    print("If the following three sums are not equal, there's an error:")
+                    print(sum1, sum2, sum3)
             else: 
                 raise Exception(f"Did not complete data processing: {why_not}")
         except Exception as e:
@@ -1114,10 +1114,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
             return False, "Intensity file not read"
         if not self.compute_Q():
             return False, "Q not computed"
-        #if not self.line_cut_at_constant_y():
-        #    return
-        #if not self.line_cut_at_constant_z():
-        #    return
         if not self.update_gui():
             return False, "GUI not updated"
         return True, None
@@ -1151,7 +1147,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def read_dat_file(self):
         # Open and read the dat file
         if _DEBUG_: 
-            datFilePath = os.path.join(".","notToVersion","Archive","p15347_00001341.dat")
+            datFilePath = os.path.join(".","notToVersion","Archive","p15496_00000992.dat")
         else:
             if len(self.dirtree.selectedIndexes()) < 1:
                 datFilePath = self.openFileNameDialog()
@@ -1162,33 +1158,39 @@ class MyFrame(qtw.QFrame,FrozenClass):
             path, filename = os.path.split(datFilePath)
             self.settings.datFileName = filename
             self.settings.dataDirPath = path
-            self.fileList.addItem(filename)
             return self.safe_parse(self.parse_dat, self.settings.datFilePath())
         return False
 
 
+    def read_sensitivity_file(self):
+        func = self.parse_sensitivity_map
+        fpath = self.settings.sensFilePath()
+        for key in self.settings.gzFileNames:
+            self.experiment = self.experiment_dict[key]
+            tf = self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
+            if not tf:
+                return False
+        return True
+
+
     def read_yaml_file(self):
         # Open and read the yaml file
-        yamlFileName = self.settings.yamlFileName
-        if yamlFileName:
-            return self.safe_parse(self.parse_yaml, self.settings.yamlFilePath())
-        return False
-
-
-    def read_sensitivity_file(self):
-        if self.settings.sensFileName:
-            fpath = self.settings.sensFilePath()
-            func = self.parse_sensitivity_map
-            return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
-        return False
+        for yamlFileName, key in zip(self.settings.yamlFilePaths(), self.settings.gzFileNames):
+            self.experiment = self.experiment_dict[key]
+            tf = self.safe_parse(self.parse_yaml, yamlFileName)
+            if not tf:
+                return False
+        return True
 
 
     def read_intensity_file(self):
-        if self.settings.gzFileName:
-            fpath = self.settings.gzFilePath()
-            func = self.parse_intensity_map
-            return self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
-        return False
+        func = self.parse_intensity_map
+        for fpath, key in zip(self.settings.gzFilePaths(),self.settings.gzFileNames):
+            self.experiment = self.experiment_dict[key]
+            tf = self.safe_parse_numpy(func, fpath, dtype=float, delimiter=' ')
+            if not tf:
+                return False
+        return True
 
 
     def parse_dat(self, file):
@@ -1204,20 +1206,22 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 selector_lambda=lambda_line_list[3]
                 self.experiment.selector_lambda = selector_lambda
                 print('Neutron wavelength (Angtrom): '+str(selector_lambda))
-            if line.find('.gz')>0:
-                line_list = line.split()
-                for word in line_list:
-                    if word.find('.gz')>0:
-                        gzFileName = word
-                        self.settings.gzFileName = gzFileName
-                        print(f"Found gz path: {self.settings.gzFilePath()}")
             if line.find('.yaml')>0:
                 line_list = line.split()
                 for word in line_list:
                     if word.find('.yaml')>0:
                         yamlFileName = word
-                        self.settings.yamlFileName = yamlFileName
-                        print(f"Found yaml path: {self.settings.yamlFilePath()}")
+                        self.settings.yamlFileNames.append(yamlFileName)
+                        print(f"Found yaml: {yamlFileName}")
+            if line.find('.gz')>0:
+                line_list = line.split()
+                for word in line_list:
+                    if word.find('.gz')>0:
+                        gzFileName = word
+                        self.settings.gzFileNames.append(gzFileName)
+                        self.experiment_dict[gzFileName] = copy.deepcopy(self.experiment)
+                        self.settings_dict[gzFileName] = copy.deepcopy(self.settings)
+                        print(f"Found gz: {gzFileName}")
         return True
 
 
@@ -1258,28 +1262,30 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
     def compute_Q(self):
-        self.experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(self.experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
-        print(f"Corrected qzc = {self.experiment.qzc}")
+        for key in self.experiment_dict.keys():
+            experiment = self.experiment_dict[key]
+            experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+            print(f"Corrected qzc = {experiment.qzc}")
 
-        Imatrix = self.experiment.Imatrix
-        ipix_range = np.asarray(range(Imatrix.shape[0]))
-        jpix_range = np.asarray(range(Imatrix.shape[1]))
+            Imatrix = experiment.Imatrix
+            ipix_range = np.asarray(range(Imatrix.shape[0]))
+            jpix_range = np.asarray(range(Imatrix.shape[1]))
 
-        two_pi_over_lambda = self.experiment.two_pi_over_lambda
-        sin_alpha_i = self.experiment.sin_alpha_i
-        sin_2theta_f = self.experiment.sin_2theta_f(ipix_range)
-        cos_alpha_f = self.experiment.cos_alpha_f(jpix_range)
-        sin_alpha_f = self.experiment.sin_alpha_f(jpix_range)
+            two_pi_over_lambda = experiment.two_pi_over_lambda
+            sin_alpha_i = experiment.sin_alpha_i
+            sin_2theta_f = experiment.sin_2theta_f(ipix_range)
+            cos_alpha_f = experiment.cos_alpha_f(jpix_range)
+            sin_alpha_f = experiment.sin_alpha_f(jpix_range)
 
 
-        QY_i, QY_j = sin_2theta_f[ipix_range], cos_alpha_f[jpix_range]
-        QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
-        self.experiment.qymatrix = two_pi_over_lambda * QYmatrix
+            QY_i, QY_j = sin_2theta_f[ipix_range], cos_alpha_f[jpix_range]
+            QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
+            experiment.qymatrix = two_pi_over_lambda * QYmatrix
 
-        QZ_j = sin_alpha_f[jpix_range]
-        QZ_i = np.ones(ipix_range.shape)
-        QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
-        self.experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
+            QZ_j = sin_alpha_f[jpix_range]
+            QZ_i = np.ones(ipix_range.shape)
+            QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
+            experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
         
         return True
 
@@ -1312,38 +1318,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 #        qz = (two_pi_over_lambda * (sin_alpha_f[0:pixf+1-pix0] + sin_alpha_i))
         return
 
-
-    def line_cut_at_constant_y(self, dqyvalue=None, qyvalue=None):
-        print("Performing line cut at constant qy")
-        qzmatrix = self.experiment.qzmatrix
-        Imatrix = self.experiment.Imatrix
-        qz = self.experiment.qz
-        qzunique = np.unique(qzmatrix)
-        Iz = np.zeros(qzunique.shape)
-
-
-        for idx, qzbin in enumerate(qzunique):
-            indices_for_which_qz_is_equal_to_something = np.argwhere(qzmatrix == qzbin)
-            Iz[idx] = np.take(Imatrix, indices_for_which_qz_is_equal_to_something).sum()
-
-        self.experiment.cut_Iz = Iz
-        return True
-
-
-    def line_cut_at_constant_z(self, dqzvalue=None, qzvalue=None):
-        print("Performing line cut at constant qz")
-        qymatrix = self.experiment.qymatrix
-        Imatrix = self.experiment.Imatrix
-        qy = self.experiment.qy
-        qyunique = np.unique(qymatrix)
-        Iy = np.zeros(qyunique.shape)
-
-#        for idx, qybin in enumerate(np.unique(qymatrix)):
-#            indices_for_which_qy_is_equal_to_something = np.argwhere(qy == qybin)
-#            Iy[idx] = np.take(Imatrix, indices_for_which_qy_is_equal_to_something).sum()
-
-        self.experiment.cut_Iy = Iy
-        return True
 
     def update_from_info_table(self):
         try:
