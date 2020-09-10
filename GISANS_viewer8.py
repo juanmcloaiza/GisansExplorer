@@ -915,14 +915,27 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
             x1, x2 = self.graphView.data.x1, self.graphView.data.x2
             y1, y2 = self.graphView.data.y1, self.graphView.data.y2
+
+            filename = noextpath+"_xyI_"+ext
             original_shape = self.graphView.data.X[y1:y2,x1:x2].shape
             x_to_save = self.graphView.data.X[y1:y2,x1:x2].flatten()
             y_to_save = self.graphView.data.Y[y1:y2,x1:x2].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].flatten()
-
             columns = np.vstack((x_to_save, y_to_save, z_to_save)).T
+            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
 
-            filename = noextpath+ext
+            filename = noextpath+"_xI_"+ext
+            original_shape = self.graphView.data.X[0,x1:x2].shape
+            x_to_save = self.graphView.data.X[0,x1:x2].flatten()
+            z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=0).flatten()
+            columns = np.vstack((x_to_save, z_to_save)).T
+            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
+
+            filename = noextpath+"_yI_"+ext
+            original_shape = self.graphView.data.X[y1:y2,0].shape
+            y_to_save = self.graphView.data.Y[y1:y2,0].flatten()
+            z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=1).flatten()
+            columns = np.vstack((y_to_save, z_to_save)).T
             np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
 
             print(f"Arrays saved:\n {filename}\n")
