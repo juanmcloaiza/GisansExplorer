@@ -306,7 +306,7 @@ class MyGraphView(qtw.QWidget):
             row, col = int(yd + 0.5), int(xd + 0.5)
 
         zd = self.data.Z[row, col]
-        coord_text = f'x={xd:1.4f}, y={yd:1.4f}, z={zd:1.4f}   [{row},{col}]'
+        coord_text = f'x={xd:1.4g}, y={yd:1.4g}, I={zd:1.4e}   [{row},{col}]'
         self.xyzLabel.setText(coord_text)
         #self.xyzLabel.setText(f"(x, y; z) = ({xd:3.2g}, {yd:3.2g}; {z:3.2g})")
 
