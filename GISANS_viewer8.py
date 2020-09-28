@@ -728,7 +728,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.layout = qtw.QHBoxLayout()
         self.splitter = qtw.QSplitter()
         self.centralpanel = qtw.QVBoxLayout()
-        self.leftpanel = qtw.QVBoxLayout()
+        self.botpanel = qtw.QHBoxLayout()
         self.rightpanel = qtw.QVBoxLayout()
         #self.minSpinBox = mySciSpinBox()
         #self.maxSpinBox = mySciSpinBox()
@@ -748,16 +748,13 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def initFrame(self):
         self.layout.setAlignment(Qt.AlignCenter)
         self.addExperimentInfo()
-        self.addFileTreeAndList()
-        self.addWelcomeMessage()
         #self.addMinMaxSpinBoxes()
         self.addFunctionalityButtons()
-        self.addCanvas()
         self.addPanels()
         self.setLayout(self.layout)
 
 
-    def addFileTreeAndList(self):
+    def addFileTreeAndList(self, botSplitter):
         model = qtw.QFileSystemModel()
         model.setRootPath('')
         filters = ["*.dat"]
@@ -774,25 +771,20 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.fileList.itemSelectionChanged.connect(self.on_file_selection_changed)
         self.fileList.setSelectionMode(3) #https://doc.qt.io/archives/qt-5.11/qabstractitemview.html#SelectionMode-enum
 
-        self.leftpanel.addWidget(qtw.QLabel("Select file:"))
-        leftSplitter = qtw.QSplitter()
-        leftSplitter.setOrientation(Qt.Vertical)
-        leftSplitter.addWidget(self.dirtree)
-        leftSplitter.addWidget(self.fileList)
-        self.leftpanel.addWidget(leftSplitter)
-        self.leftpanel.SetNoConstraint = True
-
+        botSplitter.setOrientation(Qt.Horizontal)
+        botSplitter.addWidget(self.dirtree)
+        botSplitter.addWidget(self.fileList)
         return
 
 
     def addPanels(self):
-        leftLayoutWidget = qtw.QWidget()
-        leftLayoutWidget.setLayout(self.leftpanel)
-        self.splitter.addWidget(leftLayoutWidget)
 
-
-        #self.splitter.addWidget(self.dirtree)
-        self.splitter.addWidget(self.graphView)
+        bottom_splitter = qtw.QSplitter()
+        left_splitter = qtw.QSplitter(orientation=Qt.Vertical)
+        self.addFileTreeAndList(bottom_splitter)
+        left_splitter.addWidget(self.graphView)
+        left_splitter.addWidget(bottom_splitter)
+        self.splitter.addWidget(left_splitter)
         rightlayoutwidget = qtw.QWidget()
         rightlayoutwidget.setLayout(self.rightpanel)
         self.splitter.addWidget(rightlayoutwidget)
@@ -815,7 +807,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def addFunctionalityButtons(self):
         buttonOpenDialog = qtw.QPushButton("Add data")
         buttonOpenDialog.clicked.connect(self.on_click_open_file)
-        self.leftpanel.addWidget(buttonOpenDialog)
+        self.rightpanel.addWidget(buttonOpenDialog)
 
         buttonUpdateFromTable = qtw.QPushButton("Update")
         buttonUpdateFromTable.clicked.connect(self.on_click_update)
@@ -985,26 +977,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 #         formLayout.setFormAlignment(Qt.AlignBottom)
 #         self.rightpanel.addLayout(formLayout)
 #         return
-
-
-    def addWelcomeMessage(self):
-        message = qtw.QLabel(
-            "" +
-            "GISANS viewer for MARIA data - Jan 2019\n"+
-            "for questions contact a.koutsioumpas@fz_juelich.de\n"+
-            "\n"
-        )
-        message.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        message.setAlignment(Qt.AlignCenter)
-        self.centralpanel.addWidget(message)
-        return
-
-
-    def addCanvas(self):
-        self.centralpanel.addWidget(self.graphView)
-        self.graphView.finishedUpdating.connect(self.on_graph_updated)
-        self.graphView.update_graph()
-        return
 
     def saveFileNameDialog(self):
         try:
