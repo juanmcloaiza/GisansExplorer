@@ -197,7 +197,7 @@ class PlotData(FrozenClass):
         self.zmin = -1
         self.zmax = 1
 
-        self.log_scale = False
+        self.log_scale = True
         self.reset_limits_required = True
 
         self.title = ""
@@ -331,6 +331,8 @@ class MyGraphView(qtw.QWidget):
             self.data.zmin = self.data.Z.min()
             self.data.zmax = self.data.Z.max()
             self.data.reset_limits_required = False
+            if self.data.log_scale:
+                self.data.zmin = max(self.data.zmin,1e-6)
         return #update_data
 
 
@@ -373,9 +375,9 @@ class MyGraphView(qtw.QWidget):
 
     def build_norm(self, **kwargs):
         if self.data.log_scale:
-            #self.norm = mpl.colors.LogNorm(vmin=self.data.zmin, vmax=self.data.zmax)
             thres = np.abs(self.data.Z.std()/1e8)
             self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres)
+            #self.norm = mpl.colors.LogNorm(vmin=self.data.zmin, vmax=self.data.zmax)
         else:
             self.norm = mpl.colors.Normalize(vmin=self.data.zmin, vmax=self.data.zmax)
         return #build_norm
@@ -443,7 +445,7 @@ class MyGraphView(qtw.QWidget):
 
     def update_xax(self):
         if self.data.log_scale:
-            self.xax.set_yscale('log')
+            self.xax.set_yscale('symlog')
 
         integration_x = self.data.Zzoom.sum(axis=0)
         x0, xf = self.data.zoom_extent[0:2]
@@ -466,7 +468,7 @@ class MyGraphView(qtw.QWidget):
 
     def update_yax(self):
         if self.data.log_scale:
-            self.yax.set_xscale('log')
+            self.yax.set_xscale('symlog')
 
         integration_y =  self.data.Zzoom.sum(axis=1)
         y0, yf = self.data.zoom_extent[2:4]
@@ -760,6 +762,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         model.setRootPath('')
         filters = ["*.dat"]
         model.setNameFilters(filters)
+        model.setNameFilterDisables(False)
 
         self.dirtree.setModel(model)
         self.dirtree.setRootIndex(model.index('./'))
