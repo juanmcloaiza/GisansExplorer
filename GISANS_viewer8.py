@@ -844,6 +844,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                     sum3 = self.experiment_dict[gzfn].cut_Iz.sum()
                     print("If the following three sums are not equal, there's an error:")
                     print(sum1, sum2, sum3)
+                self.fileList.setCurrentRow( self.fileList.count() - 1 )
             else: 
                 raise Exception(f"Did not complete data processing: {why_not}")
         except Exception as e:
