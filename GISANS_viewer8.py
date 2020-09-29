@@ -393,9 +393,10 @@ class MyGraphView(qtw.QWidget):
 
     def update_ax(self, **kwargs):
         self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
-        self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid', linewidths=0.5)
-        self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid', linewidths=0.5)
-        self.ax.scatter(self.data.Xc, self.data.Yc, marker='x', c='r')
+        self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
+        self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
+        self.ax.axvline(x=self.data.Xc, c='r')
+        self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
         return #update_ax
@@ -426,13 +427,14 @@ class MyGraphView(qtw.QWidget):
 
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
-            self.zoom_ax.axvline(x=0, c='k', ls='solid', lw=0.5)
+            self.zoom_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
             is_x_in = True
         if yc > y1 and yc < y2:
-            self.zoom_ax.axhline(y=0, c='k', ls='solid', lw=0.5)
+            self.zoom_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
             is_y_in = True
         if is_x_in and is_y_in:
-            self.zoom_ax.scatter(self.data.X[yc,xc], self.data.Y[yc,xc], marker='x', c='r')
+            self.zoom_ax.axvline(x=self.data.X[yc,xc], c='r')
+            self.zoom_ax.axhline(y=self.data.Y[yc,xc], c='r')
 
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
