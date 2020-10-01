@@ -827,6 +827,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonSaveAscii.clicked.connect(self.on_click_save_ascii)
         self.rightpanel.addWidget(buttonSaveAscii)
 
+        self.graphView.finishedUpdating.connect(self.on_graph_updated)
+
         return
 
 
