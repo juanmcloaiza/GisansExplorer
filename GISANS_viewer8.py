@@ -328,11 +328,11 @@ class MyGraphView(qtw.QWidget):
                 self.data.__setattr__(k,kwargs[k])
         
         if self.data.reset_limits_required:
-            self.data.zmin = self.data.Z.min()
-            self.data.zmax = self.data.Z.max()
-            self.data.reset_limits_required = False
+            self.data.zmin = 0
+            self.data.zmax = 1e-3
             if self.data.log_scale:
-                self.data.zmin = max(self.data.zmin,1e-6)
+                self.data.zmin = 1e-6
+            self.data.reset_limits_required = False
         return #update_data
 
 
