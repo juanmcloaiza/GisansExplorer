@@ -376,7 +376,7 @@ class MyGraphView(qtw.QWidget):
     def build_norm(self, **kwargs):
         if self.data.log_scale:
             thres = np.abs(self.data.Z.std()/1e8)
-            self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres)
+            self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres, base=10)
             #self.norm = mpl.colors.LogNorm(vmin=self.data.zmin, vmax=self.data.zmax)
         else:
             self.norm = mpl.colors.Normalize(vmin=self.data.zmin, vmax=self.data.zmax)
@@ -522,8 +522,8 @@ class Experiment(FrozenClass):
         self.y0 = 128
         self.xf = 256
         self.yf = 256
-        self.min_intensity = 0
-        self.max_intensity = 0
+        self.min_intensity = 1e-6
+        self.max_intensity = 1e-3
         self.sens = None
         self.meansens = None
         self.monitor_counts = None
@@ -848,14 +848,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.experiment = Experiment()
             did_stuff, why_not = self.doStuff()
             if did_stuff:
-                for gzfn in self.settings.gzFileNames:
-                    self.fileList.addItem(gzfn)
-                    sum1 = self.experiment_dict[gzfn].Imatrix.sum()
-                    sum2 = self.experiment_dict[gzfn].cut_Iy.sum()
-                    sum3 = self.experiment_dict[gzfn].cut_Iz.sum()
-                    print("If the following three sums are not equal, there's an error:")
-                    print(sum1, sum2, sum3)
-                self.fileList.setCurrentRow( self.fileList.count() - 1 )
+                pass
             else: 
                 raise Exception(f"Did not complete data processing: {why_not}")
         except Exception as e:
@@ -868,6 +861,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_file_selection_changed(self):
         selectedListEntries = self.fileList.selectedItems()
+
+        if len(selectedListEntries) < 1:
+            self.fileList.setCurrentRow( self.fileList.count() - 1 )
+
         self.subtractCheckBox.setChecked(False)
         if len(selectedListEntries) == 2:
             self.subtractCheckBox.setEnabled(True)
@@ -973,13 +970,19 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_graph_updated(self):
         try:
-            self.experiment.min_intensity = self.graphView.data.zmin
-            self.experiment.max_intensity = self.graphView.data.zmax
-            self.experiment.x0 = self.graphView.data.x1
-            self.experiment.y0 = self.graphView.data.y1
-            self.experiment.xf = self.graphView.data.x2
-            self.experiment.yf = self.graphView.data.y2
-            self.update_widgets()
+            selectedListEntries = self.fileList.selectedItems()
+            
+            for currentListItem in selectedListEntries:
+                currentListEntry = currentListItem.text()
+                self.experiment = self.experiment_dict[currentListEntry]
+                self.experiment.min_intensity = self.graphView.data.zmin
+                self.experiment.max_intensity = self.graphView.data.zmax
+                self.experiment.x0 = self.graphView.data.x1
+                self.experiment.y0 = self.graphView.data.y1
+                self.experiment.xf = self.graphView.data.x2
+                self.experiment.yf = self.graphView.data.y2
+
+            self.update_table()
         except Exception as e:
             App.handle_exception(e)
         return
@@ -1058,7 +1061,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.settings = self.settings_dict[currentListEntry]
             self.experiment = self.experiment_dict[currentListEntry]
             self.update_single_experiment_values(self.experiment)
-            self.compute_Q()
         return True
 
     
@@ -1090,7 +1092,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
 
-    def update_widgets(self):
+    def update_table(self):
         expdict = self.experiment.__dict__
 
         self.infoTable.setRowCount(0)
@@ -1123,10 +1125,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
             return False, "Sensitivity file not read"
         if not self.read_intensity_file():
             return False, "Intensity file not read"
-        if not self.compute_Q():
-            return False, "Q not computed"
         if not self.update_gui():
-            return False, "GUI not updated"
+            return False, "Unable to update GUI"
         return True, None
 
 
@@ -1273,30 +1273,29 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
     def compute_Q(self):
-        for key in self.experiment_dict.keys():
-            experiment = self.experiment_dict[key]
-            experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
-            print(f"Corrected qzc = {experiment.qzc}")
+        experiment = self.experiment
+        experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+        print(f"Corrected qzc = {experiment.qzc}")
 
-            Imatrix = experiment.Imatrix
-            ipix_range = np.asarray(range(Imatrix.shape[0]))
-            jpix_range = np.asarray(range(Imatrix.shape[1]))
+        Imatrix = experiment.Imatrix
+        ipix_range = np.asarray(range(Imatrix.shape[0]))
+        jpix_range = np.asarray(range(Imatrix.shape[1]))
 
-            two_pi_over_lambda = experiment.two_pi_over_lambda
-            sin_alpha_i = experiment.sin_alpha_i
-            sin_2theta_f = experiment.sin_2theta_f(ipix_range)
-            cos_alpha_f = experiment.cos_alpha_f(jpix_range)
-            sin_alpha_f = experiment.sin_alpha_f(jpix_range)
+        two_pi_over_lambda = experiment.two_pi_over_lambda
+        sin_alpha_i = experiment.sin_alpha_i
+        sin_2theta_f = experiment.sin_2theta_f(ipix_range)
+        cos_alpha_f = experiment.cos_alpha_f(jpix_range)
+        sin_alpha_f = experiment.sin_alpha_f(jpix_range)
 
 
-            QY_i, QY_j = sin_2theta_f[ipix_range], cos_alpha_f[jpix_range]
-            QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
-            experiment.qymatrix = two_pi_over_lambda * QYmatrix
+        QY_i, QY_j = sin_2theta_f[ipix_range], cos_alpha_f[jpix_range]
+        QYmatrix = np.einsum('i,j->ij', QY_i, QY_j)
+        experiment.qymatrix = two_pi_over_lambda * QYmatrix
 
-            QZ_j = sin_alpha_f[jpix_range]
-            QZ_i = np.ones(ipix_range.shape)
-            QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
-            experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
+        QZ_j = sin_alpha_f[jpix_range]
+        QZ_i = np.ones(ipix_range.shape)
+        QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
+        experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
         
         return True
 
@@ -1348,6 +1347,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             else:
                 Imap = self.sum_intensities_from_selected_files()
 
+            self.compute_Q()
             self.graphView.update_graph(
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
@@ -1362,7 +1362,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             x2=self.experiment.xf,
                             y2=self.experiment.yf
                         )
-            self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
 
@@ -1377,7 +1376,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
             print(f"\n-- Calculating map for {currentListEntry} --")
             Isum += [self.experiment.Imatrix]
 
-        Isum = np.asarray(Isum).sum(axis=0)
+        if len(Isum) > 1:
+            Isum = np.asarray(Isum).sum(axis=0)
+        else:
+            Isum = Isum[0]
+
         return Isum
 
 
@@ -1399,21 +1402,16 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def update_gui(self, reset_limits_required=True):
         try:
-            self.graphView.update_graph(
-                            Y = self.experiment.qymatrix,
-                            X = self.experiment.qzmatrix,
-                            Z = self.experiment.Imatrix,
-                            Xc = self.experiment.qzc,
-                            Yc = self.experiment.qyc,
-                            zmin = self.experiment.min_intensity,
-                            zmax = self.experiment.max_intensity,
-                            reset_limits_required=reset_limits_required,
-                            x1=self.experiment.x0,
-                            y1=self.experiment.y0,
-                            x2=self.experiment.xf,
-                            y2=self.experiment.yf
-                        )
-            self.update_widgets()
+            for gzfn in self.settings.gzFileNames:
+                self.fileList.addItem(gzfn)
+                sum1 = self.experiment_dict[gzfn].Imatrix.sum()
+                sum2 = self.experiment_dict[gzfn].cut_Iy.sum()
+                sum3 = self.experiment_dict[gzfn].cut_Iz.sum()
+                print("If the following three sums are not equal, there's an error:")
+                print(sum1, sum2, sum3)
+                self.fileList.setCurrentRow( self.fileList.count() - 1 )
+            self.update_table()
+            self.update_from_info_table()
         except Exception as e:
             App.handle_exception(e)
             return False
