@@ -399,6 +399,8 @@ class MyGraphView(qtw.QWidget):
         self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
+        self.ax.set_xlim(150,870)
+        self.ax.set_ylim(150,870)
         return #update_ax
 
 
@@ -1343,6 +1345,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def update_from_selection_list(self):
+        selectedListEntries = self.fileList.selectedItems()
+        if len(selectedListEntries) < 1:
+            self.fileList.setCurrentRow( self.fileList.count() - 1 )
         try:
             if self.subtractCheckBox.isChecked():
                 Imap = self.subtract_intensities_from_selected_files()
@@ -1411,7 +1416,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 sum3 = self.experiment_dict[gzfn].cut_Iz.sum()
                 print("If the following three sums are not equal, there's an error:")
                 print(sum1, sum2, sum3)
-                self.fileList.setCurrentRow( self.fileList.count() - 1 )
             self.update_table()
             self.update_from_info_table()
         except Exception as e:
