@@ -741,6 +741,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.graphView = MyGraphView("Title")
         self.infoTable = qtw.QTableWidget()
         self.fileList = qtw.QListWidget()
+        self.subtractCheckBox = qtw.QCheckBox("Subtract Intensities")
         self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
         self.initFrame()
@@ -775,7 +776,14 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         botSplitter.setOrientation(Qt.Horizontal)
         botSplitter.addWidget(self.dirtree)
-        botSplitter.addWidget(self.fileList)
+
+        fileListSplitter=qtw.QSplitter(Qt.Vertical)
+        fileListSplitter.addWidget(self.fileList)
+        fileListSplitter.addWidget(self.subtractCheckBox)
+        self.subtractCheckBox.setChecked(False)
+        self.subtractCheckBox.setEnabled(False)
+        self.subtractCheckBox.stateChanged.connect(self.on_subtract_checkbox_changed)
+        botSplitter.addWidget(fileListSplitter)
         return
 
 
@@ -807,10 +815,6 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def addFunctionalityButtons(self):
-        buttonOpenDialog = qtw.QPushButton("Add data")
-        buttonOpenDialog.clicked.connect(self.on_click_open_file)
-        self.rightpanel.addWidget(buttonOpenDialog)
-
         buttonUpdateFromTable = qtw.QPushButton("Update")
         buttonUpdateFromTable.clicked.connect(self.on_click_update)
         self.rightpanel.addWidget(buttonUpdateFromTable)
@@ -819,6 +823,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonLogLinear .clicked.connect(self.on_click_loglinear)
         self.rightpanel.addWidget(buttonLogLinear)
 
+
         buttonSavePng = qtw.QPushButton("Save png or pdf")
         buttonSavePng.clicked.connect(self.on_click_save_png)
         self.rightpanel.addWidget(buttonSavePng)
@@ -826,6 +831,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         buttonSaveAscii = qtw.QPushButton("Save ROI as ascii columns")
         buttonSaveAscii.clicked.connect(self.on_click_save_ascii)
         self.rightpanel.addWidget(buttonSaveAscii)
+
+        buttonOpenDialog = qtw.QPushButton("Open...")
+        buttonOpenDialog.clicked.connect(self.on_click_open_file)
+        self.rightpanel.addWidget(buttonOpenDialog)
 
         self.graphView.finishedUpdating.connect(self.on_graph_updated)
 
@@ -852,9 +861,18 @@ class MyFrame(qtw.QFrame,FrozenClass):
         except Exception as e:
             App.handle_exception(e)
 
+    @pyqtSlot()
+    def on_subtract_checkbox_changed(self):
+        self.update_from_selection_list()
 
     @pyqtSlot()
     def on_file_selection_changed(self):
+        selectedListEntries = self.fileList.selectedItems()
+        self.subtractCheckBox.setChecked(False)
+        if len(selectedListEntries) == 2:
+            self.subtractCheckBox.setEnabled(True)
+        else:
+            self.subtractCheckBox.setEnabled(False)
         self.update_from_selection_list()
 
     @pyqtSlot()
@@ -1324,21 +1342,16 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def update_from_selection_list(self):
-        selectedListEntries = self.fileList.selectedItems()
-        Isum = []
-        for currentListItem in selectedListEntries:
-            currentListEntry = currentListItem.text()
-            self.settings = self.settings_dict[currentListEntry]
-            self.experiment = self.experiment_dict[currentListEntry]
-            print(f"\n-- Calculating map for {currentListEntry} --")
-            Isum += [self.experiment.Imatrix]
-
-        Isum = np.asarray(Isum).sum(axis=0)
         try:
+            if self.subtractCheckBox.isChecked():
+                Imap = self.subtract_intensities_from_selected_files()
+            else:
+                Imap = self.sum_intensities_from_selected_files()
+
             self.graphView.update_graph(
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
-                            Z = Isum,
+                            Z = Imap,
                             Xc = self.experiment.qzc,
                             Yc = self.experiment.qyc,
                             zmin = self.experiment.min_intensity,
@@ -1352,6 +1365,36 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.update_widgets()
         except Exception as e:
             App.handle_exception(e)
+
+
+    def sum_intensities_from_selected_files(self):
+        selectedListEntries = self.fileList.selectedItems()
+        Isum = []
+        for currentListItem in selectedListEntries:
+            currentListEntry = currentListItem.text()
+            self.settings = self.settings_dict[currentListEntry]
+            self.experiment = self.experiment_dict[currentListEntry]
+            print(f"\n-- Calculating map for {currentListEntry} --")
+            Isum += [self.experiment.Imatrix]
+
+        Isum = np.asarray(Isum).sum(axis=0)
+        return Isum
+
+
+    def subtract_intensities_from_selected_files(self):
+        selectedListEntries = self.fileList.selectedItems()
+        if len(selectedListEntries) != 2:
+            raise ValueError("Substraction is only possible between two intensity maps")
+
+        Isum = []
+        for currentListItem in selectedListEntries:
+            currentListEntry = currentListItem.text()
+            self.settings = self.settings_dict[currentListEntry]
+            self.experiment = self.experiment_dict[currentListEntry]
+            print(f"\n-- Calculating map for {currentListEntry} --")
+            Isum += [self.experiment.Imatrix]
+
+        return np.abs(Isum[1] - Isum[0])
 
 
     def update_gui(self, reset_limits_required=True):
