@@ -518,6 +518,7 @@ class Experiment(FrozenClass):
         # and the sensitivity map file
         self.qyc = 0
         self.qzc = 0
+        self.qzc_corr = 0
         self.x0 = 128
         self.y0 = 128
         self.xf = 256
@@ -569,7 +570,7 @@ class Experiment(FrozenClass):
 
 
     def sin_alpha_f(self, pixel_j):
-        return 0.5755*(pixel_j-self.qzc)/np.sqrt(1990*1990+(0.5755*(self.qzc-pixel_j))*(0.5755*(self.qzc-pixel_j)))
+        return 0.5755*(pixel_j-self.qzc_corr)/np.sqrt(1990*1990+(0.5755*(self.qzc_corr-pixel_j))*(0.5755*(self.qzc_corr-pixel_j)))
 
 
     def cos_alpha_f(self, pixel_j):
@@ -633,7 +634,7 @@ class Settings(FrozenClass):
 class App(qtw.QMainWindow,FrozenClass):
     def __init__(self):
         super().__init__()
-        self.title = 'Alexandros GISANS Viewer'
+        self.title = 'GISANS Explorer'
         self.myTabs = MyTabs()
         self.setCentralWidget(self.myTabs)
         self._freeze()
@@ -1093,6 +1094,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def update_table(self):
+
         expdict = self.experiment.__dict__
 
         self.infoTable.setRowCount(0)
@@ -1103,7 +1105,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             if k in ["selector_lambda", "qyc", "qzc", "x0", "y0", "xf", "yf",
                      "min_intensity", "max_intensity",
                      "meansens", "monitor_counts",
-                     "angle_of_incidence"]:
+                     "angle_of_incidence", "qzc_corr"]:
 
                 item_k = qtw.QTableWidgetItem(str(k))
                 item_v = qtw.QTableWidgetItem(str(expdict[k]))
@@ -1274,8 +1276,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def compute_Q(self):
         experiment = self.experiment
-        experiment.qzc += int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
-        print(f"Corrected qzc = {experiment.qzc}")
+        experiment.qzc_corr = experiment.qzc + int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+        print(f"Corrected qzc = {experiment.qzc_corr}")
 
         Imatrix = experiment.Imatrix
         ipix_range = np.asarray(range(Imatrix.shape[0]))
@@ -1352,7 +1354,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             Y = self.experiment.qymatrix,
                             X = self.experiment.qzmatrix,
                             Z = Imap,
-                            Xc = self.experiment.qzc,
+                            Xc = self.experiment.qzc_corr,
                             Yc = self.experiment.qyc,
                             zmin = self.experiment.min_intensity,
                             zmax = self.experiment.max_intensity,
