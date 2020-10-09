@@ -346,16 +346,19 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_graph(self, **kwargs):
-        self.canvas.figure.clear()
-        self.define_axes()
-        self.update_data(**kwargs)
-        self.build_norm(**kwargs)
-        self.update_axes(**kwargs)
-        self.update_area_selector(**kwargs)
-        self.canvas.figure.suptitle(self.data.title)
-        self.canvas.draw()
-        self.save(**kwargs)
-        self.finishedUpdating.emit()
+        try:
+            self.canvas.figure.clear()
+            self.define_axes()
+            self.update_data(**kwargs)
+            self.build_norm(**kwargs)
+            self.update_axes(**kwargs)
+            self.update_area_selector(**kwargs)
+            self.canvas.figure.suptitle(self.data.title)
+            self.canvas.draw()
+            self.save(**kwargs)
+            self.finishedUpdating.emit()
+        except Exception as e:
+            App.handle_exception(e)
         return
 
 
@@ -366,10 +369,12 @@ class MyGraphView(qtw.QWidget):
             extension = os.path.splitext(filePath)[-1]
             if extension in [".png", ".pdf"]:
                 self.canvas.figure.savefig(filePath)
+                self.save_figures(filePath)
             elif extension in [".txt"]:
                 np.savetxt(filePath,self.data.Z)
             else:
                 raise NotImplementedError
+            print(f"Figure saved: {filePath}")
         return
 
 
@@ -449,7 +454,10 @@ class MyGraphView(qtw.QWidget):
 
     def update_xax(self):
         if self.data.log_scale:
-            self.xax.set_yscale('symlog')
+            try:
+                self.xax.set_yscale('log')
+            except Exception:
+                pass
 
         integration_x = self.data.Zzoom.sum(axis=0)
         x0, xf = self.data.zoom_extent[0:2]
@@ -472,7 +480,10 @@ class MyGraphView(qtw.QWidget):
 
     def update_yax(self):
         if self.data.log_scale:
-            self.yax.set_xscale('symlog')
+            try:
+                self.yax.set_xscale('log')
+            except Exception:
+                pass
 
         integration_y =  self.data.Zzoom.sum(axis=1)
         y0, yf = self.data.zoom_extent[2:4]
@@ -497,6 +508,110 @@ class MyGraphView(qtw.QWidget):
         self.cbar.mappable.set_clim(self.norm.vmin, self.norm.vmax)
         self.cax.xaxis.tick_top()
         return #build_cbar
+
+    def save_figures(self,filePath):
+        self.save_gisans_map(filePath)
+        self.save_qz_integration(filePath)
+        self.save_qy_integration(filePath)
+        return
+
+    def save_gisans_map(self,filePath):
+        print("Saving gisans map....")
+        x1, x2 = self.data.x1, self.data.x2
+        y1, y2 = self.data.y1, self.data.y2
+        xc, yc = self.data.Xc, self.data.Yc
+        self.data.Xzoom = self.data.X[y1:y2+1,x1:x2+1]
+        self.data.Yzoom = self.data.Y[y1:y2+1,x1:x2+1]
+        self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
+
+        self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
+
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+
+        is_x_in, is_y_in = False, False
+        if xc > x1 and xc < x2:
+            new_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
+            is_x_in = True
+        if yc > y1 and yc < y2:
+            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
+            is_y_in = True
+        if is_x_in and is_y_in:
+            new_ax.axvline(x=self.data.X[yc,xc], c='r')
+            new_ax.axhline(y=self.data.Y[yc,xc], c='r')
+
+        new_ax.set_aspect("auto")
+        new_ax.set_xlabel("$Q_{z}$")
+        new_ax.set_ylabel("$Q_{y}$")
+        cbar = new_fig.colorbar(cs)
+
+        no_ext, ext = os.path.splitext(filePath)
+        new_fig.savefig(f"{no_ext}-gisans_map{ext}")
+        print(f"gisans map saved.")
+        return #save_gisans_map#
+
+
+    def save_qz_integration(self, filePath):
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        print("Saving qz integration....")
+        if self.data.log_scale:
+            try:
+                new_ax.set_yscale('log')
+            except Exception:
+                pass
+
+        integration_x = self.data.Zzoom.sum(axis=0)
+        x0, xf = self.data.zoom_extent[0:2]
+        rangex = np.linspace(x0, xf, len(integration_x))
+        xax_line = new_ax.plot(rangex, integration_x)
+        new_ax.set_xlim((x0, xf))
+
+        new_ax.xaxis.set_ticks(np.linspace(x0, xf, 5))
+
+        zero = integration_x.min()
+        mu =  integration_x.mean()
+        sig = integration_x.std()
+        #new_ax.set_yticks([zero, mu, mu+2*sig])
+        new_ax.grid(which='both', axis='both')
+        new_ax.set_xlabel("$Q_{z}$")
+        new_ax.set_ylabel("I($Q_{z})$")
+
+        no_ext, ext = os.path.splitext(filePath)
+        new_fig.savefig(f"{no_ext}-integration_qz{ext}")
+        print("qz integration saved.")
+        return #save_xax
+
+
+    def save_qy_integration(self, filePath):
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        if self.data.log_scale:
+            try:
+                new_ax.set_yscale('log')
+            except Exception:
+                pass
+
+        integration_y =  self.data.Zzoom.sum(axis=1)
+        y0, yf = self.data.zoom_extent[2:4]
+        rangey = np.linspace(y0, yf, len(integration_y))
+        new_ax_line = new_ax.plot(rangey, integration_y)
+
+        new_ax.set_xlim((y0, yf))
+        new_ax.set_xticks(np.linspace(y0,yf,5))
+        zero = integration_y.min()
+        mu =  integration_y.mean()
+        sig = integration_y.std()
+        #new_ax.set_yticks([zero, mu, mu+2*sig])
+        new_ax.grid(which='both', axis='both')
+        new_ax.set_xlabel("$Q_{y}$")
+        new_ax.set_ylabel("I($Q_{y})$")
+
+        no_ext, ext = os.path.splitext(filePath)
+        new_fig.savefig(f"{no_ext}-integration_qy{ext}")
+        print("qy integration saved.")
+        return #update_yax
 
 
     def test_show(self):
@@ -915,7 +1030,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 filePath+=extension
 
             self.graphView.update_graph(save_to_file=filePath)
-            print(f"Figure saved: {filePath}")
+
         except Exception as e:
             App.handle_exception(e)
         return #on_click_save_png
