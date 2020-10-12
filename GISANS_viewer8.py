@@ -7,6 +7,7 @@ from PyQt5.QtGui import QValidator, QColor
 
 #plot stuff:
 from matplotlib.ticker import NullFormatter
+from matplotlib.ticker import FormatStrFormatter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -397,7 +398,7 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_ax(self, **kwargs):
-        self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
         self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
         self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
         self.ax.axvline(x=self.data.Xc, c='r')
@@ -430,7 +431,7 @@ class MyGraphView(qtw.QWidget):
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
 
         self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
-        self.zoom_ax_imshow = self.zoom_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        self.zoom_ax_imshow = self.zoom_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
@@ -465,11 +466,13 @@ class MyGraphView(qtw.QWidget):
         self.xax_line = self.xax.plot(rangex, integration_x)
         self.xax.set_xlim((x0, xf))
 
-        self.xax.xaxis.set_ticks(np.linspace(x0, xf, 5))
 
         zero = integration_x.min()
         mu =  integration_x.mean()
         sig = integration_x.std()
+        self.xax.xaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+        self.xax.yaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+        self.xax.set_xticks(np.linspace(x0, xf, 5))
         self.xax.set_yticks([zero, mu, mu+2*sig])
         self.xax.yaxis.tick_right()
         self.xax.grid(which='both', axis='both')
@@ -491,11 +494,13 @@ class MyGraphView(qtw.QWidget):
         self.yax_line = self.yax.plot(integration_y, rangey)
 
         self.yax.set_ylim((y0, yf))
-        self.yax.set_yticks(np.linspace(y0,yf,5))
         zero = integration_y.min()
         mu =  integration_y.mean()
         sig = integration_y.std()
+        self.yax.xaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+        self.yax.yaxis.set_major_formatter(FormatStrFormatter('%.2g'))
         self.yax.set_xticks([zero, mu, mu+2*sig])
+        self.yax.set_yticks(np.linspace(y0,yf,5))
         self.yax.yaxis.tick_right()
         self.yax.tick_params(axis='x', labelrotation=270)
         self.yax.grid(which='both', axis='both')
@@ -528,7 +533,7 @@ class MyGraphView(qtw.QWidget):
 
         new_fig = plt.figure(figsize=(10,10))
         new_ax = new_fig.add_subplot(111)
-        cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax)
+        cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
         is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
@@ -615,14 +620,21 @@ class MyGraphView(qtw.QWidget):
 
 
     def test_show(self):
-        t = np.linspace(-np.pi,np.pi, 1025)
-        y = t#np.sin(t)
-        x = t#np.cos(t)
+        #Z = np.loadtxt('./notToVersion/WelcomePlot.txt')
+        #Z = (Z - Z.min()) / (Z.max() - Z.min()) * (1e-3 - 1e-6) + 1e-6
+        #np.save("./show_test_map.npy", Z)
+        Z = np.load('./show_test_map.npy')
+        print(Z.min())
+        print(Z.max())
+        print(Z.shape)
+
+        x = np.linspace(-1,1, Z.shape[0])
+        y = np.linspace(-1,1, Z.shape[1])
         X, Y = np.meshgrid(x,y)
-        Z = np.sin(Y) * np.cos(X)
+        Xc = len(x) // 2
+        Yc = len(y) //2
         self.update_graph(X = X, Y = Y, Z = Z, Xc = 512, Yc = 512)
         #if _DEBUG_:
-        #    np.save("./myNumpyArray.npy", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         #    np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         return
 
