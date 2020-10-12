@@ -632,7 +632,7 @@ class MyGraphView(qtw.QWidget):
         X, Y = np.meshgrid(x,y)
         Xc = len(x) // 2
         Yc = len(y) //2
-        self.update_graph(X = X, Y = Y, Z = Z, Xc = 512, Yc = 512)
+        self.update_graph(X = X, Y = Y, Z = Z, Xc = 0, Yc = 0)
         #if _DEBUG_:
         #    np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
         return
