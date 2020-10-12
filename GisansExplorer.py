@@ -437,11 +437,10 @@ class MyGraphView(qtw.QWidget):
         if xc > x1 and xc < x2:
             self.zoom_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
             is_x_in = True
+            self.zoom_ax.axvline(x=self.data.X[yc,xc], c='r')
         if yc > y1 and yc < y2:
             self.zoom_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
             is_y_in = True
-        if is_x_in and is_y_in:
-            self.zoom_ax.axvline(x=self.data.X[yc,xc], c='r')
             self.zoom_ax.axhline(y=self.data.Y[yc,xc], c='r')
 
         self.zoom_ax.set_aspect("auto")
