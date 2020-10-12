@@ -6,7 +6,7 @@ Simple **GUI** that interactively helps in the reduction of NNICOS GISANS data.
 
 # Install:
 ```
- $ git clone https://github.com/juanmcloaiza/NeutronDataViewer.git
+ $ git clone https://github.com/juanmcloaiza/GisansExplorer.git
  $ cd NeutronDataViewer
  ```
  
