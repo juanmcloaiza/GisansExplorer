@@ -3,7 +3,7 @@
 #Qt stuff:
 import PyQt5.QtWidgets as qtw
 from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
-from PyQt5.QtGui import QValidator, QColor
+from PyQt5.QtGui import QValidator, QColor, QIcon
 
 #plot stuff:
 from matplotlib.ticker import NullFormatter
@@ -767,6 +767,8 @@ class App(qtw.QMainWindow,FrozenClass):
         self.setCentralWidget(self.myTabs)
         self._freeze()
         self.setWindowTitle(self.title)
+        icon = QIcon('./Icon.png')
+        self.setWindowIcon(icon)
         self.show()
 
 
