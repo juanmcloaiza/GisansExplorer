@@ -763,7 +763,7 @@ class Settings(FrozenClass):
 class App(qtw.QMainWindow,FrozenClass):
     def __init__(self):
         super().__init__()
-        self.title = 'GISANS Explorer'
+        self.title = 'GisansExplorer'
         self.myTabs = MyTabs()
         self.setCentralWidget(self.myTabs)
         self._freeze()
