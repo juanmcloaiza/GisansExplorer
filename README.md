@@ -36,3 +36,7 @@ Windows:
  (GisansExplorerEnv) $ pip install --upgrade pip
  (GisansExplorerEnv) $ pip install -r requirements.txt
  ```
+
+ ---
+
+Developed and maintained by the [MLZ Scientific Computing Group](http://apps.jcns.fz-juelich.de/doku/sc/start) in collaboration with [Alexandros Koutsioumpas](https://alexandros-koutsioumpas.weebly.com/index.html)
