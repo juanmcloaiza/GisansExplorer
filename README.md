@@ -1,6 +1,6 @@
-# NeutronDataViewer
+# GisansExplorer
 
-Simple **GUI** that interactively helps in the reduction of NNICOS GISANS data.
+Simple **GUI** that interactively helps in the reduction of [NICOS](https://nicos-controls.org/) [GISANS](http://www.gisaxs.de/theory.html) data.
 
 ![Screenshot](./Screenshot.png)
 
@@ -10,9 +10,9 @@ Simple **GUI** that interactively helps in the reduction of NNICOS GISANS data.
  $ cd NeutronDataViewer
  ```
  
- **Use Python 3.7** from here on:
+ [**Use Python 3.7**](https://realpython.com/installing-python/) from here on:
  
- Linux:
+ Linux / Mac:
  ```
  $ python -m venv ./GisansExplorerEnv
  $ source ./GisansExplorerEnv/bin/activate
@@ -31,8 +31,8 @@ Windows:
  $ python GisansExplorer.py
 ```
 
-**N.B.** Should requirements not be satisfied, run the following in the terminal:
+**N.B.** Should requirements not be satisfied, run the following in the terminal within the GisansExplorerEnv [virtual environment](https://docs.python.org/3/tutorial/venv.html) created above:
 ```
- $ pip install --upgrade pip
- $ pip install -r requirements.txt  
+ (GisansExplorerEnv) $ pip install --upgrade pip
+ (GisansExplorerEnv) $ pip install -r requirements.txt
  ```
