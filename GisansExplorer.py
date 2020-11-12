@@ -623,6 +623,13 @@ class MyGraphView(qtw.QWidget):
         #Z = (Z - Z.min()) / (Z.max() - Z.min()) * (1e-3 - 1e-6) + 1e-6
         #np.save("./show_test_map.npy", Z)
         Z = np.load('./show_test_map.npy')
+
+        #This creates a cross to test the correct alignment between the
+        #different plot axes:
+        Z[:,:] = 1e-5
+        Z[500:511,:] = 1e-4
+        Z[:,500:511] = 1e-4
+
         print(Z.min())
         print(Z.max())
         print(Z.shape)
@@ -1137,9 +1144,15 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def saveFileNameDialog(self):
         try:
+            fmt_choices = {"All Files(*)":".png", #default
+                            "png (*.png)":".png",
+                            "pdf (*.pdf)": ".pdf",
+                            "ascii (*.txt)": ".txt"}
+            choices_str = ";;".join([]+[k for k in fmt_choices.keys()])
             options = qtw.QFileDialog.Options()
             options |= qtw.QFileDialog.DontUseNativeDialog
-            fileName, _ = qtw.QFileDialog.getSaveFileName(self,"Save File", "","All Files (*);;png file (*.png);;pdf file (*.pdf)", options=options)
+            fileName, fmtChoice = qtw.QFileDialog.getSaveFileName(self,"Save File", "",
+                                                          choices_str, options=options)
             if fileName:
                 return fileName
         except Exception as e:
