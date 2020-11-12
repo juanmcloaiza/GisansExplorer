@@ -372,7 +372,8 @@ class MyGraphView(qtw.QWidget):
                 self.canvas.figure.savefig(filePath)
                 self.save_figures(filePath)
             elif extension in [".txt"]:
-                np.savetxt(filePath,self.data.Z)
+                header = kwargs["header"]
+                np.savetxt(filePath,self.data.Z, header=header)
             else:
                 raise NotImplementedError
             print(f"Figure saved: {filePath}")
@@ -1049,11 +1050,23 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 extension = fmt_choices[fmtChoice]
                 filePath+=extension
 
-            self.graphView.update_graph(save_to_file=filePath)
+            self.graphView.update_graph(save_to_file=filePath, header=self.build_ascii_header())
 
         except Exception as e:
             App.handle_exception(e)
         return #on_click_save_png
+
+
+    def build_ascii_header(self):
+        gz_filenames = [s.text() for s in self.fileList.selectedItems()]
+        dat_filenames= [self.settings_dict[s].datFileName for s in gz_filenames]
+        op_str = ""
+        if self.subtractCheckBox.isChecked():
+            op_str = "Subtraction of:\n"
+        else:
+            op_str = "Addition of:\n"
+        header = op_str + "\n".join([d + "\t" + gz for (d,gz) in zip(dat_filenames, gz_filenames)])
+        return header
 
 
     @pyqtSlot()
@@ -1069,27 +1082,29 @@ class MyFrame(qtw.QFrame,FrozenClass):
             x1, x2 = self.graphView.data.x1, self.graphView.data.x2
             y1, y2 = self.graphView.data.y1, self.graphView.data.y2
 
+            header = self.build_ascii_header()
+
             filename = noextpath+"_xyI_"+ext
             original_shape = self.graphView.data.X[y1:y2,x1:x2].shape
             x_to_save = self.graphView.data.X[y1:y2,x1:x2].flatten()
             y_to_save = self.graphView.data.Y[y1:y2,x1:x2].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].flatten()
             columns = np.vstack((x_to_save, y_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
 
             filename = noextpath+"_xI_"+ext
             original_shape = self.graphView.data.X[0,x1:x2].shape
             x_to_save = self.graphView.data.X[0,x1:x2].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=0).flatten()
             columns = np.vstack((x_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
 
             filename = noextpath+"_yI_"+ext
             original_shape = self.graphView.data.X[y1:y2,0].shape
             y_to_save = self.graphView.data.Y[y1:y2,0].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=1).flatten()
             columns = np.vstack((y_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=f"#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
 
             print(f"Arrays saved:\n {filename}\n")
         except Exception as e:
