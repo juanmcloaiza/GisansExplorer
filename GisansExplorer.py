@@ -2,7 +2,7 @@
 
 #Qt stuff:
 import PyQt5.QtWidgets as qtw
-from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QThread
 from PyQt5.QtGui import QValidator, QColor, QIcon
 
 #plot stuff:
@@ -858,10 +858,6 @@ class MyTabs(qtw.QTabWidget,FrozenClass):
         return
 
 
-
-
-
-
 class MyFrame(qtw.QFrame,FrozenClass):
 
     def __init__(self):
@@ -883,6 +879,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.subtractCheckBox = qtw.QCheckBox("Subtract Intensities")
         self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
+        self.progress =qtw.QProgressBar()
+
         self.initFrame()
         self._freeze()
 
@@ -933,6 +931,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.addFileTreeAndList(bottom_splitter)
         left_splitter.addWidget(self.graphView)
         left_splitter.addWidget(bottom_splitter)
+        left_splitter.addWidget(self.progress)
         self.splitter.addWidget(left_splitter)
         rightlayoutwidget = qtw.QWidget()
         rightlayoutwidget.setLayout(self.rightpanel)
@@ -979,6 +978,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         return
 
+    @pyqtSlot(int)
+    def on_progress_emited(self, value):
+        self.progress.setValue(value)
 
     @pyqtSlot()
     def on_click_open_file(self):
@@ -1275,6 +1277,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def doStuff(self):
+
+        #self.progress.setMaximum(100)
+        #self.thread.progress_signal.connect(self.on_progress_emited)
+        #self.thread.start()
         #self.graphView.test()
         #return
         if not self.read_dat_file():
