@@ -76,37 +76,38 @@ def valid_float_string(string):
 
 class MyThread(QThread):
     progress_signal = pyqtSignal(int)
-    finished = pyqtSignal(bool, str)
-    def __init__(self, stuff):
+    def __init__(self, myframe):
         super().__init__()
-        self.stuff = stuff
+        self.frame = myframe
         self.retval = None
 
     def run(self):
-        stuff = self.stuff
+        myframe = self.frame
+        myframe.settings = Settings()
+        myframe.experiment = Experiment()
 
         self.progress_signal.emit(0)
-        if not stuff.read_dat_file():
-            self.finished.emit(False, "dat file not read")
+        if not myframe.read_dat_file():
+            self.retval = False, "dat file not read"
             return
 
         self.progress_signal.emit(10)
-        if not stuff.read_yaml_file():
-            self.finished.emit(False, "yaml file not read")
+        if not myframe.read_yaml_file():
+            self.retval = False, "yaml file not read"
             return
 
         self.progress_signal.emit(25)
-        if not stuff.read_sensitivity_file():
-            self.finished.emit(False, "Sensitivity file not read")
+        if not myframe.read_sensitivity_file():
+            self.retval = False, "Sensitivity file not read"
             return
 
         self.progress_signal.emit(75)
-        if not stuff.read_intensity_file():
-            self.finished.emit(False, "Intensity file not read")
+        if not myframe.read_intensity_file():
+            self.retval = False, "Intensity file not read"
             return
 
         self.progress_signal.emit(90)
-        self.finished.emit(True, "")
+        self.retval = True, ""
         return
 
 
@@ -408,7 +409,7 @@ class MyGraphView(qtw.QWidget):
                 self.save_figures(filePath)
             elif extension in [".txt"]:
                 header = kwargs["header"]
-                np.savetxt(filePath,self.data.Z, header=header)
+                np.savetxt(filePath,self.data.Z, header=header,fmt='%.3e')
             else:
                 raise NotImplementedError
             print(f"Figure saved: {filePath}")
@@ -915,6 +916,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
         self.progress_bar =qtw.QProgressBar()
+        self.thread = MyThread(self)
 
         self.initFrame()
         self._freeze()
@@ -927,6 +929,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.addFunctionalityButtons()
         self.addPanels()
         self.setLayout(self.layout)
+        self.progress_bar.setMaximum(100)
+        self.thread.progress_signal.connect(self.on_progress_emited)
+        self.thread.finished.connect(self.update_gui)
 
 
     def addFileTreeAndList(self, botSplitter):
@@ -1020,8 +1025,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_click_open_file(self):
         try:
-            self.settings = Settings()
-            self.experiment = Experiment()
+            #self.settings = Settings()
+            #self.experiment = Experiment()
             self.doStuff()
         except Exception as e:
             App.handle_exception(e)
@@ -1123,21 +1128,21 @@ class MyFrame(qtw.QFrame,FrozenClass):
             y_to_save = self.graphView.data.Y[y1:y2,x1:x2].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].flatten()
             columns = np.vstack((x_to_save, y_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}",fmt='%.3e')
 
             filename = noextpath+"_xI_"+ext
             original_shape = self.graphView.data.X[0,x1:x2].shape
             x_to_save = self.graphView.data.X[0,x1:x2].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=0).flatten()
             columns = np.vstack((x_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}",fmt='%.3e')
 
             filename = noextpath+"_yI_"+ext
             original_shape = self.graphView.data.X[y1:y2,0].shape
             y_to_save = self.graphView.data.Y[y1:y2,0].flatten()
             z_to_save = self.graphView.data.Z[y1:y2,x1:x2].sum(axis=1).flatten()
             columns = np.vstack((y_to_save, z_to_save)).T
-            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}")
+            np.savetxt(filename, columns, header=header+f"\n#Original shape: {original_shape}",fmt='%.3e')
 
             print(f"Arrays saved:\n {filename}\n")
         except Exception as e:
@@ -1308,15 +1313,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
     def doStuff(self):
-
-        self.progress_bar.setMaximum(100)
-        #self.thread.start()
-        #self.graphView.test()
-        #return
-        thread = MyThread(self)
-        thread.progress_signal.connect(self.on_progress_emited)
-        thread.finished.connect(self.update_gui)
-        thread.start()
+        self.thread.start()
         return
 
 
@@ -1593,9 +1590,10 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return np.abs(Isum[1] - Isum[0])
 
 
-    @pyqtSlot(bool, str)
-    def update_gui(self, did_stuff, why_not ):
+    @pyqtSlot()
+    def update_gui(self):
         try:
+            did_stuff, why_not = self.thread.retval
             if not did_stuff:
                 raise Exception(f"Did not complete data processing: {why_not}")
             for gzfn in self.settings.gzFileNames:
