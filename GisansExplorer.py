@@ -74,6 +74,41 @@ def valid_float_string(string):
     match = _float_re.search(string)
     return match.groups()[0] == string if match else False
 
+class MyThread(QThread):
+    progress_signal = pyqtSignal(int)
+    finished = pyqtSignal(bool, str)
+    def __init__(self, stuff):
+        super().__init__()
+        self.stuff = stuff
+        self.retval = None
+
+    def run(self):
+        stuff = self.stuff
+
+        self.progress_signal.emit(0)
+        if not stuff.read_dat_file():
+            self.finished.emit(False, "dat file not read")
+            return
+
+        self.progress_signal.emit(10)
+        if not stuff.read_yaml_file():
+            self.finished.emit(False, "yaml file not read")
+            return
+
+        self.progress_signal.emit(25)
+        if not stuff.read_sensitivity_file():
+            self.finished.emit(False, "Sensitivity file not read")
+            return
+
+        self.progress_signal.emit(75)
+        if not stuff.read_intensity_file():
+            self.finished.emit(False, "Intensity file not read")
+            return
+
+        self.progress_signal.emit(90)
+        self.finished.emit(True, "")
+        return
+
 
 class FloatValidator(QValidator):
     def __init__(self, *args, **kwargs):
@@ -879,7 +914,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.subtractCheckBox = qtw.QCheckBox("Subtract Intensities")
         self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
-        self.progress =qtw.QProgressBar()
+        self.progress_bar =qtw.QProgressBar()
 
         self.initFrame()
         self._freeze()
@@ -931,7 +966,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.addFileTreeAndList(bottom_splitter)
         left_splitter.addWidget(self.graphView)
         left_splitter.addWidget(bottom_splitter)
-        left_splitter.addWidget(self.progress)
+        left_splitter.addWidget(self.progress_bar)
         self.splitter.addWidget(left_splitter)
         rightlayoutwidget = qtw.QWidget()
         rightlayoutwidget.setLayout(self.rightpanel)
@@ -980,18 +1015,14 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     @pyqtSlot(int)
     def on_progress_emited(self, value):
-        self.progress.setValue(value)
+        self.progress_bar.setValue(value)
 
     @pyqtSlot()
     def on_click_open_file(self):
         try:
             self.settings = Settings()
             self.experiment = Experiment()
-            did_stuff, why_not = self.doStuff()
-            if did_stuff:
-                pass
-            else: 
-                raise Exception(f"Did not complete data processing: {why_not}")
+            self.doStuff()
         except Exception as e:
             App.handle_exception(e)
 
@@ -1278,22 +1309,15 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def doStuff(self):
 
-        #self.progress.setMaximum(100)
-        #self.thread.progress_signal.connect(self.on_progress_emited)
+        self.progress_bar.setMaximum(100)
         #self.thread.start()
         #self.graphView.test()
         #return
-        if not self.read_dat_file():
-            return False, "dat file not read"
-        if not self.read_yaml_file():
-            return False, "yaml file not read"
-        if not self.read_sensitivity_file():
-            return False, "Sensitivity file not read"
-        if not self.read_intensity_file():
-            return False, "Intensity file not read"
-        if not self.update_gui():
-            return False, "Unable to update GUI"
-        return True, None
+        thread = MyThread(self)
+        thread.progress_signal.connect(self.on_progress_emited)
+        thread.finished.connect(self.update_gui)
+        thread.start()
+        return
 
 
     def safe_parse(self, parse_func, file_path):
@@ -1569,8 +1593,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return np.abs(Isum[1] - Isum[0])
 
 
-    def update_gui(self, reset_limits_required=True):
+    @pyqtSlot(bool, str)
+    def update_gui(self, did_stuff, why_not ):
         try:
+            if not did_stuff:
+                raise Exception(f"Did not complete data processing: {why_not}")
             for gzfn in self.settings.gzFileNames:
                 self.fileList.addItem(gzfn)
                 sum1 = self.experiment_dict[gzfn].Imatrix.sum()
@@ -1580,9 +1607,12 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 print(sum1, sum2, sum3)
             self.update_table()
             self.update_from_info_table()
+            self.progress_bar.setValue(100)
         except Exception as e:
             App.handle_exception(e)
             return False
+        finally:
+            self.progress_bar.setValue(0)
 
         return True
 
