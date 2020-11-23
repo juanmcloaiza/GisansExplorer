@@ -390,7 +390,7 @@ class MyGraphView(qtw.QWidget):
             self.build_norm(**kwargs)
             self.update_axes(**kwargs)
             self.update_area_selector(**kwargs)
-            self.canvas.figure.suptitle(self.data.title)
+            self.canvas.figure.suptitle(self.data.title, fontsize=5)
             self.canvas.draw()
             self.save(**kwargs)
             self.finishedUpdating.emit()
@@ -586,6 +586,7 @@ class MyGraphView(qtw.QWidget):
         new_ax.set_xlabel("$Q_{z}$")
         new_ax.set_ylabel("$Q_{y}$")
         cbar = new_fig.colorbar(cs)
+        new_ax.set_title(self.data.title, fontsize=10)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-gisans_map{ext}")
@@ -618,6 +619,7 @@ class MyGraphView(qtw.QWidget):
         new_ax.grid(which='both', axis='both')
         new_ax.set_xlabel("$Q_{z}$")
         new_ax.set_ylabel("I($Q_{z})$")
+        new_ax.set_title(self.data.title, fontsize=10)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-integration_qz{ext}")
@@ -648,6 +650,7 @@ class MyGraphView(qtw.QWidget):
         new_ax.grid(which='both', axis='both')
         new_ax.set_xlabel("$Q_{y}$")
         new_ax.set_ylabel("I($Q_{y})$")
+        new_ax.set_title(self.data.title, fontsize=10)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-integration_qy{ext}")
@@ -1088,7 +1091,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 extension = fmt_choices[fmtChoice]
                 filePath+=extension
 
-            self.graphView.update_graph(save_to_file=filePath, header=self.build_ascii_header())
+            self.graphView.update_graph(save_to_file=filePath, header=self.build_ascii_header(), title=self.build_ascii_header())
 
         except Exception as e:
             App.handle_exception(e)
@@ -1103,7 +1106,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             op_str = "Subtraction of:\n"
         else:
             op_str = "Addition of:\n"
-        header = op_str + "\n".join([d + "\t" + gz for (d,gz) in zip(dat_filenames, gz_filenames)])
+        header = op_str + "\n".join([d + ": " + gz for (d,gz) in zip(dat_filenames, gz_filenames)])
         return header
 
 
@@ -1550,7 +1553,8 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             x1=self.experiment.x0,
                             y1=self.experiment.y0,
                             x2=self.experiment.xf,
-                            y2=self.experiment.yf
+                            y2=self.experiment.yf,
+                            title=self.build_ascii_header()
                         )
         except Exception as e:
             App.handle_exception(e)
