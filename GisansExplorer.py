@@ -435,15 +435,21 @@ class MyGraphView(qtw.QWidget):
 
 
     def update_ax(self, **kwargs):
+        #self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid', label = "Detector center")#, linewidths=0.5)
+        #self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
         self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
-        self.cont_x = self.ax.contour(self.data.X, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
-        self.cont_y = self.ax.contour(self.data.Y, [0.], colors='k', linestyles='solid')#, linewidths=0.5)
-        self.ax.axvline(x=self.data.Xc, c='r')
+        X_is_zero_at_idx = np.abs(self.data.X[0]).argmin()
+        Y_is_zero_at_idx = np.abs(self.data.Y).T[0].argmin()
+        self.ax.axvline(x=X_is_zero_at_idx, c='k', label = "Detector center")
+        self.ax.axhline(y=Y_is_zero_at_idx, c='k')
+        self.ax.axvline(x=self.data.Xc, c='r', label = "Detector center (corrected)")
         self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
         self.ax.set_xlim(150,870)
         self.ax.set_ylim(150,870)
+        self.ax.legend(loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
+            borderaxespad=0, frameon=False, fontsize = 6)
         return #update_ax
 
 
@@ -470,15 +476,13 @@ class MyGraphView(qtw.QWidget):
         self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
         self.zoom_ax_imshow = self.zoom_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
-        is_x_in, is_y_in = False, False
         if xc > x1 and xc < x2:
             self.zoom_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
-            is_x_in = True
             self.zoom_ax.axvline(x=self.data.X[yc,xc], c='r')
         if yc > y1 and yc < y2:
             self.zoom_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
-            is_y_in = True
             self.zoom_ax.axhline(y=self.data.Y[yc,xc], c='r')
+
 
         self.zoom_ax.set_aspect("auto")
         self.zoom_ax.set_xticks([])
@@ -571,22 +575,29 @@ class MyGraphView(qtw.QWidget):
         new_ax = new_fig.add_subplot(111)
         cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
-        is_x_in, is_y_in = False, False
+        has_legend = False
         if xc > x1 and xc < x2:
-            new_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
-            is_x_in = True
+            new_ax.axvline(x=0, c='k', ls='solid', label = "Detector center")
+            new_ax.axvline(x=self.data.X[yc,xc], c='r', label = "Detector center (corrected)")
+            has_legend = True
+
         if yc > y1 and yc < y2:
-            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
-            is_y_in = True
-        if is_x_in and is_y_in:
-            new_ax.axvline(x=self.data.X[yc,xc], c='r')
-            new_ax.axhline(y=self.data.Y[yc,xc], c='r')
+            if not has_legend:
+                new_ax.axhline(y=0, c='k', ls='solid', label = "Detector center")
+                new_ax.axhline(y=self.data.Y[yc,xc], c='r', label = "Detector center (corrected)")
+            else:
+                new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
+                new_ax.axhline(y=self.data.Y[yc,xc], c='r')
+
 
         new_ax.set_aspect("auto")
         new_ax.set_xlabel("$Q_{z}$")
         new_ax.set_ylabel("$Q_{y}$")
         cbar = new_fig.colorbar(cs)
         new_ax.set_title(self.data.title, fontsize=10)
+
+        new_ax.legend()#loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
+            #borderaxespad=0, frameon=False, fontsize = 6)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-gisans_map{ext}")
