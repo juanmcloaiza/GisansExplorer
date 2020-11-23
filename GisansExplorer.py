@@ -219,6 +219,7 @@ class PlotData(FrozenClass):
         self.zoom_extent = (0., 1., 0., 1.)
 
         self.Xc = 0
+        self.Xs = 0
         self.Yc = 0
 
         self.x1 = 0
@@ -325,7 +326,7 @@ class MyGraphView(qtw.QWidget):
                 return
 
             vmin, vmax = (func(c) for c in self.cbar.get_clim())
-            print("Rescaling colorbar:", vmin,vmax)
+            #print("Rescaling colorbar:", vmin,vmax)
             self.update_graph(zmin=vmin, zmax=vmax)
         return #on_mouse_wheel
 
@@ -353,8 +354,8 @@ class MyGraphView(qtw.QWidget):
     def line_select_callback(self, eclick, erelease):
         x1, y1 = int(eclick.xdata), int(eclick.ydata)
         x2, y2 = int(erelease.xdata), int(erelease.ydata)
-        print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
-        print(" The button you used were: %s %s" % (eclick.button, erelease.button))
+        #print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (x1, y1, x2, y2))
+        #print(" The button you used were: %s %s" % (eclick.button, erelease.button))
         self.update_graph(x1=x1, x2=x2, y1=y1, y2=y2)
         return #line_select_callback
 
@@ -443,6 +444,7 @@ class MyGraphView(qtw.QWidget):
         self.ax.axvline(x=X_is_zero_at_idx, c='k', label = "Detector center")
         self.ax.axhline(y=Y_is_zero_at_idx, c='k')
         self.ax.axvline(x=self.data.Xc, c='r', label = "Detector center (corrected)")
+        self.ax.axvline(x=self.data.Xs, c='g', label = "Specular beam")
         self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
@@ -468,7 +470,9 @@ class MyGraphView(qtw.QWidget):
     def update_zoom_ax(self):
         x1, x2 = self.data.x1, self.data.x2
         y1, y2 = self.data.y1, self.data.y2
-        xc, yc = self.data.Xc, self.data.Yc
+        xc, yc, xs = self.data.Xc, self.data.Yc, self.data.Xs
+        x0 = np.abs(self.data.X[0]).argmin()
+        y0 = np.abs(self.data.Y).T[0].argmin()
         self.data.Xzoom = self.data.X[y1:y2+1,x1:x2+1]
         self.data.Yzoom = self.data.Y[y1:y2+1,x1:x2+1]
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
@@ -476,12 +480,17 @@ class MyGraphView(qtw.QWidget):
         self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
         self.zoom_ax_imshow = self.zoom_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
-        if xc > x1 and xc < x2:
+        if x0 > x1 and x0 < x2:
             self.zoom_ax.axvline(x=0, c='k', ls='solid')#, lw=0.5)
+        if xc > x1 and xc < x2:
             self.zoom_ax.axvline(x=self.data.X[yc,xc], c='r')
+        if xs > x1 and xs < x2:
+            self.zoom_ax.axvline(x=self.data.X[yc,xs], c='g')
+
         if yc > y1 and yc < y2:
-            self.zoom_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
             self.zoom_ax.axhline(y=self.data.Y[yc,xc], c='r')
+        if y0 > y1 and y0 < y2:
+            self.zoom_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
 
 
         self.zoom_ax.set_aspect("auto")
@@ -564,7 +573,9 @@ class MyGraphView(qtw.QWidget):
         print("Saving gisans map....")
         x1, x2 = self.data.x1, self.data.x2
         y1, y2 = self.data.y1, self.data.y2
-        xc, yc = self.data.Xc, self.data.Yc
+        x0 = np.abs(self.data.X[0]).argmin()
+        y0 = np.abs(self.data.Y).T[0].argmin()
+        xc, yc, xs = self.data.Xc, self.data.Yc, self.data.Xs
         self.data.Xzoom = self.data.X[y1:y2+1,x1:x2+1]
         self.data.Yzoom = self.data.Y[y1:y2+1,x1:x2+1]
         self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
@@ -576,19 +587,17 @@ class MyGraphView(qtw.QWidget):
         cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
 
         has_legend = False
-        if xc > x1 and xc < x2:
+        if x0 > x1 and x0 < x2:
             new_ax.axvline(x=0, c='k', ls='solid', label = "Detector center")
+        if xc > x1 and xc < x2:
             new_ax.axvline(x=self.data.X[yc,xc], c='r', label = "Detector center (corrected)")
-            has_legend = True
+        if xs > x1 and xs < x2:
+            new_ax.axvline(x=self.data.X[yc,xs], c='g', label = "Specular beam")
 
         if yc > y1 and yc < y2:
-            if not has_legend:
-                new_ax.axhline(y=0, c='k', ls='solid', label = "Detector center")
-                new_ax.axhline(y=self.data.Y[yc,xc], c='r', label = "Detector center (corrected)")
-            else:
-                new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
-                new_ax.axhline(y=self.data.Y[yc,xc], c='r')
-
+            new_ax.axhline(y=self.data.Y[yc,xc], c='r')
+        if y0 > y1 and y0 < y2:
+            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
 
         new_ax.set_aspect("auto")
         new_ax.set_xlabel("$Q_{z}$")
@@ -699,21 +708,22 @@ class Experiment(FrozenClass):
     def __init__(self):
         self.selector_lambda = None
         self.angle_of_incidence = 0
+        self.sens = None
+        self.meansens = None
+        self.monitor_counts = None
 
         # Define the position of the direct beam on the detector
         # and the sensitivity map file
         self.qyc = 0
         self.qzc = 0
         self.qzc_corr = 0
+        self.qzc_spec = 0
         self.x0 = 128
         self.y0 = 128
         self.xf = 256
         self.yf = 256
         self.min_intensity = 1e-6
         self.max_intensity = 1e-3
-        self.sens = None
-        self.meansens = None
-        self.monitor_counts = None
         #self.qy = np.asarray([])
         #self.qz = np.asarray([])
         #self.I = np.asarray([])
@@ -1308,15 +1318,15 @@ class MyFrame(qtw.QFrame,FrozenClass):
         expdict = self.experiment.__dict__
 
         self.infoTable.setRowCount(0)
-        for i, k in enumerate(expdict.keys()):
+        for k in expdict.keys():
             if k[0] == "_":
                 continue
 
             if k in ["selector_lambda", "qyc", "qzc", "x0", "y0", "xf", "yf",
                      "min_intensity", "max_intensity",
                      "meansens", "monitor_counts",
-                     "angle_of_incidence", "qzc_corr"]:
-
+                     "angle_of_incidence", "qzc_corr", "qzc_spec"]:
+                i = self.infoTable.rowCount()
                 item_k = qtw.QTableWidgetItem(str(k))
                 item_v = qtw.QTableWidgetItem(str(expdict[k]))
                 self.infoTable.insertRow(i)
@@ -1476,7 +1486,9 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def compute_Q(self):
         experiment = self.experiment
         experiment.qzc_corr = experiment.qzc + int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
-        print(f"Corrected qzc = {experiment.qzc_corr}")
+        experiment.qzc_spec = experiment.qzc - int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+        #print(f"Corrected qzc = {experiment.qzc_corr}")
+        #print(f"Specular  qzc = {experiment.qzc_spec}")
 
         Imatrix = experiment.Imatrix
         ipix_range = np.asarray(range(Imatrix.shape[0]))
@@ -1557,6 +1569,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                             X = self.experiment.qzmatrix,
                             Z = Imap,
                             Xc = self.experiment.qzc_corr,
+                            Xs = self.experiment.qzc_spec,
                             Yc = self.experiment.qyc,
                             zmin = self.experiment.min_intensity,
                             zmax = self.experiment.max_intensity,
