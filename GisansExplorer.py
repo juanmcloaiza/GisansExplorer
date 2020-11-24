@@ -74,12 +74,13 @@ def valid_float_string(string):
     match = _float_re.search(string)
     return match.groups()[0] == string if match else False
 
-class MyThread(QThread):
+class FileReadingThread(QThread):
     progress_signal = pyqtSignal(int)
     def __init__(self, myframe):
         super().__init__()
         self.frame = myframe
         self.retval = None
+        self.datFilePath  = None
 
     def run(self):
         myframe = self.frame
@@ -87,7 +88,7 @@ class MyThread(QThread):
         myframe.experiment = Experiment()
 
         self.progress_signal.emit(0)
-        if not myframe.read_dat_file():
+        if not myframe.read_dat_file(self.datFilePath):
             self.retval = False, "dat file not read"
             return
 
@@ -139,9 +140,10 @@ class mySciSpinBox(qtw.QDoubleSpinBox):
     def validate(self, text, position):
         try:
             asdf = self.validator.validate(text, position)
+            return asdf
         except Exception as e:
             App.handle_exception(e)
-        return asdf
+        return
 
     def fixup(self, text):
         return self.validator.fixup(text)
@@ -487,7 +489,7 @@ class MyGraphView(qtw.QWidget):
             self.build_norm(**kwargs)
             self.update_axes(**kwargs)
             self.update_area_selector(**kwargs)
-            self.canvas.figure.suptitle(self.data.title, fontsize=5)
+            self.canvas.figure.suptitle("", fontsize=5)
             self.canvas.draw()
             self.save(**kwargs)
             self.finishedUpdating.emit()
@@ -543,7 +545,7 @@ class MyGraphView(qtw.QWidget):
         self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.axhline(y=Y_is_zero_at_idx, c='k')
         self.ax.set_aspect("auto")
-        self.ax.set_title("Detector View", pad=50)
+        self.ax.set_title(self.data.title + "\n - Detector View - ", fontsize = 5, pad=35)
         self.ax.set_xlim(150,870)
         self.ax.set_ylim(150,870)
         self.ax.legend(loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
@@ -975,7 +977,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         self.dirtree = qtw.QTreeView()
         self.tabs = qtw.QTabWidget()
         self.progress_bar =qtw.QProgressBar()
-        self.thread = MyThread(self)
+        self.thread = FileReadingThread(self)
 
         self.initFrame()
         self._freeze()
@@ -1001,12 +1003,12 @@ class MyFrame(qtw.QFrame,FrozenClass):
         model.setNameFilterDisables(False)
 
         self.dirtree.setModel(model)
-        self.dirtree.setRootIndex(model.index('./'))
+        self.dirtree.setRootIndex(model.index('/'))
 
         self.dirtree.setAnimated(True)
         self.dirtree.setIndentation(20)
         self.dirtree.setSortingEnabled(True)
-        self.dirtree.doubleClicked.connect(self.on_click_open_file)
+        self.dirtree.doubleClicked.connect(self.on_file_double_clicked)
         self.fileList.itemSelectionChanged.connect(self.on_file_selection_changed)
         self.fileList.setSelectionMode(3) #https://doc.qt.io/archives/qt-5.11/qabstractitemview.html#SelectionMode-enum
 
@@ -1084,11 +1086,24 @@ class MyFrame(qtw.QFrame,FrozenClass):
     @pyqtSlot()
     def on_click_open_file(self):
         try:
-            #self.settings = Settings()
-            #self.experiment = Experiment()
-            self.doStuff()
+            if _DEBUG_:
+                datFilePath = os.path.join(".","notToVersion","Archive","p15496_00000992.dat")
+            else:
+                datFilePath = self.openFileNameDialog()
+                self.doStuff(datFilePath)
         except Exception as e:
             App.handle_exception(e)
+
+    @pyqtSlot()
+    def on_file_double_clicked(self):
+        try:
+            if len(self.dirtree.selectedIndexes()) < 1:
+                return
+            datFilePath = self.dirtree.model().filePath(self.dirtree.currentIndex())
+            self.doStuff(datFilePath)
+        except Exception as e:
+            App.handle_exception(e)
+
 
     @pyqtSlot()
     def on_subtract_checkbox_changed(self):
@@ -1275,7 +1290,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         try:
             options = qtw.QFileDialog.Options()
             options |= qtw.QFileDialog.DontUseNativeDialog
-            fileName, _ = qtw.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",
+            fileName, _ = qtw.QFileDialog.getOpenFileName(self,"Open File", "",
             "Measurement dat file (*.dat);;All Files (*)",
             options=options)
             # self.openFileNamesDialog()
@@ -1371,8 +1386,13 @@ class MyFrame(qtw.QFrame,FrozenClass):
         return True
 
 
-    def doStuff(self):
-        self.thread.start()
+    def doStuff(self, datFilePath):
+        try:
+            self.thread.datFilePath = datFilePath
+            self.thread.start()
+        except Exception as e:
+            App.handle_exception(e)
+            return
         return
 
 
@@ -1401,15 +1421,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
 
 
-    def read_dat_file(self):
-        # Open and read the dat file
-        if _DEBUG_:
-            datFilePath = os.path.join(".","notToVersion","Archive","p15496_00000992.dat")
-        else:
-            if len(self.dirtree.selectedIndexes()) < 1:
-                datFilePath = self.openFileNameDialog()
-            else:
-                datFilePath = self.dirtree.model().filePath(self.dirtree.currentIndex())
+    def read_dat_file(self, datFilePath=None):
 
         if datFilePath:
             path, filename = os.path.split(datFilePath)
@@ -1488,6 +1500,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         line2=''
         line3=''
         line4=''
+        monitor = None
         for line in fp:
             if line4.find('name: mon1')>0:
                 line_list=line1.split()
