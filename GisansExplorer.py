@@ -281,7 +281,7 @@ class MyGraphView(qtw.QWidget):
 
 
     def define_axes(self):
-        #[left, bottom, width, height] 
+        #[left, bottom, width, height]
         self.ax =  self.canvas.figure.add_axes([0.1,0.2,0.3,0.5])
         self.cax = self.canvas.figure.add_axes([0.1,0.71,0.3,0.03])
         #self.cax = self.canvas.figure.add_axes([0.55,0.76,0.25,0.025])
@@ -364,7 +364,7 @@ class MyGraphView(qtw.QWidget):
         for k in self.data.__dict__.keys():
             if k in kwargs.keys():
                 self.data.__setattr__(k,kwargs[k])
-        
+
         if self.data.reset_limits_required:
             self.data.zmin = 0
             self.data.zmax = 1e-3
@@ -441,11 +441,11 @@ class MyGraphView(qtw.QWidget):
         self.ax_imshow = self.ax.pcolorfast(self.data.Z, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
         X_is_zero_at_idx = np.abs(self.data.X[0]).argmin()
         Y_is_zero_at_idx = np.abs(self.data.Y).T[0].argmin()
-        self.ax.axvline(x=X_is_zero_at_idx, c='k', label = "Detector center")
-        self.ax.axhline(y=Y_is_zero_at_idx, c='k')
         self.ax.axvline(x=self.data.Xc, c='r', label = "Detector center (corrected)")
         self.ax.axvline(x=self.data.Xs, c='g', label = "Specular beam")
+        self.ax.axvline(x=X_is_zero_at_idx, c='k', label = "Detector center")
         self.ax.axhline(y=self.data.Yc, c='r')
+        self.ax.axhline(y=Y_is_zero_at_idx, c='k')
         self.ax.set_aspect("auto")
         self.ax.set_title("Detector View", pad=50)
         self.ax.set_xlim(150,870)
@@ -839,6 +839,17 @@ class App(qtw.QMainWindow,FrozenClass):
         self.setWindowIcon(icon)
         self.show()
 
+    def closeEvent(self, event):
+
+        quit_msg = "Are you sure you want to exit?"
+        reply = qtw.QMessageBox.question(self, 'Message',
+                     quit_msg, qtw.QMessageBox.Yes, qtw.QMessageBox.No)
+
+        if reply == qtw.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
 
     def addTab(self):
         self.myTabs.addTab()
@@ -967,7 +978,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         self.dirtree.setModel(model)
         self.dirtree.setRootIndex(model.index('./'))
-        
+
         self.dirtree.setAnimated(True)
         self.dirtree.setIndentation(20)
         self.dirtree.setSortingEnabled(True)
@@ -1186,7 +1197,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
     def on_graph_updated(self):
         try:
             selectedListEntries = self.fileList.selectedItems()
-            
+
             for currentListItem in selectedListEntries:
                 currentListEntry = currentListItem.text()
                 self.experiment = self.experiment_dict[currentListEntry]
@@ -1270,7 +1281,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                 value = int(current_item.text())
             elif key in ["min_intensity", "max_intensity"]:
                 value = float(current_item.text())
-            else: 
+            else:
                 continue
             expdict[key] = value
         return True
@@ -1284,7 +1295,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
             self.update_single_experiment_values(self.experiment)
         return True
 
-    
+
     def color_outdated(self):
         expdict = self.experiment.__dict__
 
@@ -1299,7 +1310,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
                         value = float(current_item.text())
                     else:
                         continue
-                
+
                     self.color_validate(current_item, value, expdict[key])
                 except Exception as e:
                     red = QColor(255, 000, 0, 127)
@@ -1368,7 +1379,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
     def read_dat_file(self):
         # Open and read the dat file
-        if _DEBUG_: 
+        if _DEBUG_:
             datFilePath = os.path.join(".","notToVersion","Archive","p15496_00000992.dat")
         else:
             if len(self.dirtree.selectedIndexes()) < 1:
@@ -1509,7 +1520,7 @@ class MyFrame(qtw.QFrame,FrozenClass):
         QZ_i = np.ones(ipix_range.shape)
         QZmatrix = np.einsum('i,j->ij', QZ_i, QZ_j)
         experiment.qzmatrix = two_pi_over_lambda * (QZmatrix + sin_alpha_i)
-        
+
         return True
 
 
@@ -1642,12 +1653,11 @@ class MyFrame(qtw.QFrame,FrozenClass):
 
         return True
 
-
 if __name__ == '__main__':
     enable_high_dpi_scaling()
     app = qtw.QApplication(sys.argv)
     app.setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5;}")
-    
+
     ex = App()
     #sys.exit(app.exec_())
     #x = profile_function_with_arguments(app.exec_)
