@@ -241,7 +241,99 @@ class PlotData(FrozenClass):
         self.title = ""
         self._freeze()
         return
+###
+def create_gisans_figure(data, cnorm):
+        x1, x2 = data.x1, data.x2
+        y1, y2 = data.y1, data.y2
+        x0 = np.abs(data.X[0]).argmin()
+        y0 = np.abs(data.Y).T[0].argmin()
+        xc, yc, xs = data.Xc, data.Yc, data.Xs
+        data.Xzoom = data.X[y1:y2+1,x1:x2+1]
+        data.Yzoom = data.Y[y1:y2+1,x1:x2+1]
+        data.Zzoom = data.Z[y1:y2,x1:x2]
 
+        data.zoom_extent = (data.X[y1,x1], data.X[y2,x2], data.Y[y1,x1], data.Y[y2,x2])
+
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        cs = new_ax.pcolorfast(data.Xzoom, data.Yzoom, data.Zzoom, norm=cnorm, vmin=cnorm.vmin, vmax=cnorm.vmax, cmap='jet')
+
+        has_legend = False
+        if x0 > x1 and x0 < x2:
+            new_ax.axvline(x=0, c='k', ls='solid', label = "Detector center")
+        if xc > x1 and xc < x2:
+            new_ax.axvline(x=data.X[yc,xc], c='r', label = "Detector center (corrected)")
+        if xs > x1 and xs < x2:
+            new_ax.axvline(x=data.X[yc,xs], c='g', label = "Specular beam")
+
+        if yc > y1 and yc < y2:
+            new_ax.axhline(y=data.Y[yc,xc], c='r')
+        if y0 > y1 and y0 < y2:
+            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
+
+        new_ax.set_aspect("auto")
+        new_ax.set_xlabel("$Q_{z}$")
+        new_ax.set_ylabel("$Q_{y}$")
+        cbar = new_fig.colorbar(cs)
+        new_ax.set_title(data.title, fontsize=10)
+
+        new_ax.legend()#loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
+            #borderaxespad=0, frameon=False, fontsize = 6)
+        return new_fig
+
+def create_qz_integration_figure(data):
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        if data.log_scale:
+            try:
+                new_ax.set_yscale('log')
+            except Exception:
+                pass
+
+        integration_x = data.Zzoom.sum(axis=0)
+        x0, xf = data.zoom_extent[0:2]
+        rangex = np.linspace(x0, xf, len(integration_x))
+        xax_line = new_ax.plot(rangex, integration_x)
+        new_ax.set_xlim((x0, xf))
+
+        new_ax.xaxis.set_ticks(np.linspace(x0, xf, 5))
+
+        zero = integration_x.min()
+        mu =  integration_x.mean()
+        sig = integration_x.std()
+        #new_ax.set_yticks([zero, mu, mu+2*sig])
+        new_ax.grid(which='both', axis='both')
+        new_ax.set_xlabel("$Q_{z}$")
+        new_ax.set_ylabel("I($Q_{z})$")
+        new_ax.set_title(data.title, fontsize=10)
+        return new_fig
+
+def create_qy_integration_figure(data):
+        new_fig = plt.figure(figsize=(10,10))
+        new_ax = new_fig.add_subplot(111)
+        if data.log_scale:
+            try:
+                new_ax.set_yscale('log')
+            except Exception:
+                pass
+
+        integration_y =  data.Zzoom.sum(axis=1)
+        y0, yf = data.zoom_extent[2:4]
+        rangey = np.linspace(y0, yf, len(integration_y))
+        new_ax_line = new_ax.plot(rangey, integration_y)
+
+        new_ax.set_xlim((y0, yf))
+        new_ax.set_xticks(np.linspace(y0,yf,5))
+        zero = integration_y.min()
+        mu =  integration_y.mean()
+        sig = integration_y.std()
+        #new_ax.set_yticks([zero, mu, mu+2*sig])
+        new_ax.grid(which='both', axis='both')
+        new_ax.set_xlabel("$Q_{y}$")
+        new_ax.set_ylabel("I($Q_{y})$")
+        new_ax.set_title(data.title, fontsize=10)
+        return new_fig
+###
 
 class MyGraphView(qtw.QWidget):
     finishedUpdating = pyqtSignal()
@@ -297,6 +389,7 @@ class MyGraphView(qtw.QWidget):
         self.canvas.mpl_connect('scroll_event', self.on_mouse_wheel)
         self.canvas.mpl_connect('key_press_event', self.area_selector)
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+        self.canvas.mpl_connect('button_press_event', self.on_mouse_click)
         #self.canvas.mpl_connect('draw_event', self.area_selector.mycallback)
         self.canvas.setFocusPolicy( Qt.ClickFocus)
         self.canvas.setFocus()
@@ -330,6 +423,9 @@ class MyGraphView(qtw.QWidget):
             self.update_graph(zmin=vmin, zmax=vmax)
         return #on_mouse_wheel
 
+    def on_mouse_click(self, event):
+        if event.dblclick:
+            self.show_figures()
 
     def on_mouse_move(self, event):
         if not event.inaxes:
@@ -569,44 +665,17 @@ class MyGraphView(qtw.QWidget):
         self.save_qy_integration(filePath)
         return
 
-    def save_gisans_map(self,filePath):
+    def show_figures(self):
+        create_gisans_figure(self.data, self.norm)
+        create_qz_integration_figure(self.data)
+        create_qy_integration_figure(self.data)
+        plt.show()
+        plt.close('all')
+        return
+
+    def save_gisans_map(self,filePath=None):
         print("Saving gisans map....")
-        x1, x2 = self.data.x1, self.data.x2
-        y1, y2 = self.data.y1, self.data.y2
-        x0 = np.abs(self.data.X[0]).argmin()
-        y0 = np.abs(self.data.Y).T[0].argmin()
-        xc, yc, xs = self.data.Xc, self.data.Yc, self.data.Xs
-        self.data.Xzoom = self.data.X[y1:y2+1,x1:x2+1]
-        self.data.Yzoom = self.data.Y[y1:y2+1,x1:x2+1]
-        self.data.Zzoom = self.data.Z[y1:y2,x1:x2]
-
-        self.data.zoom_extent = (self.data.X[y1,x1], self.data.X[y2,x2], self.data.Y[y1,x1], self.data.Y[y2,x2])
-
-        new_fig = plt.figure(figsize=(10,10))
-        new_ax = new_fig.add_subplot(111)
-        cs = new_ax.pcolorfast(self.data.Xzoom, self.data.Yzoom, self.data.Zzoom, norm=self.norm, vmin=self.norm.vmin, vmax=self.norm.vmax, cmap='jet')
-
-        has_legend = False
-        if x0 > x1 and x0 < x2:
-            new_ax.axvline(x=0, c='k', ls='solid', label = "Detector center")
-        if xc > x1 and xc < x2:
-            new_ax.axvline(x=self.data.X[yc,xc], c='r', label = "Detector center (corrected)")
-        if xs > x1 and xs < x2:
-            new_ax.axvline(x=self.data.X[yc,xs], c='g', label = "Specular beam")
-
-        if yc > y1 and yc < y2:
-            new_ax.axhline(y=self.data.Y[yc,xc], c='r')
-        if y0 > y1 and y0 < y2:
-            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
-
-        new_ax.set_aspect("auto")
-        new_ax.set_xlabel("$Q_{z}$")
-        new_ax.set_ylabel("$Q_{y}$")
-        cbar = new_fig.colorbar(cs)
-        new_ax.set_title(self.data.title, fontsize=10)
-
-        new_ax.legend()#loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
-            #borderaxespad=0, frameon=False, fontsize = 6)
+        new_fig = create_gisans_figure(self.data, self.norm)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-gisans_map{ext}")
@@ -614,32 +683,9 @@ class MyGraphView(qtw.QWidget):
         return #save_gisans_map#
 
 
-    def save_qz_integration(self, filePath):
-        new_fig = plt.figure(figsize=(10,10))
-        new_ax = new_fig.add_subplot(111)
-        print("Saving qz integration....")
-        if self.data.log_scale:
-            try:
-                new_ax.set_yscale('log')
-            except Exception:
-                pass
-
-        integration_x = self.data.Zzoom.sum(axis=0)
-        x0, xf = self.data.zoom_extent[0:2]
-        rangex = np.linspace(x0, xf, len(integration_x))
-        xax_line = new_ax.plot(rangex, integration_x)
-        new_ax.set_xlim((x0, xf))
-
-        new_ax.xaxis.set_ticks(np.linspace(x0, xf, 5))
-
-        zero = integration_x.min()
-        mu =  integration_x.mean()
-        sig = integration_x.std()
-        #new_ax.set_yticks([zero, mu, mu+2*sig])
-        new_ax.grid(which='both', axis='both')
-        new_ax.set_xlabel("$Q_{z}$")
-        new_ax.set_ylabel("I($Q_{z})$")
-        new_ax.set_title(self.data.title, fontsize=10)
+    def save_qz_integration(self, filePath=None):
+        print("Saving qz integration...")
+        new_fig = create_qz_integration_figure(self.data)
 
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-integration_qz{ext}")
@@ -647,31 +693,9 @@ class MyGraphView(qtw.QWidget):
         return #save_xax
 
 
-    def save_qy_integration(self, filePath):
-        new_fig = plt.figure(figsize=(10,10))
-        new_ax = new_fig.add_subplot(111)
-        if self.data.log_scale:
-            try:
-                new_ax.set_yscale('log')
-            except Exception:
-                pass
-
-        integration_y =  self.data.Zzoom.sum(axis=1)
-        y0, yf = self.data.zoom_extent[2:4]
-        rangey = np.linspace(y0, yf, len(integration_y))
-        new_ax_line = new_ax.plot(rangey, integration_y)
-
-        new_ax.set_xlim((y0, yf))
-        new_ax.set_xticks(np.linspace(y0,yf,5))
-        zero = integration_y.min()
-        mu =  integration_y.mean()
-        sig = integration_y.std()
-        #new_ax.set_yticks([zero, mu, mu+2*sig])
-        new_ax.grid(which='both', axis='both')
-        new_ax.set_xlabel("$Q_{y}$")
-        new_ax.set_ylabel("I($Q_{y})$")
-        new_ax.set_title(self.data.title, fontsize=10)
-
+    def save_qy_integration(self, filePath=None):
+        print("Saving qy integration...")
+        new_fig = create_qy_integration_figure(self.data)
         no_ext, ext = os.path.splitext(filePath)
         new_fig.savefig(f"{no_ext}-integration_qy{ext}")
         print("qy integration saved.")
