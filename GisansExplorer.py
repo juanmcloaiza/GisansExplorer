@@ -244,7 +244,29 @@ class PlotData(FrozenClass):
         self._freeze()
         return
 ###
+class PlotStyle(object):
+    fontSize = 20
+    borderWidth = 3
+    figSize = (12,9)
+    lineWidth = 0.2 * fontSize
+    majorTickLength = fontSize
+    minorTickLength = 0.3*fontSize
+    axisLabelFontSize = 1.5*fontSize
+    titleFontSize = 0.5*fontSize
+
+    @classmethod
+    def apply_style(cls,ax):
+        ax.tick_params(labelsize=0.7*cls.fontSize)
+        ax.tick_params(width=cls.borderWidth, length=0.5*cls.fontSize, which='major')
+        ax.tick_params(width=cls.borderWidth, length=0.2*cls.fontSize, which='minor')
+        for axis in ['top','bottom','left','right']:
+            ax.spines[axis].set_linewidth(cls.lineWidth)
+
+        return
+
+
 def create_gisans_figure(data, cnorm):
+        ps = PlotStyle()
         x1, x2 = data.x1, data.x2
         y1, y2 = data.y1, data.y2
         x0 = np.abs(data.X[0]).argmin()
@@ -256,35 +278,42 @@ def create_gisans_figure(data, cnorm):
 
         data.zoom_extent = (data.X[y1,x1], data.X[y2,x2], data.Y[y1,x1], data.Y[y2,x2])
 
-        new_fig = plt.figure(figsize=(10,10))
+        new_fig = plt.figure(figsize=ps.figSize)
         new_ax = new_fig.add_subplot(111)
         cs = new_ax.pcolorfast(data.Xzoom, data.Yzoom, data.Zzoom, norm=cnorm, vmin=cnorm.vmin, vmax=cnorm.vmax, cmap='jet')
 
         has_legend = False
         if x0 > x1 and x0 < x2:
-            new_ax.axvline(x=0, c='k', ls='solid', label = "Detector center")
+            new_ax.axvline(x=0, c='k', ls='solid', lw=ps.lineWidth, label = "Detector center")
         if xc > x1 and xc < x2:
-            new_ax.axvline(x=data.X[yc,xc], c='r', label = "Detector center (corrected)")
+            new_ax.axvline(x=data.X[yc,xc], c='r', lw=ps.lineWidth , label = "Detector center (corrected)")
         if xs > x1 and xs < x2:
-            new_ax.axvline(x=data.X[yc,xs], c='g', label = "Specular beam")
+            new_ax.axvline(x=data.X[yc,xs], c='g', lw=ps.lineWidth , label = "Specular beam")
 
         if yc > y1 and yc < y2:
-            new_ax.axhline(y=data.Y[yc,xc], c='r')
+            new_ax.axhline(y=data.Y[yc,xc], c='r', lw=ps.lineWidth)
         if y0 > y1 and y0 < y2:
-            new_ax.axhline(y=0, c='k', ls='solid')#, lw=0.5)
+            new_ax.axhline(y=0, c='k', ls='solid', lw=ps.lineWidth)
 
         new_ax.set_aspect("auto")
-        new_ax.set_xlabel("$Q_{z}$")
-        new_ax.set_ylabel("$Q_{y}$")
+        new_ax.set_xlabel("$Q_{z}$", fontsize=ps.axisLabelFontSize)
+        new_ax.set_ylabel("$Q_{y}$", fontsize=ps.axisLabelFontSize)
         cbar = new_fig.colorbar(cs)
-        new_ax.set_title(data.title, fontsize=10)
+        cbar.outline.set_linewidth(ps.lineWidth)
+        new_ax.set_title(data.title, fontsize=ps.titleFontSize)
 
-        new_ax.legend()#loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
-            #borderaxespad=0, frameon=False, fontsize = 6)
+        new_ax.legend(fontsize=ps.fontSize)
+            #loc='upper left', bbox_to_anchor= (0,1.06),
+        #ncol=3, borderaxespad=0, frameon=False, fontsize = ps.fontSize)
+
+        for ax in new_fig.axes:
+            ps.apply_style(ax)
+
         return new_fig
 
 def create_qz_integration_figure(data):
-        new_fig = plt.figure(figsize=(10,10))
+        ps = PlotStyle()
+        new_fig = plt.figure(figsize=ps.figSize)
         new_ax = new_fig.add_subplot(111)
         if data.log_scale:
             try:
@@ -295,7 +324,7 @@ def create_qz_integration_figure(data):
         integration_x = data.Zzoom.sum(axis=0)
         x0, xf = data.zoom_extent[0:2]
         rangex = np.linspace(x0, xf, len(integration_x))
-        xax_line = new_ax.plot(rangex, integration_x)
+        #xax_line = new_ax.plot(rangex, integration_x, lw=ps.lineWidth)
         new_ax.set_xlim((x0, xf))
 
         new_ax.xaxis.set_ticks(np.linspace(x0, xf, 5))
@@ -304,14 +333,20 @@ def create_qz_integration_figure(data):
         mu =  integration_x.mean()
         sig = integration_x.std()
         #new_ax.set_yticks([zero, mu, mu+2*sig])
-        new_ax.grid(which='both', axis='both')
-        new_ax.set_xlabel("$Q_{z}$")
-        new_ax.set_ylabel("I($Q_{z})$")
-        new_ax.set_title(data.title, fontsize=10)
+        new_ax.grid(which='both', axis='both', lw=ps.lineWidth)
+        new_ax.fill_between(rangex, 0, integration_x,
+                            facecolor='lightsalmon', edgecolor='orangered', alpha = 0.5,
+                            linewidth=ps.lineWidth, zorder=10)
+        new_ax.set_xlabel("$Q_{z}$", fontsize=ps.axisLabelFontSize)
+        new_ax.set_ylabel("I($Q_{z})$", fontsize=ps.axisLabelFontSize)
+        new_ax.set_title(data.title, fontsize=ps.titleFontSize)
+        ps.apply_style(new_ax)
+
         return new_fig
 
 def create_qy_integration_figure(data):
-        new_fig = plt.figure(figsize=(10,10))
+        ps = PlotStyle()
+        new_fig = plt.figure(figsize=ps.figSize)
         new_ax = new_fig.add_subplot(111)
         if data.log_scale:
             try:
@@ -322,7 +357,7 @@ def create_qy_integration_figure(data):
         integration_y =  data.Zzoom.sum(axis=1)
         y0, yf = data.zoom_extent[2:4]
         rangey = np.linspace(y0, yf, len(integration_y))
-        new_ax_line = new_ax.plot(rangey, integration_y)
+        #new_ax_line = new_ax.plot(rangey, integration_y, lw=ps.lineWidth)
 
         new_ax.set_xlim((y0, yf))
         new_ax.set_xticks(np.linspace(y0,yf,5))
@@ -330,10 +365,15 @@ def create_qy_integration_figure(data):
         mu =  integration_y.mean()
         sig = integration_y.std()
         #new_ax.set_yticks([zero, mu, mu+2*sig])
-        new_ax.grid(which='both', axis='both')
-        new_ax.set_xlabel("$Q_{y}$")
-        new_ax.set_ylabel("I($Q_{y})$")
-        new_ax.set_title(data.title, fontsize=10)
+        new_ax.grid(which='both', axis='both', lw=ps.lineWidth)
+        new_ax.fill_between(rangey, 0, integration_y,
+                            facecolor='cornflowerblue', edgecolor='royalblue', alpha=0.5,
+                            linewidth=ps.lineWidth, zorder=10)
+        new_ax.set_xlabel("$Q_{y}$", fontsize=ps.axisLabelFontSize)
+        new_ax.set_ylabel("I($Q_{y})$", fontsize=ps.axisLabelFontSize)
+        new_ax.set_title(data.title, fontsize=ps.titleFontSize)
+        ps.apply_style(new_ax)
+
         return new_fig
 ###
 
@@ -427,7 +467,10 @@ class MyGraphView(qtw.QWidget):
 
     def on_mouse_click(self, event):
         if event.dblclick:
-            self.show_figures()
+            try:
+                self.show_figures()
+            except Exception as e:
+                App.handle_exception(e)
 
     def on_mouse_move(self, event):
         if not event.inaxes:
@@ -545,7 +588,7 @@ class MyGraphView(qtw.QWidget):
         self.ax.axhline(y=self.data.Yc, c='r')
         self.ax.axhline(y=Y_is_zero_at_idx, c='k')
         self.ax.set_aspect("auto")
-        self.ax.set_title(self.data.title + "\n - Detector View - ", fontsize = 5, pad=35)
+        self.ax.set_title(self.data.title + "\n - Detector View - ", fontsize = 6, pad=35)
         self.ax.set_xlim(150,870)
         self.ax.set_ylim(150,870)
         self.ax.legend(loc='upper left', bbox_to_anchor= (-0.3, -0.3), ncol=3,
@@ -610,7 +653,12 @@ class MyGraphView(qtw.QWidget):
         integration_x = self.data.Zzoom.sum(axis=0)
         x0, xf = self.data.zoom_extent[0:2]
         rangex = np.linspace(x0, xf, len(integration_x))
-        self.xax_line = self.xax.plot(rangex, integration_x)
+        #self.xax_line = self.xax.plot(rangex, integration_x)
+
+        self.xax_lin = self.xax.fill_between(rangex, 0, integration_x,
+                            facecolor='lightsalmon', edgecolor='orangered', alpha = 0.5,
+                            zorder=10)
+
         self.xax.set_xlim((x0, xf))
 
 
@@ -638,7 +686,11 @@ class MyGraphView(qtw.QWidget):
         integration_y =  self.data.Zzoom.sum(axis=1)
         y0, yf = self.data.zoom_extent[2:4]
         rangey = np.linspace(y0, yf, len(integration_y))
-        self.yax_line = self.yax.plot(integration_y, rangey)
+        #self.yax_line = self.yax.plot(integration_y, rangey)
+
+        self.yax_line = self.yax.fill_betweenx(rangey, integration_y,
+                            facecolor='cornflowerblue', edgecolor='royalblue', alpha=0.5,
+                            zorder=10)
 
         self.yax.set_ylim((y0, yf))
         zero = integration_y.min()
@@ -712,19 +764,19 @@ class MyGraphView(qtw.QWidget):
 
         #This creates a cross to test the correct alignment between the
         #different plot axes:
-        Z[:,:] = 1e-5
-        Z[500:511,:] = 1e-4
-        Z[:,500:511] = 1e-4
+        #Z[:,:] = 1e-5
+        #Z[500:511,:] = 1e-4
+        #Z[:,500:511] = 1e-4
 
-        print(Z.min())
-        print(Z.max())
-        print(Z.shape)
+        #print(Z.min())
+        #print(Z.max())
+        #print(Z.shape)
 
         x = np.linspace(-1,1, Z.shape[0])
         y = np.linspace(-1,1, Z.shape[1])
         X, Y = np.meshgrid(x,y)
-        Xc = len(x) // 2
-        Yc = len(y) //2
+        #Xc = len(x) // 2
+        #Yc = len(y) //2
         self.update_graph(X = X, Y = Y, Z = Z, Xc = 0, Yc = 0)
         #if _DEBUG_:
         #    np.savetxt("./myNumpyArray.txt", 3 + 10*np.sin(np.sqrt(X**2 + Y**2)))
