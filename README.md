@@ -10,7 +10,7 @@ Simple **GUI** that interactively helps in the reduction of [NICOS](https://nico
  $ cd NeutronDataViewer
  ```
  
- [**Use Python 3.7**](https://realpython.com/installing-python/) from here on:
+ [**Use Python 3.6**](https://realpython.com/installing-python/) from here on:
  
  Linux / Mac:
  ```
