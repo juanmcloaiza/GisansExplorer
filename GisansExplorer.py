@@ -561,7 +561,7 @@ class MyGraphView(qtw.QWidget):
     def build_norm(self, **kwargs):
         if self.data.log_scale:
             thres = np.abs(self.data.Z.std()/1e8)
-            self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres, base=10)
+            self.norm = mpl.colors.SymLogNorm(vmin=self.data.zmin, vmax=self.data.zmax, linthresh=thres)#, base=10)
             #self.norm = mpl.colors.LogNorm(vmin=self.data.zmin, vmax=self.data.zmax)
         else:
             self.norm = mpl.colors.Normalize(vmin=self.data.zmin, vmax=self.data.zmax)
@@ -709,7 +709,8 @@ class MyGraphView(qtw.QWidget):
     def build_cbar(self):
         self.cax.tick_params(axis='x', direction='in', labeltop=True, top=True)
         self.cbar = self.canvas.figure.colorbar(self.ax_imshow, cax=self.cax, orientation='horizontal', norm = self.norm)
-        self.cbar.mappable.set_clim(self.norm.vmin, self.norm.vmax)
+        #self.cbar.mappable.set_clim(self.norm.vmin, self.norm.vmax)
+        self.cbar.set_clim(self.norm.vmin, self.norm.vmax)
         self.cax.xaxis.tick_top()
         return #build_cbar
 
