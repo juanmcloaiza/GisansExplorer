@@ -300,6 +300,7 @@ class MyFrame(qtw.QFrame,Frozen):
         else:
             op_str = "Addition of:\n"
         header = op_str + "\n".join([d + ": " + gz for (d,gz) in zip(dat_filenames, gz_filenames)])
+        header += "\n - "+self.experiment.instrument_name+" - "
         return header
 
 
@@ -471,6 +472,8 @@ class MyFrame(qtw.QFrame,Frozen):
                         value = int(current_item.text())
                     elif key in ["min_intensity", "max_intensity", "pixel_size_mm"]:
                         value = float(current_item.text())
+                    elif key in ['instrument_name']:
+                        value = str(current_item.text())
                     else:
                         continue
 
