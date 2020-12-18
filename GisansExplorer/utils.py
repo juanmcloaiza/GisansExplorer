@@ -22,6 +22,7 @@ import cProfile, pstats, io
 # part.
 _float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
 __DEBUG__=False
+__DEPLOYED__=True
 __DATA_ROOT_DIR__ = "./notToVersion/Archive"
 
 def valid_float_string(string):

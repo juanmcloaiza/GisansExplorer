@@ -14,8 +14,10 @@ from matplotlib.figure import Figure
 
 import numpy as np
 import os
+import sys
+from pathlib import Path
 
-from GisansExplorer.utils import Frozen, handle_exception
+from gisansexplorer.utils import Frozen, handle_exception, __DEPLOYED__
 
 
 class AreaSelector(Frozen):
@@ -594,7 +596,15 @@ class MyGraphView(qtw.QWidget):
         #Z = np.loadtxt('./notToVersion/WelcomePlot.txt')
         #Z = (Z - Z.min()) / (Z.max() - Z.min()) * (1e-3 - 1e-6) + 1e-6
         #np.save("./show_test_map.npy", Z)
-        Z = np.load('./resources/show_test_map.npy')
+        if not __DEPLOYED__:
+            filepath = Path('gisansexplorer/resources/show_test_map.npy')
+        else:
+            filepath = Path(sys.prefix+'/resources/show_test_map.npy')
+        try:
+            Z = np.load(filepath)
+        except Exception as e:
+            print(f"Failed to load: {filepath}")
+            Z = np.abs(np.random.normal(0,1e-5,(1025,1025)))
 
         #This creates a cross to test the correct alignment between the
         #different plot axes:

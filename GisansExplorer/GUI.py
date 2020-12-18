@@ -9,9 +9,9 @@ import numpy as np
 import copy
 import os
 
-from GisansExplorer.utils import Frozen, handle_exception, is_file, __DEBUG__, __DATA_ROOT_DIR__
-from GisansExplorer.experiment_data_handling import Settings, Experiment, FileReadingThread
-from GisansExplorer.plotting import MyGraphView
+from gisansexplorer.utils import Frozen, handle_exception, is_file, __DEBUG__, __DATA_ROOT_DIR__
+from gisansexplorer.experiment_data_handling import Settings, Experiment, FileReadingThread
+from gisansexplorer.plotting import MyGraphView
 
 
 class MyTabs(qtw.QTabWidget,Frozen):

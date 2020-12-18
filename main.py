@@ -1,11 +1,9 @@
 #!/bin/env python
 
-
-if __name__ == '__main__':
-
+def entry_point():
     #Qt stuff:
-    from GisansExplorer.main_app import App
-    from GisansExplorer.utils import enable_high_dpi_scaling, profile_function_with_arguments, __DEBUG__
+    from gisansexplorer.main_app import App
+    from gisansexplorer.utils import enable_high_dpi_scaling, profile_function_with_arguments, __DEBUG__
     import PyQt5.QtWidgets as qtw
     import sys
 
@@ -20,3 +18,7 @@ if __name__ == '__main__':
     else:
         x = app.exec()
     sys.exit(x)
+
+
+if __name__ == '__main__':
+    entry_point()

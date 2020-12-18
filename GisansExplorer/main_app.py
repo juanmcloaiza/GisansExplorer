@@ -1,20 +1,29 @@
 #Qt stuff:
-from GisansExplorer.utils import Frozen
-from GisansExplorer.GUI import MyTabs
+from gisansexplorer.utils import Frozen
+from gisansexplorer.GUI import MyTabs
 import PyQt5.QtWidgets as qtw
 from PyQt5.QtGui import QIcon
+from gisansexplorer.utils import __DEPLOYED__
 
-import traceback
+from pathlib import Path
+import sys
+
+def icon_file():
+    if not __DEPLOYED__:
+            filepath = Path('gisansexplorer/resources/Icon.png')
+    else:
+            filepath = Path(sys.prefix+'/resources/Icon.png')
+    return str(filepath)
 
 class App(qtw.QMainWindow,Frozen):
     def __init__(self):
         super().__init__()
-        self.title = 'GisansExplorer'
+        self.title = 'gisansexplorer'
         self.myTabs = MyTabs()
         self.setCentralWidget(self.myTabs)
         self._freeze()
         self.setWindowTitle(self.title)
-        icon = QIcon('./Icon.png')
+        icon = QIcon(icon_file())
         self.setWindowIcon(icon)
         self.show()
 

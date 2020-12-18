@@ -4,7 +4,7 @@ import numpy as np
 import os
 from PyQt5.QtCore import pyqtSignal, QThread
 
-from GisansExplorer.utils import Frozen, handle_exception
+from gisansexplorer.utils import Frozen, handle_exception
 
 
 class Instrument(Frozen):
