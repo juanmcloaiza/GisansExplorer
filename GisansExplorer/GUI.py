@@ -438,10 +438,12 @@ class MyFrame(qtw.QFrame,Frozen):
         for i in range(self.infoTable.rowCount()):
             key = self.infoTable.verticalHeaderItem(i).text()
             current_item = self.infoTable.item(i,0)
-            if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf']:
+            if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf', 'sample_detector_distance_mm']:
                 value = int(current_item.text())
-            elif key in ["min_intensity", "max_intensity"]:
+            elif key in ['min_intensity', "max_intensity", 'pixel_size_mm']:
                 value = float(current_item.text())
+            elif key in ['instrument_name']:
+                value = str(current_item.text())
             else:
                 continue
             expdict[key] = value
@@ -465,9 +467,9 @@ class MyFrame(qtw.QFrame,Frozen):
                 key = self.infoTable.verticalHeaderItem(i).text()
                 current_item = self.infoTable.item(i,0)
                 try:
-                    if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf']:
+                    if key in ['qyc', 'qzc', 'x0', 'y0', 'xf', 'yf','sample_detector_distance_mm']:
                         value = int(current_item.text())
-                    elif key in ["min_intensity", "max_intensity"]:
+                    elif key in ["min_intensity", "max_intensity", "pixel_size_mm"]:
                         value = float(current_item.text())
                     else:
                         continue
@@ -494,7 +496,7 @@ class MyFrame(qtw.QFrame,Frozen):
             if k[0] == "_":
                 continue
 
-            if k in ["instrument_name", "pixel_size_mm", "sample_to_detector_distance_mm",
+            if k in ["instrument_name", "pixel_size_mm", "sample_detector_distance_mm",
                      "selector_lambda", "qyc", "qzc", "x0", "y0", "xf", "yf",
                      "min_intensity", "max_intensity",
                      "meansens", "monitor_counts",
@@ -506,7 +508,7 @@ class MyFrame(qtw.QFrame,Frozen):
                 self.infoTable.setVerticalHeaderItem(i,item_k)
                 self.infoTable.setItem(i,0,item_v)
 
-            if k in ["instrument_name", "pixel_size_mm", "sample_to_detector_distance_mm",
+            if k in [#"instrument_name", "pixel_size_mm", "sample_detector_distance_mm",
                      "selector_lambda", "meansens", "monitor_counts", "angle_of_incidence",
                      "qzc_corr", "qzc_spec"]:
                 current_item = self.infoTable.item(i,0)
