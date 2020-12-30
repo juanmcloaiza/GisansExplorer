@@ -15,15 +15,30 @@ from gisansexplorer.plotting import MyGraphView
 
 
 class MyTabs(qtw.QTabWidget,Frozen):
-    """[summary]
-
-    Parameters
-    ----------
-    qtw : [type]
-        [description]
-    Frozen : [type]
-        [description]
     """
+    Collection of tabs hosting gisans data frames
+
+    Attributes
+    ----------
+    tabButton_add: QToolButton
+        Adds a new tab
+    tabButton_rmv: QToolButton
+        Removes the current tab
+    frameList: List
+        List of gisans frames
+    last_num: int
+        index of last tab created
+
+    Methods
+    -------
+    initCornerButton()
+        Adds and creates connections for the add/rmv tab buttons
+    addTab():
+        Adds a new tab
+    removeTab():
+        Removes current tab
+    """
+    
     def __init__(self):
         """[summary]
         """
