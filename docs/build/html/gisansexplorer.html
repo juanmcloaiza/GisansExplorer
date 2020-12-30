@@ -1,0 +1,1179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>gisansexplorer package &mdash; gisansexplorer 0.0.19 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gisansexplorer" href="modules.html" />
+    <link rel="prev" title="Introduction" href="howto.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> gisansexplorer
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">gisansexplorer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.GUI">gisansexplorer.GUI module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.experiment_data_handling">gisansexplorer.experiment_data_handling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.main_app">gisansexplorer.main_app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.plotting">gisansexplorer.plotting module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.utils">gisansexplorer.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">gisansexplorer</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">gisansexplorer package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer.GUI">gisansexplorer.GUI module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer.experiment_data_handling">gisansexplorer.experiment_data_handling module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer.main_app">gisansexplorer.main_app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer.plotting">gisansexplorer.plotting module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer.utils">gisansexplorer.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gisansexplorer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gisansexplorer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>gisansexplorer package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gisansexplorer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gisansexplorer-package">
+<h1>gisansexplorer package<a class="headerlink" href="#gisansexplorer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gisansexplorer.GUI">
+<span id="gisansexplorer-gui-module"></span><h2>gisansexplorer.GUI module<a class="headerlink" href="#module-gisansexplorer.GUI" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gisansexplorer.GUI.MyFrame">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.GUI.</code><code class="sig-name descname">MyFrame</code><a class="headerlink" href="#gisansexplorer.GUI.MyFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QFrame</span></code>, <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+<p>[summary]</p>
+<dl class="simple">
+<dt>qtw<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>Frozen<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.addExperimentInfo">
+<code class="sig-name descname">addExperimentInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.addExperimentInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.addFileTreeAndList">
+<code class="sig-name descname">addFileTreeAndList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">botSplitter</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.addFileTreeAndList" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>botSplitter<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.addFunctionalityButtons">
+<code class="sig-name descname">addFunctionalityButtons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.addFunctionalityButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.addPanels">
+<code class="sig-name descname">addPanels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.addPanels" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.build_ascii_header">
+<code class="sig-name descname">build_ascii_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.build_ascii_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.color_outdated">
+<code class="sig-name descname">color_outdated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.color_outdated" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.color_validate">
+<em class="property">static </em><code class="sig-name descname">color_validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_item</span></em>, <em class="sig-param"><span class="n">value_a</span></em>, <em class="sig-param"><span class="n">value_b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.color_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>table_item<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>value_a<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>value_b<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.compute_Q">
+<code class="sig-name descname">compute_Q</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.compute_Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.doStuff">
+<code class="sig-name descname">doStuff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datFilePath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.doStuff" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>datFilePath<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.initFrame">
+<code class="sig-name descname">initFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.initFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_cell_changed">
+<code class="sig-name descname">on_cell_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_cell_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_click_loglinear">
+<code class="sig-name descname">on_click_loglinear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_click_loglinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_click_open_file">
+<code class="sig-name descname">on_click_open_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_click_open_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_click_save_ascii">
+<code class="sig-name descname">on_click_save_ascii</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_click_save_ascii" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_click_save_png">
+<code class="sig-name descname">on_click_save_png</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_click_save_png" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_click_update">
+<code class="sig-name descname">on_click_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_click_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_file_double_clicked">
+<code class="sig-name descname">on_file_double_clicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_file_double_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_file_selection_changed">
+<code class="sig-name descname">on_file_selection_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_file_selection_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_graph_updated">
+<code class="sig-name descname">on_graph_updated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_graph_updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_progress_emited">
+<code class="sig-name descname">on_progress_emited</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_progress_emited" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>value<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.on_subtract_checkbox_changed">
+<code class="sig-name descname">on_subtract_checkbox_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.on_subtract_checkbox_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.openFileNameDialog">
+<code class="sig-name descname">openFileNameDialog</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.openFileNameDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.parse_dat">
+<code class="sig-name descname">parse_dat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.parse_dat" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>file<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.parse_intensity_map">
+<code class="sig-name descname">parse_intensity_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.parse_intensity_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>inputd<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.parse_sensitivity_map">
+<code class="sig-name descname">parse_sensitivity_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sens</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.parse_sensitivity_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>sens<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.parse_yaml">
+<code class="sig-name descname">parse_yaml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.parse_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>fp<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.read_dat_file">
+<code class="sig-name descname">read_dat_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datFilePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.read_dat_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>datFilePath<span class="classifier">[type], optional</span></dt><dd><p>[description], by default None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.read_intensity_file">
+<code class="sig-name descname">read_intensity_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.read_intensity_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.read_sensitivity_file">
+<code class="sig-name descname">read_sensitivity_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.read_sensitivity_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.read_yaml_file">
+<code class="sig-name descname">read_yaml_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.read_yaml_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.safe_parse">
+<code class="sig-name descname">safe_parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parse_func</span></em>, <em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.safe_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>parse_func<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>file_path<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.safe_parse_numpy">
+<code class="sig-name descname">safe_parse_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parse_func</span></em>, <em class="sig-param"><span class="n">file_path</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">'i'</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">' '</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.safe_parse_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>parse_func<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>file_path<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+<dt>dtype<span class="classifier">str, optional</span></dt><dd><p>[description], by default ‘i’</p>
+</dd>
+<dt>delimiter<span class="classifier">str, optional</span></dt><dd><p>[description], by default ‘ ‘</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.saveFileNameDialog">
+<code class="sig-name descname">saveFileNameDialog</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.saveFileNameDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.save_gisans_map_filepath">
+<code class="sig-name descname">save_gisans_map_filepath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.save_gisans_map_filepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>inputd<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>NotImplementedError</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.subtract_intensities_from_selected_files">
+<code class="sig-name descname">subtract_intensities_from_selected_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.subtract_intensities_from_selected_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.sum_intensities_from_selected_files">
+<code class="sig-name descname">sum_intensities_from_selected_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.sum_intensities_from_selected_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_from_info_table">
+<code class="sig-name descname">update_from_info_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_from_info_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_from_selection_list">
+<code class="sig-name descname">update_from_selection_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_from_selection_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_gui">
+<code class="sig-name descname">update_gui</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Exception</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_multi_experiment_values">
+<code class="sig-name descname">update_multi_experiment_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_multi_experiment_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_single_experiment_values">
+<code class="sig-name descname">update_single_experiment_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_single_experiment_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>experiment<span class="classifier">[type]</span></dt><dd><p>[description]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyFrame.update_table">
+<code class="sig-name descname">update_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyFrame.update_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="simple">
+<dt>[type]</dt><dd><p>[description]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.GUI.MyTabs">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.GUI.</code><code class="sig-name descname">MyTabs</code><a class="headerlink" href="#gisansexplorer.GUI.MyTabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QTabWidget</span></code>, <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+<p>Collection of tabs hosting gisans data frames</p>
+<dl class="simple">
+<dt>tabButton_add: QToolButton</dt><dd><p>Adds a new tab</p>
+</dd>
+<dt>tabButton_rmv: QToolButton</dt><dd><p>Removes the current tab</p>
+</dd>
+<dt>frameList: List</dt><dd><p>List of gisans frames</p>
+</dd>
+<dt>last_num: int</dt><dd><p>index of last tab created</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>initCornerButton()</dt><dd><p>Adds and creates connections for the add/rmv tab buttons</p>
+</dd>
+<dt>addTab():</dt><dd><p>Adds a new tab</p>
+</dd>
+<dt>removeTab():</dt><dd><p>Removes current tab</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyTabs.addTab">
+<code class="sig-name descname">addTab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.addTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new data frame and adds it to the list of frames</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyTabs.initCornerButton">
+<code class="sig-name descname">initCornerButton</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.initCornerButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds and creates connections for the add/rmv tab buttons</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.GUI.MyTabs.removeTab">
+<code class="sig-name descname">removeTab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.removeTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the tab currently selected</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-gisansexplorer.experiment_data_handling">
+<span id="gisansexplorer-experiment-data-handling-module"></span><h2>gisansexplorer.experiment_data_handling module<a class="headerlink" href="#module-gisansexplorer.experiment_data_handling" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gisansexplorer.experiment_data_handling.Experiment">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.experiment_data_handling.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param">instrument=&lt;gisansexplorer.experiment_data_handling.Instrument object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.cos_alpha_f">
+<code class="sig-name descname">cos_alpha_f</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pixel_j</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.cos_alpha_f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.cos_alpha_i">
+<em class="property">property </em><code class="sig-name descname">cos_alpha_i</code><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.cos_alpha_i" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.sin_2theta_f">
+<code class="sig-name descname">sin_2theta_f</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pixel_i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.sin_2theta_f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.sin_alpha_f">
+<code class="sig-name descname">sin_alpha_f</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pixel_j</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.sin_alpha_f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.sin_alpha_i">
+<em class="property">property </em><code class="sig-name descname">sin_alpha_i</code><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.sin_alpha_i" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Experiment.two_pi_over_lambda">
+<em class="property">property </em><code class="sig-name descname">two_pi_over_lambda</code><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Experiment.two_pi_over_lambda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.experiment_data_handling.FileReadingThread">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.experiment_data_handling.</code><code class="sig-name descname">FileReadingThread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">myframe</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.FileReadingThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QThread</span></code></p>
+<dl class="py attribute">
+<dt id="gisansexplorer.experiment_data_handling.FileReadingThread.progress_signal">
+<code class="sig-name descname">progress_signal</code><a class="headerlink" href="#gisansexplorer.experiment_data_handling.FileReadingThread.progress_signal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.FileReadingThread.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.FileReadingThread.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.experiment_data_handling.Instrument">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.experiment_data_handling.</code><code class="sig-name descname">Instrument</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">pixel_size_mm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_detector_distance_mm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_root_dir</span><span class="o">=</span><span class="default_value">'/'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.experiment_data_handling.Settings">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.experiment_data_handling.</code><code class="sig-name descname">Settings</code><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.basename">
+<code class="sig-name descname">basename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.basename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.datFilePath">
+<code class="sig-name descname">datFilePath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.datFilePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.gisans_cut_filepath">
+<code class="sig-name descname">gisans_cut_filepath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_or_z</span><span class="o">=</span><span class="default_value">'z'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.gisans_cut_filepath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.gisans_map_filepath">
+<code class="sig-name descname">gisans_map_filepath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.gisans_map_filepath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.gzFilePaths">
+<code class="sig-name descname">gzFilePaths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.gzFilePaths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.sensFilePath">
+<code class="sig-name descname">sensFilePath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.sensFilePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.experiment_data_handling.Settings.yamlFilePaths">
+<code class="sig-name descname">yamlFilePaths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.experiment_data_handling.Settings.yamlFilePaths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-gisansexplorer.main_app">
+<span id="gisansexplorer-main-app-module"></span><h2>gisansexplorer.main_app module<a class="headerlink" href="#module-gisansexplorer.main_app" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gisansexplorer.main_app.App">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.main_app.</code><code class="sig-name descname">App</code><a class="headerlink" href="#gisansexplorer.main_app.App" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QMainWindow</span></code>, <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+<dl class="py method">
+<dt id="gisansexplorer.main_app.App.addTab">
+<code class="sig-name descname">addTab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.main_app.App.addTab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.main_app.App.closeEvent">
+<code class="sig-name descname">closeEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QCloseEvent</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.main_app.App.closeEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.main_app.icon_file">
+<code class="sig-prename descclassname">gisansexplorer.main_app.</code><code class="sig-name descname">icon_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.main_app.icon_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-gisansexplorer.plotting">
+<span id="gisansexplorer-plotting-module"></span><h2>gisansexplorer.plotting module<a class="headerlink" href="#module-gisansexplorer.plotting" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gisansexplorer.plotting.AreaSelector">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">AreaSelector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">line_select_callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.AreaSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.plotting.MyGraphView">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">MyGraphView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_title</span></em>, <em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.build_cbar">
+<code class="sig-name descname">build_cbar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.build_cbar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.build_norm">
+<code class="sig-name descname">build_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.build_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.define_axes">
+<code class="sig-name descname">define_axes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.define_axes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.define_layout">
+<code class="sig-name descname">define_layout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.define_layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.MyGraphView.finishedUpdating">
+<code class="sig-name descname">finishedUpdating</code><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.finishedUpdating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.init_canvas_connections">
+<code class="sig-name descname">init_canvas_connections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.init_canvas_connections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.init_data_and_parameters">
+<code class="sig-name descname">init_data_and_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.init_data_and_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.init_xyzLabel">
+<code class="sig-name descname">init_xyzLabel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.init_xyzLabel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.line_select_callback">
+<code class="sig-name descname">line_select_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eclick</span></em>, <em class="sig-param"><span class="n">erelease</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.line_select_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.on_mouse_click">
+<code class="sig-name descname">on_mouse_click</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.on_mouse_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.on_mouse_move">
+<code class="sig-name descname">on_mouse_move</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.on_mouse_move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.on_mouse_wheel">
+<code class="sig-name descname">on_mouse_wheel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.on_mouse_wheel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save_figures">
+<code class="sig-name descname">save_figures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_figures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save_gisans_map">
+<code class="sig-name descname">save_gisans_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_gisans_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save_qy_integration">
+<code class="sig-name descname">save_qy_integration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_qy_integration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save_qz_integration">
+<code class="sig-name descname">save_qz_integration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_qz_integration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.show_figures">
+<code class="sig-name descname">show_figures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.show_figures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.take_care_of_negative_values">
+<code class="sig-name descname">take_care_of_negative_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.take_care_of_negative_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.test_show">
+<code class="sig-name descname">test_show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.test_show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_area_selector">
+<code class="sig-name descname">update_area_selector</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_area_selector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_ax">
+<code class="sig-name descname">update_ax</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_ax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_axes">
+<code class="sig-name descname">update_axes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_axes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_cax">
+<code class="sig-name descname">update_cax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_cax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_data">
+<code class="sig-name descname">update_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_graph">
+<code class="sig-name descname">update_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_xax">
+<code class="sig-name descname">update_xax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_xax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_yax">
+<code class="sig-name descname">update_yax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_yax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.update_zoom_ax">
+<code class="sig-name descname">update_zoom_ax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.update_zoom_ax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.plotting.PlotData">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">PlotData</code><a class="headerlink" href="#gisansexplorer.plotting.PlotData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gisansexplorer.utils.Frozen" title="gisansexplorer.utils.Frozen"><code class="xref py py-class docutils literal notranslate"><span class="pre">gisansexplorer.utils.Frozen</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.plotting.PlotStyle">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">PlotStyle</code><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="gisansexplorer.plotting.PlotStyle.apply_style">
+<em class="property">classmethod </em><code class="sig-name descname">apply_style</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.apply_style" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.axisLabelFontSize">
+<code class="sig-name descname">axisLabelFontSize</code><em class="property"> = 30.0</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.axisLabelFontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.borderWidth">
+<code class="sig-name descname">borderWidth</code><em class="property"> = 3</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.borderWidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.figSize">
+<code class="sig-name descname">figSize</code><em class="property"> = (12, 9)</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.figSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.fontSize">
+<code class="sig-name descname">fontSize</code><em class="property"> = 20</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.fontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.lineWidth">
+<code class="sig-name descname">lineWidth</code><em class="property"> = 4.0</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.lineWidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.majorTickLength">
+<code class="sig-name descname">majorTickLength</code><em class="property"> = 20</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.majorTickLength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.minorTickLength">
+<code class="sig-name descname">minorTickLength</code><em class="property"> = 6.0</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.minorTickLength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="gisansexplorer.plotting.PlotStyle.titleFontSize">
+<code class="sig-name descname">titleFontSize</code><em class="property"> = 10.0</em><a class="headerlink" href="#gisansexplorer.plotting.PlotStyle.titleFontSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.plotting.create_gisans_figure">
+<code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">create_gisans_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">cnorm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.create_gisans_figure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.plotting.create_qy_integration_figure">
+<code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">create_qy_integration_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.create_qy_integration_figure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.plotting.create_qz_integration_figure">
+<code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">create_qz_integration_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.create_qz_integration_figure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-gisansexplorer.utils">
+<span id="gisansexplorer-utils-module"></span><h2>gisansexplorer.utils module<a class="headerlink" href="#module-gisansexplorer.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="gisansexplorer.utils.FloatValidator">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">FloatValidator</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.FloatValidator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtGui.QValidator</span></code></p>
+<dl class="py method">
+<dt id="gisansexplorer.utils.FloatValidator.fixup">
+<code class="sig-name descname">fixup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#gisansexplorer.utils.FloatValidator.fixup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.utils.FloatValidator.validate">
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">str</span></em>, <em class="sig-param"><span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>QValidator.State<span class="p">, </span>str<span class="p">, </span>int<span class="p">]</span><a class="headerlink" href="#gisansexplorer.utils.FloatValidator.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.utils.Frozen">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">Frozen</code><a class="headerlink" href="#gisansexplorer.utils.Frozen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.enable_high_dpi_scaling">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">enable_high_dpi_scaling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.enable_high_dpi_scaling" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.format_float">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">format_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.format_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified form of the ‘g’ format specifier.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.handle_exception">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">handle_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.handle_exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.is_file">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">is_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.is_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="gisansexplorer.utils.mySciSpinBox">
+<em class="property">class </em><code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">mySciSpinBox</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QDoubleSpinBox</span></code></p>
+<dl class="py method">
+<dt id="gisansexplorer.utils.mySciSpinBox.fixup">
+<code class="sig-name descname">fixup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox.fixup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.utils.mySciSpinBox.stepBy">
+<code class="sig-name descname">stepBy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox.stepBy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.utils.mySciSpinBox.textFromValue">
+<code class="sig-name descname">textFromValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox.textFromValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.utils.mySciSpinBox.validate">
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">str</span></em>, <em class="sig-param"><span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>QValidator.State<span class="p">, </span>str<span class="p">, </span>int<span class="p">]</span><a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gisansexplorer.utils.mySciSpinBox.valueFromText">
+<code class="sig-name descname">valueFromText</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#gisansexplorer.utils.mySciSpinBox.valueFromText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.profile_dec">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">profile_dec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fnc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.profile_dec" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator that uses cProfile to profile a function</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.profile_function_with_arguments">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">profile_function_with_arguments</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.profile_function_with_arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gisansexplorer.utils.valid_float_string">
+<code class="sig-prename descclassname">gisansexplorer.utils.</code><code class="sig-name descname">valid_float_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.utils.valid_float_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-gisansexplorer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-gisansexplorer" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gisansexplorer.entry_point">
+<code class="sig-prename descclassname">gisansexplorer.</code><code class="sig-name descname">entry_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.entry_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="gisansexplorer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="howto.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Juan M. Carmona-Loaiza
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
