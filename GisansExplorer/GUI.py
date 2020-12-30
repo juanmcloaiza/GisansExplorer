@@ -15,7 +15,18 @@ from gisansexplorer.plotting import MyGraphView
 
 
 class MyTabs(qtw.QTabWidget,Frozen):
+    """[summary]
+
+    Parameters
+    ----------
+    qtw : [type]
+        [description]
+    Frozen : [type]
+        [description]
+    """
     def __init__(self):
+        """[summary]
+        """
         super().__init__()
         self.tabButton_add = qtw.QToolButton()
         self.tabButton_rmv = qtw.QToolButton()
@@ -26,6 +37,8 @@ class MyTabs(qtw.QTabWidget,Frozen):
         self._freeze()
 
     def initCornerButton(self):
+        """[summary]
+        """
         self.setCornerWidget(self.tabButton_add,corner=Qt.TopLeftCorner)
         self.tabButton_add.setText('+')
         font = self.tabButton_add.font()
@@ -62,6 +75,8 @@ class MyTabs(qtw.QTabWidget,Frozen):
 
     @pyqtSlot()
     def removeTab(self):
+        """[summary]
+        """
         idx = self.currentIndex()
         del self.frameList[idx]
         super().removeTab(idx)
@@ -73,8 +88,18 @@ class MyTabs(qtw.QTabWidget,Frozen):
 
 
 class MyFrame(qtw.QFrame,Frozen):
+    """[summary]
 
+    Parameters
+    ----------
+    qtw : [type]
+        [description]
+    Frozen : [type]
+        [description]
+    """
     def __init__(self):
+        """[summary]
+        """
         super().__init__()
         self.layout = qtw.QHBoxLayout()
         self.splitter = qtw.QSplitter()
@@ -101,6 +126,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def initFrame(self):
+        """[summary]
+        """
         self.layout.setAlignment(Qt.AlignCenter)
         self.addExperimentInfo()
         #self.addMinMaxSpinBoxes()
@@ -113,6 +140,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def addFileTreeAndList(self, botSplitter):
+        """[summary]
+
+        Parameters
+        ----------
+        botSplitter : [type]
+            [description]
+        """
         model = qtw.QFileSystemModel()
         model.setRootPath('')
         filters = ["*.dat"]
@@ -143,6 +177,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def addPanels(self):
+        """[summary]
+        """
 
         bottom_splitter = qtw.QSplitter()
         left_splitter = qtw.QSplitter(orientation=Qt.Vertical)
@@ -159,6 +195,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def addExperimentInfo(self):
+        """[summary]
+        """
         #self.infoTable.setMaximumWidth(self.infoTable.width()/2.)
         self.infoTable.setColumnCount(1)
         self.infoTable.setRowCount(0)
@@ -171,6 +209,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def addFunctionalityButtons(self):
+        """[summary]
+        """
         buttonUpdateFromTable = qtw.QPushButton("Update")
         buttonUpdateFromTable.clicked.connect(self.on_click_update)
         self.rightpanel.addWidget(buttonUpdateFromTable)
@@ -198,9 +238,16 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot(int)
     def on_progress_emited(self, value):
+        """[summary]
+
+        Parameters
+        ----------
+        value : [type]
+            [description]
+        """
         self.progress_bar.setValue(value)
 
-    
+
 
     @pyqtSlot()
     def on_click_open_file(self):
@@ -217,6 +264,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_file_double_clicked(self):
+        """[summary]
+        """
         try:
             if len(self.dirtree.selectedIndexes()) < 1:
                 return
@@ -229,10 +278,14 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_subtract_checkbox_changed(self):
+        """[summary]
+        """
         self.update_from_selection_list()
 
     @pyqtSlot()
     def on_file_selection_changed(self):
+        """[summary]
+        """
         selectedListEntries = self.fileList.selectedItems()
 
         if len(selectedListEntries) < 1:
@@ -247,15 +300,21 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_click_update(self):
+        """[summary]
+        """
         self.update_from_info_table()
 
     @pyqtSlot()
     def on_cell_changed(self):
+        """[summary]
+        """
         self.color_outdated()
 
 
     @pyqtSlot()
     def on_click_loglinear(self):
+        """[summary]
+        """
         try:
             self.graphView.update_graph(log_scale = not self.graphView.data.log_scale, reset_limits_required=False)
         except Exception as e:
@@ -265,6 +324,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_click_save_png(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
 
             fmt_choices = {"All Files(*)":".png", #default
@@ -292,6 +358,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def build_ascii_header(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         gz_filenames = [s.text() for s in self.fileList.selectedItems()]
         dat_filenames= [self.settings_dict[s].datFileName for s in gz_filenames]
         op_str = ""
@@ -306,6 +379,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_click_save_ascii(self):
+        """[summary]
+        """
         try:
             filepath = self.saveFileNameDialog()
             if filepath is None:
@@ -357,6 +432,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def on_graph_updated(self):
+        """[summary]
+        """
         try:
             selectedListEntries = self.fileList.selectedItems()
 
@@ -393,6 +470,13 @@ class MyFrame(qtw.QFrame,Frozen):
 #         return
 
     def saveFileNameDialog(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
             fmt_choices = {"All Files(*)":".png", #default
                             "png (*.png)":".png",
@@ -410,6 +494,13 @@ class MyFrame(qtw.QFrame,Frozen):
         return None
 
     def openFileNameDialog(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
             options = qtw.QFileDialog.Options()
             options |= qtw.QFileDialog.DontUseNativeDialog
@@ -426,6 +517,22 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @staticmethod
     def color_validate(table_item, value_a, value_b):
+        """[summary]
+
+        Parameters
+        ----------
+        table_item : [type]
+            [description]
+        value_a : [type]
+            [description]
+        value_b : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         green = QColor(000, 255, 0, 127)
         if value_a != value_b:
             table_item.setBackground(green)
@@ -435,6 +542,18 @@ class MyFrame(qtw.QFrame,Frozen):
         return True
 
     def update_single_experiment_values(self, experiment):
+        """[summary]
+
+        Parameters
+        ----------
+        experiment : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         expdict = experiment.__dict__
         for i in range(self.infoTable.rowCount()):
             key = self.infoTable.verticalHeaderItem(i).text()
@@ -451,6 +570,13 @@ class MyFrame(qtw.QFrame,Frozen):
         return True
 
     def update_multi_experiment_values(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         selectedListEntries = self.fileList.selectedItems()
         for currentListItem in selectedListEntries:
             currentListEntry = currentListItem.text()
@@ -461,6 +587,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def color_outdated(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         expdict = self.experiment.__dict__
 
         try:
@@ -491,6 +624,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def update_table(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
 
         expdict = self.experiment.__dict__
 
@@ -522,6 +662,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def doStuff(self, datFilePath):
+        """[summary]
+
+        Parameters
+        ----------
+        datFilePath : [type]
+            [description]
+        """
         try:
             self.thread.datFilePath = datFilePath
             self.thread.start()
@@ -532,6 +679,20 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def safe_parse(self, parse_func, file_path):
+        """[summary]
+
+        Parameters
+        ----------
+        parse_func : [type]
+            [description]
+        file_path : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
             with open(file_path, 'r') as fp:
                 tf = parse_func(fp)
@@ -543,6 +704,24 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def safe_parse_numpy(self, parse_func, file_path, dtype='i', delimiter=' '):
+        """[summary]
+
+        Parameters
+        ----------
+        parse_func : [type]
+            [description]
+        file_path : [type]
+            [description]
+        dtype : str, optional
+            [description], by default 'i'
+        delimiter : str, optional
+            [description], by default ' '
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
             nparray = np.loadtxt(file_path, dtype=dtype, delimiter=delimiter)
             print(f"{file_path}:")
@@ -557,6 +736,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def read_dat_file(self, datFilePath=None):
+        """[summary]
+
+        Parameters
+        ----------
+        datFilePath : [type], optional
+            [description], by default None
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
 
         if datFilePath:
             path, filename = os.path.split(datFilePath)
@@ -567,6 +758,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def read_sensitivity_file(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         func = self.parse_sensitivity_map
         fpath = self.settings.sensFilePath()
         for key in self.settings.gzFileNames:
@@ -578,6 +776,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def read_yaml_file(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         # Open and read the yaml file
         for yamlFileName, key in zip(self.settings.yamlFilePaths(), self.settings.gzFileNames):
             self.experiment = self.experiment_dict[key]
@@ -588,6 +793,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def read_intensity_file(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         func = self.parse_intensity_map
         for fpath, key in zip(self.settings.gzFilePaths(),self.settings.gzFileNames):
             self.experiment = self.experiment_dict[key]
@@ -598,6 +810,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def parse_dat(self, file):
+        """[summary]
+
+        Parameters
+        ----------
+        file : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         for line in file:
             if line.find('omega_value')>0:
                 omega_line_list = line.split()
@@ -630,6 +854,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def parse_yaml(self, fp):
+        """[summary]
+
+        Parameters
+        ----------
+        fp : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         # Open and read the yaml file
         line1=''
         line2=''
@@ -650,6 +886,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def parse_sensitivity_map(self, sens):
+        """[summary]
+
+        Parameters
+        ----------
+        sens : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         meansens = sens.astype(float).mean()
         self.experiment.sens = sens
         self.experiment.meansens = meansens
@@ -657,6 +905,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def parse_intensity_map(self, inputd):
+        """[summary]
+
+        Parameters
+        ----------
+        inputd : [type]
+            [description]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         sens = self.experiment.sens
         meansens = self.experiment.meansens
         monitor = self.experiment.monitor_counts
@@ -667,6 +927,13 @@ class MyFrame(qtw.QFrame,Frozen):
         return True
 
     def compute_Q(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         experiment = self.experiment
         experiment.qzc_corr = experiment.qzc + int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
         experiment.qzc_spec = experiment.qzc - int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
@@ -697,6 +964,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def save_gisans_map_filepath(self, inputd):
+        """[summary]
+
+        Parameters
+        ----------
+        inputd : [type]
+            [description]
+
+        Raises
+        ------
+        NotImplementedError
+            [description]
+        """
         raise NotImplementedError
 #        qy = np.zeros(len(ipix_range)*len(jpix_range))
 #        qz = np.zeros(len(ipix_range)*len(jpix_range))
@@ -726,6 +1005,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def update_from_info_table(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         try:
             self.update_multi_experiment_values()
             self.color_outdated()
@@ -737,6 +1023,8 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def update_from_selection_list(self):
+        """[summary]
+        """
         selectedListEntries = self.fileList.selectedItems()
         if len(selectedListEntries) < 1:
             self.fileList.setCurrentRow( self.fileList.count() - 1 )
@@ -768,6 +1056,13 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def sum_intensities_from_selected_files(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+        """
         selectedListEntries = self.fileList.selectedItems()
         Isum = []
         for currentListItem in selectedListEntries:
@@ -786,6 +1081,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
 
     def subtract_intensities_from_selected_files(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+
+        Raises
+        ------
+        ValueError
+            [description]
+        """
         selectedListEntries = self.fileList.selectedItems()
         if len(selectedListEntries) != 2:
             raise ValueError("Substraction is only possible between two intensity maps")
@@ -803,6 +1110,18 @@ class MyFrame(qtw.QFrame,Frozen):
 
     @pyqtSlot()
     def update_gui(self):
+        """[summary]
+
+        Returns
+        -------
+        [type]
+            [description]
+
+        Raises
+        ------
+        Exception
+            [description]
+        """
         try:
             did_stuff, why_not = self.thread.retval
             if not did_stuff:
