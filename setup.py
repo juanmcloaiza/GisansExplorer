@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="gisansexplorer", # Replace with your own username
-    version="0.0.19",
+    version="0.0.20",
     author="Juan M. Carmona Loaiza",
     author_email="j.carmona.loaiza@fz-juelich.de",
     description="Nicos data reduction and visualisation tool",
