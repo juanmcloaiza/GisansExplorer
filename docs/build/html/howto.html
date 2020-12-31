@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; gisansexplorer 0.0.19 documentation</title>
+  <title>How to… &mdash; gisansexplorer 0.0.19 documentation</title>
   
 
   
@@ -29,6 +29,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -83,9 +85,13 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#motivation">Motivation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to…</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#open-a-first-data-file">Open a first data file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#select-the-region-of-interest-roi">Select the region of interest (ROI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#take-a-closer-look-to-the-roi-plots">Take a closer look to the ROI plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-individual-figures">Save individual figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-or-subtract-intensities-from-different-gisans-maps">Add or subtract intensities from different Gisans maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-the-roi-as-ascii-column-files">Save the ROI as ascii column files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gisansexplorer.html">gisansexplorer package</a></li>
@@ -136,7 +142,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Introduction</li>
+      <li>How to…</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -155,23 +161,94 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>[TODO, JUAN]</p>
-<p><code class="docutils literal notranslate"><span class="pre">simpleble</span></code> is a high-level OO Python package which aims to provide an easy and intuitive way of interacting with nearby Bluetooth Low Energy (BLE) devices (GATT servers). In essence, this package is an extension of the <code class="docutils literal notranslate"><span class="pre">bluepy</span></code> package created by Ian Harvey (see <a class="reference external" href="https://github.com/IanHarvey/bluepy/">here</a>)</p>
-<p>The aim here was to define a single object which would allow users to perform the various operations performed by the <code class="docutils literal notranslate"><span class="pre">bluepy.btle.Peripheral</span></code>, <code class="docutils literal notranslate"><span class="pre">bluepy.btle.Scanner</span></code>, <code class="docutils literal notranslate"><span class="pre">bluepy.btle.Service</span></code> and <code class="docutils literal notranslate"><span class="pre">bluepy.btle.Characteristic</span></code> classes of <code class="docutils literal notranslate"><span class="pre">bluepy</span></code>, from one central place. This functionality is facilitated by the <code class="docutils literal notranslate"><span class="pre">simpleble.SimpleBleClient</span></code> and <code class="docutils literal notranslate"><span class="pre">simpleble.SimpleBleDevice</span></code> classes, where the latter is an extention/subclass of <code class="docutils literal notranslate"><span class="pre">bluepy.btle.Peripheral</span></code>, combined with properties of <code class="docutils literal notranslate"><span class="pre">bluepy.btle.ScanEntry</span></code>.</p>
-<p>The current implementation has been developed in Python 3 and tested on a Raspberry Pi Zero W, running Raspbian 9 (stretch), but should work with Python 2.7+ (maybe with minor modifications in terms of printing and error handling) and most Debian based OSs.</p>
-<div class="section" id="motivation">
-<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
-<p>As a newbie experimenter/hobbyist in the field of IoT using BLE communications, I found it pretty hard to identify a Python package which would enable one to use a Raspberry Pi (Zero W inthis case) to swiftly scan, connect to and read/write from/to a nearby BLE device (GATT server).</p>
-<p>This package is intended to provide a quick, as well as (hopefully) easy to undestand, way of getting a simple BLE GATT client up and running, for all those out there, who, like myself, are hands-on learners and are eager to get their hands dirty from early on.</p>
-</div>
-<div class="section" id="limitations">
-<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>As my main use-case scenario was to simply connect two devices, the current version of <code class="xref py py-class docutils literal notranslate"><span class="pre">simpleble.SimpleBleClient</span></code> has been designed and implemented with this use-case in mind. As such, if you are looking for a package to allow you to connect to multiple devices, then know that off-the-self this package DOES NOT allow you to do so. However, implementing such a feature is an easily achievable task, which has been planned for sometime in the near future and if there proves to be interest on the project, I would be happy to speed up the process.</p></li>
-<li><p>Only Read and Write operations are currently supported, but I am planning on adding Notifications soon.</p></li>
+  <div class="section" id="how-to">
+<h1>How to…<a class="headerlink" href="#how-to" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="open-a-first-data-file">
+<h2>Open a first data file<a class="headerlink" href="#open-a-first-data-file" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>By navigating to it on the bottom left panel:</dt><dd><p><a class="reference internal" href="_images/NavigateToFile.png"><img alt="Only dat files are shown" src="_images/NavigateToFile.png" style="width: 600px;" /></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>By browsing to it using the <cite>open…</cite> button on the bottom rigth:</dt><dd><p><a class="reference internal" href="_images/OpenButton.png"><img alt="Press to open a dialog" src="_images/OpenButton.png" style="width: 600px;" /></a>
+<a class="reference internal" href="_images/FileBrowser.png"><img alt="Only dat files are selectable" src="_images/FileBrowser.png" style="width: 600px;" /></a></p>
+</dd>
+</dl>
+</li>
 </ul>
+</div></blockquote>
+</div>
+<div class="section" id="select-the-region-of-interest-roi">
+<h2>Select the region of interest (ROI)<a class="headerlink" href="#select-the-region-of-interest-roi" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><dl>
+<dt>By using the ROI selector on the left plot:</dt><dd><ul class="simple">
+<li><p>Click a corner and drag <strong>to resize</strong>.</p></li>
+<li><p>Click the center and drag <strong>to move</strong>.</p></li>
+</ul>
+<p><a class="reference internal" href="_images/SquareROISelector.png"><img alt="Click and drag the squre on the plot" src="_images/SquareROISelector.png" style="width: 600px;" /></a></p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>By setting the limits on the information table on the right:</dt><dd><ul class="simple">
+<li><p>Set the pixel limit values <cite>x0</cite>, <cite>y0</cite>, <cite>xf</cite>, <cite>xf</cite> (left, bottom, right, top).</p></li>
+<li><p>After they turn green –wrong entries will turn red, click <cite>Update</cite>.</p></li>
+</ul>
+<p><a class="reference internal" href="_images/TableROISettings.png"><img alt="Hit enter so each value turns green" src="_images/TableROISettings.png" style="width: 600px;" /></a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="take-a-closer-look-to-the-roi-plots">
+<h2>Take a closer look to the ROI plots<a class="headerlink" href="#take-a-closer-look-to-the-roi-plots" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>By double clicking on any of the ROI plots, <a class="reference internal" href="_images/DoubleClickRegion.png"><img alt="DoubleClickRegion" src="_images/DoubleClickRegion.png" style="width: 600px;" /></a> ,three pop-up windows will appear:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q_z\)</span> vs integration along <span class="math notranslate nohighlight">\(Q_y\)</span></p></li>
+</ul>
+<p><a class="reference internal" href="_images/IntegrationAlongQy.png"><img alt="IntegrationAlongQy" src="_images/IntegrationAlongQy.png" style="width: 600px;" /></a></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q_y\)</span> vs integration along <span class="math notranslate nohighlight">\(Q_z\)</span></p></li>
+</ul>
+<p><a class="reference internal" href="_images/IntegrationAlongQz.png"><img alt="IntegrationAlongQz" src="_images/IntegrationAlongQz.png" style="width: 600px;" /></a></p>
+<ul class="simple">
+<li><p>2D Intensity map as function of <span class="math notranslate nohighlight">\(Q_y, Q_z\)</span></p></li>
+</ul>
+<p><a class="reference internal" href="_images/GisansMap.png"><img alt="" src="_images/GisansMap.png" style="width: 600px;" /></a></p>
+<ul class="simple">
+<li><p>3D Intensity surface as function of <span class="math notranslate nohighlight">\(Q_y, Q_z\)</span></p></li>
+</ul>
+<p><a class="reference internal" href="_images/GisansSurface.png"><img alt="GisansSurface" src="_images/GisansSurface.png" style="width: 600px;" /></a></p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="save-individual-figures">
+<h2>Save individual figures<a class="headerlink" href="#save-individual-figures" title="Permalink to this headline">¶</a></h2>
+<p>Refer to the step above and click the floppy disk icon in the desired figure.</p>
+</div>
+<div class="section" id="add-or-subtract-intensities-from-different-gisans-maps">
+<h2>Add or subtract intensities from different Gisans maps<a class="headerlink" href="#add-or-subtract-intensities-from-different-gisans-maps" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>After loading one or more files, click the corresponding maps on the gisans map list. To select several files, hold the keys <code class="docutils literal notranslate"><span class="pre">shift</span></code> or <code class="docutils literal notranslate"><span class="pre">ctrl</span></code> while clicking on each entry. This will automatically show the <strong>addition</strong> of the intensities of the selected gisans maps.</p></li>
+</ul>
+<p><a href="#id1"><span class="problematic" id="id2">|AddIntensities|</span></a></p>
+<ul class="simple">
+<li><p>To show the <strong>subtraction</strong> of the intensities, select any two entries on the list and tick the checkbox <em>Subtract intensities</em></p></li>
+</ul>
+<p><a href="#id3"><span class="problematic" id="id4">|SubtractIntensities|</span></a></p>
+<p>N.B. Addition is calculated in the obvious way, <span class="math notranslate nohighlight">\(I = I_A + I_B\)</span>, while subtraction is calculated as <span class="math notranslate nohighlight">\(I = |I_A - I_B|\)</span></p>
+</div></blockquote>
+</div>
+<div class="section" id="save-the-roi-as-ascii-column-files">
+<h2>Save the ROI as ascii column files<a class="headerlink" href="#save-the-roi-as-ascii-column-files" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

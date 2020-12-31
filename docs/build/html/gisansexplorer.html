@@ -29,6 +29,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="gisansexplorer" href="modules.html" />
-    <link rel="prev" title="Introduction" href="howto.html" /> 
+    <link rel="prev" title="How to…" href="howto.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,7 +85,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="howto.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How to…</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">gisansexplorer package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-gisansexplorer.GUI">gisansexplorer.GUI module</a></li>
@@ -640,20 +642,20 @@
 </dl>
 <dl class="py method">
 <dt id="gisansexplorer.GUI.MyTabs.addTab">
-<code class="sig-name descname">addTab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.addTab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new data frame and adds it to the list of frames</p>
+<code class="sig-name descname">addTab</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QWidget</span></em>, <em class="sig-param"><span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#gisansexplorer.GUI.MyTabs.addTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>addTab(self, QWidget, QIcon, str) -&gt; int</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="gisansexplorer.GUI.MyTabs.initCornerButton">
 <code class="sig-name descname">initCornerButton</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.initCornerButton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds and creates connections for the add/rmv tab buttons</p>
+<dd><p>[summary]</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="gisansexplorer.GUI.MyTabs.removeTab">
 <code class="sig-name descname">removeTab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.GUI.MyTabs.removeTab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes the tab currently selected</p>
+<dd><p>[summary]</p>
 </dd></dl>
 
 </dd></dl>
@@ -873,6 +875,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="gisansexplorer.plotting.MyGraphView.save_gisans_surface">
+<code class="sig-name descname">save_gisans_surface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_gisans_surface" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="gisansexplorer.plotting.MyGraphView.save_qy_integration">
 <code class="sig-name descname">save_qy_integration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filePath</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.MyGraphView.save_qy_integration" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1003,7 +1010,7 @@
 
 <dl class="py function">
 <dt id="gisansexplorer.plotting.create_gisans_figure">
-<code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">create_gisans_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">cnorm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.create_gisans_figure" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">gisansexplorer.plotting.</code><code class="sig-name descname">create_gisans_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">cnorm</span></em>, <em class="sig-param"><span class="n">draw_surface_plot</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#gisansexplorer.plotting.create_gisans_figure" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1131,7 +1138,7 @@
         <a href="modules.html" class="btn btn-neutral float-right" title="gisansexplorer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="howto.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="howto.html" class="btn btn-neutral float-left" title="How to…" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

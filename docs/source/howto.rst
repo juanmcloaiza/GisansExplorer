@@ -1,24 +1,74 @@
-Introduction
-============
+.. include:: Figures.rst
 
-[TODO, JUAN]
+How to...
+=========
 
-``simpleble`` is a high-level OO Python package which aims to provide an easy and intuitive way of interacting with nearby Bluetooth Low Energy (BLE) devices (GATT servers). In essence, this package is an extension of the ``bluepy`` package created by Ian Harvey (see `here <https://github.com/IanHarvey/bluepy/>`_)
+Open a first data file 
+**********************
 
-The aim here was to define a single object which would allow users to perform the various operations performed by the ``bluepy.btle.Peripheral``, ``bluepy.btle.Scanner``, ``bluepy.btle.Service`` and ``bluepy.btle.Characteristic`` classes of ``bluepy``, from one central place. This functionality is facilitated by the ``simpleble.SimpleBleClient`` and ``simpleble.SimpleBleDevice`` classes, where the latter is an extention/subclass of ``bluepy.btle.Peripheral``, combined with properties of ``bluepy.btle.ScanEntry``.
+ - By navigating to it on the bottom left panel:
+    |NavigateToFile|
 
-The current implementation has been developed in Python 3 and tested on a Raspberry Pi Zero W, running Raspbian 9 (stretch), but should work with Python 2.7+ (maybe with minor modifications in terms of printing and error handling) and most Debian based OSs.
+ - By browsing to it using the `open...` button on the bottom rigth:
+    |OpenButton|
+    |FileBrowser|
 
-Motivation
-**********
+Select the region of interest (ROI)
+***********************************
 
-As a newbie experimenter/hobbyist in the field of IoT using BLE communications, I found it pretty hard to identify a Python package which would enable one to use a Raspberry Pi (Zero W inthis case) to swiftly scan, connect to and read/write from/to a nearby BLE device (GATT server).
+- By using the ROI selector on the left plot:
+    - Click a corner and drag **to resize**.  
+    - Click the center and drag **to move**.
 
-This package is intended to provide a quick, as well as (hopefully) easy to undestand, way of getting a simple BLE GATT client up and running, for all those out there, who, like myself, are hands-on learners and are eager to get their hands dirty from early on.
+    |SquareROISelector|
 
-Limitations
-***********
+- By setting the limits on the information table on the right:
+    - Set the pixel limit values `x0`, `y0`, `xf`, `xf` (left, bottom, right, top).
+    - After they turn green --wrong entries will turn red, click `Update`.
 
-- As my main use-case scenario was to simply connect two devices, the current version of :class:`simpleble.SimpleBleClient` has been designed and implemented with this use-case in mind. As such, if you are looking for a package to allow you to connect to multiple devices, then know that off-the-self this package DOES NOT allow you to do so. However, implementing such a feature is an easily achievable task, which has been planned for sometime in the near future and if there proves to be interest on the project, I would be happy to speed up the process.
+    |TableROISettings|
 
-- Only Read and Write operations are currently supported, but I am planning on adding Notifications soon.
+Take a closer look to the ROI plots
+***********************************
+
+- By double clicking on any of the ROI plots, |DoubleClickRegion| ,three pop-up windows will appear:
+
+    - :math:`Q_z` vs integration along :math:`Q_y`
+
+    |IntegrationAlongQy|
+
+    - :math:`Q_y` vs integration along :math:`Q_z`
+
+    |IntegrationAlongQz|
+
+    - 2D Intensity map as function of :math:`Q_y, Q_z`
+
+    |GisansMap|
+
+    - 3D Intensity surface as function of :math:`Q_y, Q_z`
+
+    |GisansSurface|
+
+Save individual figures
+***********************
+
+Refer to the step above and click the floppy disk icon in the desired figure.
+
+Add or subtract intensities from different Gisans maps
+******************************************************
+
+    - After loading one or more files, click the corresponding maps on the gisans map list. To select several files, hold the keys ``shift`` or ``ctrl`` while clicking on each entry. This will automatically show the **addition** of the intensities of the selected gisans maps. 
+
+    |AddIntensities|
+
+    - To show the **subtraction** of the intensities, select any two entries on the list and tick the checkbox *Subtract intensities*
+
+    |SubtractIntensities|
+
+    N.B. Addition is calculated in the obvious way, :math:`I = I_A + I_B`, while subtraction is calculated as :math:`I = |I_A - I_B|`
+
+
+Save the ROI as ascii column files
+**********************************
+
+    
