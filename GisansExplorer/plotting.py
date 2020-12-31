@@ -120,7 +120,7 @@ class PlotStyle(object):
         return
 
 
-def create_gisans_figure(data, cnorm):
+def create_gisans_figure(data, cnorm, draw_surface_plot=False):
         ps = PlotStyle()
         x1, x2 = data.x1, data.x2
         y1, y2 = data.y1, data.y2
@@ -134,8 +134,21 @@ def create_gisans_figure(data, cnorm):
         data.zoom_extent = (data.X[y1,x1], data.X[y2,x2], data.Y[y1,x1], data.Y[y2,x2])
 
         new_fig = plt.figure(figsize=ps.figSize)
-        new_ax = new_fig.add_subplot(111)
-        cs = new_ax.pcolorfast(data.Xzoom, data.Yzoom, data.Zzoom, norm=cnorm, vmin=cnorm.vmin, vmax=cnorm.vmax, cmap='jet')
+        if draw_surface_plot:
+            from mpl_toolkits.mplot3d import Axes3D
+            new_ax = new_fig.gca(projection='3d')
+        else:
+            new_ax = new_fig.add_subplot(111)
+
+        print(data.Xzoom.shape)
+        print(data.Yzoom.shape)
+        print(data.Zzoom.shape)
+
+        if draw_surface_plot:
+            cs = new_ax.plot_surface(data.Xzoom[:-1,:-1], data.Yzoom[:-1,:-1], data.Zzoom, norm=cnorm, vmin=cnorm.vmin, vmax=cnorm.vmax, cmap='jet')
+        else:
+            cs = new_ax.pcolorfast(data.Xzoom, data.Yzoom, data.Zzoom, norm=cnorm, vmin=cnorm.vmin, vmax=cnorm.vmax, cmap='jet')
+        
 
         has_legend = False
         if x0 > x1 and x0 < x2:
@@ -571,6 +584,7 @@ class MyGraphView(qtw.QWidget):
 
     def save_figures(self,filePath):
         self.save_gisans_map(filePath)
+        self.save_gisans_surface(filePath)
         self.save_qz_integration(filePath)
         self.save_qy_integration(filePath)
         return
@@ -578,6 +592,7 @@ class MyGraphView(qtw.QWidget):
     def show_figures(self):
         plt.close('all')
         create_gisans_figure(self.data, self.norm)
+        create_gisans_figure(self.data, self.norm, draw_surface_plot=True)
         create_qz_integration_figure(self.data)
         create_qy_integration_figure(self.data)
         plt.show()
@@ -592,6 +607,14 @@ class MyGraphView(qtw.QWidget):
         print(f"gisans map saved.")
         return #save_gisans_map#
 
+    def save_gisans_surface(self,filePath=None):
+        print("Saving gisans surface....")
+        new_fig = create_gisans_figure(self.data, self.norm, draw_surface_plot=True)
+
+        no_ext, ext = os.path.splitext(filePath)
+        new_fig.savefig(f"{no_ext}-gisans_surface{ext}")
+        print(f"gisans surface saved.")
+        return #save_gisans_surface#
 
     def save_qz_integration(self, filePath=None):
         print("Saving qz integration...")
