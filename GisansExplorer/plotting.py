@@ -4,18 +4,38 @@
 import PyQt5.QtWidgets as qtw
 from PyQt5.QtCore import Qt, pyqtSignal
 
-#plot stuff:
-from matplotlib.ticker import FormatStrFormatter
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.widgets import RectangleSelector
-from matplotlib.figure import Figure
 
 import numpy as np
 import os
 import sys
+from sys import platform
 from pathlib import Path
+
+#plot stuff:
+import matplotlib as mpl
+from matplotlib.ticker import FormatStrFormatter
+
+if platform == "linux" or platform == "linux2":
+    from matplotlib import pyplot as plt
+elif platform == "darwin":
+    gui_env = ['Qt5Agg','TKAgg','GTKAgg','WXAgg']
+    for gui in gui_env:
+        try:
+            print("testing", gui)
+            mpl.use(gui,warn=False, force=True)
+            from matplotlib import pyplot as plt
+            break
+        except:
+            continue
+    print("Using:", mpl.get_backend())
+elif platform == "win32":
+    from matplotlib import pyplot as plt
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.widgets import RectangleSelector
+from matplotlib.figure import Figure
+
+
 
 from gisansexplorer.utils import Frozen, handle_exception, __DEPLOYED__
 
@@ -556,11 +576,11 @@ class MyGraphView(qtw.QWidget):
         return
 
     def show_figures(self):
+        plt.close('all')
         create_gisans_figure(self.data, self.norm)
         create_qz_integration_figure(self.data)
         create_qy_integration_figure(self.data)
         plt.show()
-        plt.close('all')
         return
 
     def save_gisans_map(self,filePath=None):
