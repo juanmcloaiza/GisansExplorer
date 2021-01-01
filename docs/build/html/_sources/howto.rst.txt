@@ -1,4 +1,4 @@
-.. include:: Figures.rst
+.. include:: figures.rst
 
 How to...
 =========
