@@ -13,6 +13,7 @@ Welcome to gisansexplorer's documentation!
     howto
     gisansexplorer
     modules
+    figures
 
 Indices and tables
 ==================
@@ -20,3 +21,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+* :ref:`figures`
