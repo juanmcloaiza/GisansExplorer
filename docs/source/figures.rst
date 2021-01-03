@@ -38,6 +38,54 @@
   :width: 600
   :alt: IntegrationAlongQz
 
-.. |Dummy| image:: /screenshots/dummy.png
+.. |AddIntensities| image:: /screenshots/AddIntensities.png
   :width: 600
-  :alt: dummy
+  :alt: Use 'ctrl' and 'shift' to select multiple files.
+
+.. |SubtractIntensities| image:: /screenshots/SubtractIntensities.png
+  :width: 600
+  :alt: When more than two entries are selected, the checkbox becomes inactive
+
+.. |MyGivenFilename| image:: /screenshots/MyGivenFilename.png
+  :width: 600
+  :alt: MyGivenFilename.png
+
+.. |SaveButtons| image:: /screenshots/SaveButtons.png
+  :width: 600
+  :alt: SaveButtons
+
+.. |ChangeInstrumentParameters| image:: /screenshots/ChangeInstrumentParameters.png
+  :width: 600
+  :alt: ChangeInstrumentParameters
+
+.. |BeamCenterPosition| image:: /screenshots/BeamCenterPosition.png
+  :width: 600
+  :alt: The black crosshairs are the user defined detector centre. The red line corresponds to the correction and the green one to the specular reflection.
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy
+
+.. |Dummy| image:: /screenshots/Dummy.png
+  :width: 600
+  :alt: Dummy

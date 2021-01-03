@@ -86,12 +86,13 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">How to…</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#open-a-first-data-file">Open a first data file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#open-a-nicos-dat-file">Open a NICOS <code class="docutils literal notranslate"><span class="pre">.dat</span></code> file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#select-the-region-of-interest-roi">Select the region of interest (ROI)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#take-a-closer-look-to-the-roi-plots">Take a closer look to the ROI plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#save-individual-figures">Save individual figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pop-up-the-roi-plots">Pop up the ROI plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-or-subtract-intensities-from-different-gisans-maps">Add or subtract intensities from different Gisans maps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#save-the-roi-as-ascii-column-files">Save the ROI as ascii column files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-the-roi">Save the ROI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-instrument-and-detector-parameters">Change instrument and detector parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adjust-the-beam-center-position">Adjust the beam center position</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gisansexplorer.html">gisansexplorer package</a></li>
@@ -163,8 +164,8 @@
             
   <div class="section" id="how-to">
 <h1>How to…<a class="headerlink" href="#how-to" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="open-a-first-data-file">
-<h2>Open a first data file<a class="headerlink" href="#open-a-first-data-file" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="open-a-nicos-dat-file">
+<span id="openfile"></span><h2>Open a NICOS <code class="docutils literal notranslate"><span class="pre">.dat</span></code> file<a class="headerlink" href="#open-a-nicos-dat-file" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><dl class="simple">
@@ -204,10 +205,10 @@
 </li>
 </ul>
 </div>
-<div class="section" id="take-a-closer-look-to-the-roi-plots">
-<h2>Take a closer look to the ROI plots<a class="headerlink" href="#take-a-closer-look-to-the-roi-plots" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pop-up-the-roi-plots">
+<span id="popuproi"></span><h2>Pop up the ROI plots<a class="headerlink" href="#pop-up-the-roi-plots" title="Permalink to this headline">¶</a></h2>
 <ul>
-<li><p>By double clicking on any of the ROI plots, <a class="reference internal" href="_images/DoubleClickRegion.png"><img alt="DoubleClickRegion" src="_images/DoubleClickRegion.png" style="width: 600px;" /></a> ,three pop-up windows will appear:</p>
+<li><p>By double clicking on any of the ROI plots, <a class="reference internal" href="_images/DoubleClickRegion.png"><img alt="DoubleClickRegion" src="_images/DoubleClickRegion.png" style="width: 600px;" /></a>, four pop-up windows will appear:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(Q_z\)</span> vs integration along <span class="math notranslate nohighlight">\(Q_y\)</span></p></li>
@@ -228,27 +229,67 @@
 </div></blockquote>
 </li>
 </ul>
-</div>
-<div class="section" id="save-individual-figures">
-<h2>Save individual figures<a class="headerlink" href="#save-individual-figures" title="Permalink to this headline">¶</a></h2>
-<p>Refer to the step above and click the floppy disk icon in the desired figure.</p>
+<p>Clicking the floppy disk icon will save individual figures.</p>
 </div>
 <div class="section" id="add-or-subtract-intensities-from-different-gisans-maps">
 <h2>Add or subtract intensities from different Gisans maps<a class="headerlink" href="#add-or-subtract-intensities-from-different-gisans-maps" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><p>After loading one or more files, click the corresponding maps on the gisans map list. To select several files, hold the keys <code class="docutils literal notranslate"><span class="pre">shift</span></code> or <code class="docutils literal notranslate"><span class="pre">ctrl</span></code> while clicking on each entry. This will automatically show the <strong>addition</strong> of the intensities of the selected gisans maps.</p></li>
+<li><p>After loading one or more files, click the corresponding maps on the gisans map list. To select several maps, hold the keys <code class="docutils literal notranslate"><span class="pre">shift</span></code> or <code class="docutils literal notranslate"><span class="pre">ctrl</span></code> while clicking on each entry. This will automatically show the <strong>addition</strong> of the intensities of the selected gisans maps. To open several <cite>.dat</cite> files, repeat the procedure to <a class="reference internal" href="#openfile"><span class="std std-ref">Open a NICOS .dat file</span></a>.</p></li>
 </ul>
-<p><a href="#id1"><span class="problematic" id="id2">|AddIntensities|</span></a></p>
+<p><a class="reference internal" href="_images/AddIntensities.png"><img alt="Use 'ctrl' and 'shift' to select multiple files." src="_images/AddIntensities.png" style="width: 600px;" /></a></p>
 <ul class="simple">
 <li><p>To show the <strong>subtraction</strong> of the intensities, select any two entries on the list and tick the checkbox <em>Subtract intensities</em></p></li>
 </ul>
-<p><a href="#id3"><span class="problematic" id="id4">|SubtractIntensities|</span></a></p>
-<p>N.B. Addition is calculated in the obvious way, <span class="math notranslate nohighlight">\(I = I_A + I_B\)</span>, while subtraction is calculated as <span class="math notranslate nohighlight">\(I = |I_A - I_B|\)</span></p>
+<p><a class="reference internal" href="_images/SubtractIntensities.png"><img alt="When more than two entries are selected, the checkbox becomes inactive" src="_images/SubtractIntensities.png" style="width: 600px;" /></a></p>
+<p>N.B. While ddition is calculated in the obvious way, <span class="math notranslate nohighlight">\(I = I_A + I_B\)</span>, subtraction is calculated as <span class="math notranslate nohighlight">\(I = |I_A - I_B|\)</span>.</p>
 </div></blockquote>
 </div>
-<div class="section" id="save-the-roi-as-ascii-column-files">
-<h2>Save the ROI as ascii column files<a class="headerlink" href="#save-the-roi-as-ascii-column-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="save-the-roi">
+<h2>Save the ROI<a class="headerlink" href="#save-the-roi" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_images/SaveButtons.png"><img alt="SaveButtons" src="_images/SaveButtons.png" style="width: 600px;" /></a></p>
+<ul>
+<li><p>The button <em>Save ROI as ascii columns</em> opens a dialog asking for a location and a filename. After the filename is given (e.g. <code class="docutils literal notranslate"><span class="pre">MyGivenFilename</span></code>), three files are saved:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename_xI_.txt</span></code> - two columns: the first one, the <span class="math notranslate nohighlight">\(x\)</span> coordinate of the detector in <span class="math notranslate nohighlight">\(Q\)</span>-space (i.e. <span class="math notranslate nohighlight">\(Q_z\)</span>); the second one, <span class="math notranslate nohighlight">\(I(Q_z)\)</span>, i.e. the intensity integrated along <span class="math notranslate nohighlight">\(Q_y\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename_yI_.txt</span></code> - two columns: the first one, the <span class="math notranslate nohighlight">\(y\)</span> coordinate of the detector in <span class="math notranslate nohighlight">\(Q\)</span>-space (i.e. <span class="math notranslate nohighlight">\(Q_y\)</span>); the second one, <span class="math notranslate nohighlight">\(I(Q_y)\)</span>, i.e. the intensity integrated along <span class="math notranslate nohighlight">\(Q_z\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename_xyI_.txt</span></code>- three columns: analogously to the two previous files, each column represents <span class="math notranslate nohighlight">\(Q_z, Q_y, I(Q_z, Q_y)\)</span>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The button <em>Save png or pdf</em> also opens a dialog asking for a location and a filename. After the filename is given (e.g. <code class="docutils literal notranslate"><span class="pre">MyGivenFilename</span></code>), five files are saved:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename.png</span></code> (or <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename-integration_qy.png</span></code> (or <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename-integration_qz.png</span></code> (or <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename-gisans_surface.png</span></code> (or <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MyGivenFilename-gisans_map.png</span></code> (or <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>The first file is practically a screenshot of the plotting area,</p>
+<p><a class="reference internal" href="_images/MyGivenFilename.png"><img alt="MyGivenFilename.png" src="_images/MyGivenFilename.png" style="width: 600px;" /></a></p>
+<p>, and the other four files correspond to the figures described in Section <a class="reference internal" href="#popuproi"><span class="std std-ref">Pop up the ROI plots</span></a>.</p>
+</div>
+<div class="section" id="change-instrument-and-detector-parameters">
+<h2>Change instrument and detector parameters<a class="headerlink" href="#change-instrument-and-detector-parameters" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_images/ChangeInstrumentParameters.png"><img alt="ChangeInstrumentParameters" src="_images/ChangeInstrumentParameters.png" style="width: 600px;" /></a></p>
+<p>The <strong>name of the instrument</strong>, the <strong>pixel size</strong> (in mm) and the <strong>sample-detector distance</strong> (in mm) can be modified by double-clicking the corresponding entries in the <em>Info</em> table.
+Once the new entries turn green, the <em>Update</em> button must be clicked for the changes to take effect. the <strong>wavelength selector</strong>, the <strong>angle of incidence</strong>, the <strong>mean sensitivity</strong>, and the <strong>monitor counts</strong> are read from the NICOS <em>.dat</em> file and thus are not adjustable.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> parameter only affects the title of the figures and the header of the ascii file when saving; instead, <code class="docutils literal notranslate"><span class="pre">sample_detector_distance_mm</span></code> and <code class="docutils literal notranslate"><span class="pre">pixel_size_mm</span></code> affect also the way in which the <span class="math notranslate nohighlight">\([Q_y, Q_z]\)</span> map is computed for the ROI plot:</p>
+</div>
+<div class="section" id="adjust-the-beam-center-position">
+<h2>Adjust the beam center position<a class="headerlink" href="#adjust-the-beam-center-position" title="Permalink to this headline">¶</a></h2>
+<p>The detector pixel corresponding to the beam center can be adjusted via the parameters <code class="docutils literal notranslate"><span class="pre">qyc</span></code> and <code class="docutils literal notranslate"><span class="pre">qzc</span></code>. By modifying this parameters on the info table, black crosshairs appear on the detector view (left plot) and, if they are inside the ROI, they appear also on the q-space view (right plot). Two additional lines are calculated: a red one, corresponding to the corrected beam center and a green one, corresponding to the specular reflection. For the changes to take effect, the <em>Update</em> button must be clicked after the parameters turn green after being edited.</p>
+<p><a class="reference internal" href="_images/BeamCenterPosition.png"><img alt="The black crosshairs are the user defined detector centre. The red line corresponds to the correction and the green one to the specular reflection." src="_images/BeamCenterPosition.png" style="width: 600px;" /></a></p>
+<p>The location of the green and red lines are properties of the class <code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code> and are calculated inside the class <code class="xref py py-class docutils literal notranslate"><span class="pre">MyFrame</span></code> according to:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">experiment</span><span class="o">.</span><span class="n">qzc_corr</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">qzc</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span> <span class="n">experiment</span><span class="o">.</span><span class="n">sample_detector_distance_mm</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">angle_of_incidence</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="n">experiment</span><span class="o">.</span><span class="n">pixel_size_mm</span> <span class="p">)</span>
+<span class="n">experiment</span><span class="o">.</span><span class="n">qzc_spec</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">qzc</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span> <span class="n">experiment</span><span class="o">.</span><span class="n">sample_detector_distance_mm</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">angle_of_incidence</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="n">experiment</span><span class="o">.</span><span class="n">pixel_size_mm</span> <span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
