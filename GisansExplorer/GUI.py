@@ -950,8 +950,8 @@ class MyFrame(qtw.QFrame,Frozen):
             [description]
         """
         experiment = self.experiment
-        experiment.qzc_corr = experiment.qzc + int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
-        experiment.qzc_spec = experiment.qzc - int( ( 1990.0 * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / 0.5755 )
+        experiment.qzc_corr = experiment.qzc + int( ( experiment.sample_detector_distance_mm * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / experiment.pixel_size_mm )
+        experiment.qzc_spec = experiment.qzc - int( ( experiment.sample_detector_distance_mm * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0 ) ) / experiment.pixel_size_mm )
         #print(f"Corrected qzc = {experiment.qzc_corr}")
         #print(f"Specular  qzc = {experiment.qzc_spec}")
 
