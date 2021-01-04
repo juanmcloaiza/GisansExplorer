@@ -71,6 +71,8 @@ Add or subtract intensities from different Gisans maps
     N.B. While ddition is calculated in the obvious way, :math:`I = I_A + I_B`, subtraction is calculated as :math:`I = |I_A - I_B|`.
 
 
+.. _SaveROI:
+
 Save the ROI
 ************
 
@@ -106,7 +108,9 @@ Change instrument and detector parameters
 The **name of the instrument**, the **pixel size** (in mm) and the **sample-detector distance** (in mm) can be modified by double-clicking the corresponding entries in the *Info* table.
 Once the new entries turn green, the *Update* button must be clicked for the changes to take effect. the **wavelength selector**, the **angle of incidence**, the **mean sensitivity**, and the **monitor counts** are read from the NICOS *.dat* file and thus are not adjustable.
 
-The ``instrument_name`` parameter only affects the title of the figures and the header of the ascii file when saving; instead, ``sample_detector_distance_mm`` and ``pixel_size_mm`` affect also the way in which the :math:`[Q_y, Q_z]` map is computed for the ROI plot:
+The ``instrument_name`` parameter only affects the title of the figures and the header of the ascii file when saving; instead, ``sample_detector_distance_mm`` and ``pixel_size_mm`` affect also the way in which the :math:`[Q_y, Q_z]` map is computed for the ROI plot.
+
+Default vaules for the sdd and the pixel size are ``1990`` and ``0.5755`` respectively.
 
 
 Adjust the beam center position
@@ -122,3 +126,39 @@ The location of the green and red lines are properties of the class :py:class:`E
 
     experiment.qzc_corr = experiment.qzc + int( ( experiment.sample_detector_distance_mm * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0) ) / experiment.pixel_size_mm )
     experiment.qzc_spec = experiment.qzc - int( ( experiment.sample_detector_distance_mm * np.tan( np.pi * float(experiment.angle_of_incidence) / 180.0) ) / experiment.pixel_size_mm )
+
+
+Modify the intensity gradient range
+***********************************
+
+The intensity gradient can be shown either in linear scale or in logarithmic scale (default). To switch between these two scales, press the *Log/Linear* button.
+
+|IntensityGradientRange|
+
+Changing the range of the colormap can be achieved in two ways: 
+
+    - By specifying the minumum and maximum intensity values of the colormap in the Info Table.
+    - By using the mouse wheel while hovering over the detector view (left plot) color bar.
+
+The default min- and max- intensity values are ``1e-06`` and ``1e-03`` respectively.
+
+
+Open and close experiment tabs
+******************************
+
+Creating new experiments allows to analyse data using different instruments and different sets of parameters in general. 
+
+    - Clicking the left *+* button will open a new experiment tab.
+    - Clicking the right *-* button will delete the current experiment tab.
+
+|ExperimentTabs|
+
+After a new experiment tab is opened, the previous tabs are renamed according to the experimental ``.dat`` file opened in them. The new tab will have the default name "New Experiment *N*", with *N* increasing by 1 every time the *+* button is pressed. **The names of experiment tabs are non-editable.**
+
+
+Save progress
+*************
+
+**Saving the partial progress is not possible**. When the *close* button is pressed (Usually an `X` in a top corner of the window, depending on the Operating System), a pop-up dialog asks whether to quit the application. After clicking *Yes*, the application will close and all progress will be lost. **Make sure that all the reduced ascii data and the figures required are correctly saved before closing the application** --refer to sections :ref:`PopUpROI` and :ref:`SaveROI`.
+
+|CloseApp|

@@ -1,3 +1,7 @@
+.. |Screenshot| image:: /screenshots/Screenshot.png
+  :width: 600
+  :alt: Screenshot
+
 .. |FileBrowser| image:: /screenshots/FileBrowser.png
   :width: 600
   :alt: Only dat files are selectable
@@ -62,30 +66,14 @@
   :width: 600
   :alt: The black crosshairs are the user defined detector centre. The red line corresponds to the correction and the green one to the specular reflection.
 
-.. |Dummy| image:: /screenshots/Dummy.png
+.. |IntensityGradientRange| image:: /screenshots/IntensityGradientRange.png
   :width: 600
-  :alt: Dummy
+  :alt: IntensityGradientRange
 
-.. |Dummy| image:: /screenshots/Dummy.png
+.. |ExperimentTabs| image:: /screenshots/ExperimentTabs.png
   :width: 600
-  :alt: Dummy
+  :alt: ExperimentTabs
 
-.. |Dummy| image:: /screenshots/Dummy.png
+.. |CloseApp| image:: /screenshots/CloseApp.png
   :width: 600
-  :alt: Dummy
-
-.. |Dummy| image:: /screenshots/Dummy.png
-  :width: 600
-  :alt: Dummy
-
-.. |Dummy| image:: /screenshots/Dummy.png
-  :width: 600
-  :alt: Dummy
-
-.. |Dummy| image:: /screenshots/Dummy.png
-  :width: 600
-  :alt: Dummy
-
-.. |Dummy| image:: /screenshots/Dummy.png
-  :width: 600
-  :alt: Dummy
+  :alt: CloseApp

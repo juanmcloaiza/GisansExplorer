@@ -28,15 +28,6 @@ class MyTabs(qtw.QTabWidget,Frozen):
         List of gisans frames
     last_num: int
         index of last tab created
-
-    Methods
-    -------
-    initCornerButton()
-        Adds and creates connections for the add/rmv tab buttons
-    addTab():
-        Adds a new tab
-    removeTab():
-        Removes current tab
     """
     
     def __init__(self):
@@ -52,7 +43,8 @@ class MyTabs(qtw.QTabWidget,Frozen):
         self._freeze()
 
     def initCornerButton(self):
-        """[summary]
+        """
+        Adds and creates connections for the add/rmv tab buttons
         """
         self.setCornerWidget(self.tabButton_add,corner=Qt.TopLeftCorner)
         self.tabButton_add.setText('+')
@@ -73,6 +65,9 @@ class MyTabs(qtw.QTabWidget,Frozen):
 
     @pyqtSlot()
     def addTab(self):
+        """
+        Adds a new tab
+        """
         frame = MyFrame()
         super().addTab(frame, "New Experiment " + str(1 + self.last_num))
         self.setCurrentIndex(self.last_num)
@@ -90,7 +85,8 @@ class MyTabs(qtw.QTabWidget,Frozen):
 
     @pyqtSlot()
     def removeTab(self):
-        """[summary]
+        """
+        Removes the current tab
         """
         idx = self.currentIndex()
         del self.frameList[idx]

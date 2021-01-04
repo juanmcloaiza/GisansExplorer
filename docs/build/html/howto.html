@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="gisansexplorer package" href="gisansexplorer.html" />
-    <link rel="prev" title="Welcome to gisansexplorer’s documentation!" href="index.html" /> 
+    <link rel="prev" title="gisans-X-plorer" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,6 +93,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#save-the-roi">Save the ROI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#change-instrument-and-detector-parameters">Change instrument and detector parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#adjust-the-beam-center-position">Adjust the beam center position</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modify-the-intensity-gradient-range">Modify the intensity gradient range</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#open-and-close-experiment-tabs">Open and close experiment tabs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-progress">Save progress</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gisansexplorer.html">gisansexplorer package</a></li>
@@ -246,7 +249,7 @@
 </div></blockquote>
 </div>
 <div class="section" id="save-the-roi">
-<h2>Save the ROI<a class="headerlink" href="#save-the-roi" title="Permalink to this headline">¶</a></h2>
+<span id="saveroi"></span><h2>Save the ROI<a class="headerlink" href="#save-the-roi" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="_images/SaveButtons.png"><img alt="SaveButtons" src="_images/SaveButtons.png" style="width: 600px;" /></a></p>
 <ul>
 <li><p>The button <em>Save ROI as ascii columns</em> opens a dialog asking for a location and a filename. After the filename is given (e.g. <code class="docutils literal notranslate"><span class="pre">MyGivenFilename</span></code>), three files are saved:</p>
@@ -279,7 +282,8 @@
 <p><a class="reference internal" href="_images/ChangeInstrumentParameters.png"><img alt="ChangeInstrumentParameters" src="_images/ChangeInstrumentParameters.png" style="width: 600px;" /></a></p>
 <p>The <strong>name of the instrument</strong>, the <strong>pixel size</strong> (in mm) and the <strong>sample-detector distance</strong> (in mm) can be modified by double-clicking the corresponding entries in the <em>Info</em> table.
 Once the new entries turn green, the <em>Update</em> button must be clicked for the changes to take effect. the <strong>wavelength selector</strong>, the <strong>angle of incidence</strong>, the <strong>mean sensitivity</strong>, and the <strong>monitor counts</strong> are read from the NICOS <em>.dat</em> file and thus are not adjustable.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> parameter only affects the title of the figures and the header of the ascii file when saving; instead, <code class="docutils literal notranslate"><span class="pre">sample_detector_distance_mm</span></code> and <code class="docutils literal notranslate"><span class="pre">pixel_size_mm</span></code> affect also the way in which the <span class="math notranslate nohighlight">\([Q_y, Q_z]\)</span> map is computed for the ROI plot:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> parameter only affects the title of the figures and the header of the ascii file when saving; instead, <code class="docutils literal notranslate"><span class="pre">sample_detector_distance_mm</span></code> and <code class="docutils literal notranslate"><span class="pre">pixel_size_mm</span></code> affect also the way in which the <span class="math notranslate nohighlight">\([Q_y, Q_z]\)</span> map is computed for the ROI plot.</p>
+<p>Default vaules for the sdd and the pixel size are <code class="docutils literal notranslate"><span class="pre">1990</span></code> and <code class="docutils literal notranslate"><span class="pre">0.5755</span></code> respectively.</p>
 </div>
 <div class="section" id="adjust-the-beam-center-position">
 <h2>Adjust the beam center position<a class="headerlink" href="#adjust-the-beam-center-position" title="Permalink to this headline">¶</a></h2>
@@ -290,6 +294,36 @@ Once the new entries turn green, the <em>Update</em> button must be clicked for 
 <span class="n">experiment</span><span class="o">.</span><span class="n">qzc_spec</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">qzc</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span> <span class="n">experiment</span><span class="o">.</span><span class="n">sample_detector_distance_mm</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">angle_of_incidence</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="n">experiment</span><span class="o">.</span><span class="n">pixel_size_mm</span> <span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="modify-the-intensity-gradient-range">
+<h2>Modify the intensity gradient range<a class="headerlink" href="#modify-the-intensity-gradient-range" title="Permalink to this headline">¶</a></h2>
+<p>The intensity gradient can be shown either in linear scale or in logarithmic scale (default). To switch between these two scales, press the <em>Log/Linear</em> button.</p>
+<p><a class="reference internal" href="_images/IntensityGradientRange.png"><img alt="IntensityGradientRange" src="_images/IntensityGradientRange.png" style="width: 600px;" /></a></p>
+<p>Changing the range of the colormap can be achieved in two ways:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>By specifying the minumum and maximum intensity values of the colormap in the Info Table.</p></li>
+<li><p>By using the mouse wheel while hovering over the detector view (left plot) color bar.</p></li>
+</ul>
+</div></blockquote>
+<p>The default min- and max- intensity values are <code class="docutils literal notranslate"><span class="pre">1e-06</span></code> and <code class="docutils literal notranslate"><span class="pre">1e-03</span></code> respectively.</p>
+</div>
+<div class="section" id="open-and-close-experiment-tabs">
+<h2>Open and close experiment tabs<a class="headerlink" href="#open-and-close-experiment-tabs" title="Permalink to this headline">¶</a></h2>
+<p>Creating new experiments allows to analyse data using different instruments and different sets of parameters in general.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Clicking the left <em>+</em> button will open a new experiment tab.</p></li>
+<li><p>Clicking the right <em>-</em> button will delete the current experiment tab.</p></li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="_images/ExperimentTabs.png"><img alt="ExperimentTabs" src="_images/ExperimentTabs.png" style="width: 600px;" /></a></p>
+<p>After a new experiment tab is opened, the previous tabs are renamed according to the experimental <code class="docutils literal notranslate"><span class="pre">.dat</span></code> file opened in them. The new tab will have the default name “New Experiment <em>N</em>”, with <em>N</em> increasing by 1 every time the <em>+</em> button is pressed. <strong>The names of experiment tabs are non-editable.</strong></p>
+</div>
+<div class="section" id="save-progress">
+<h2>Save progress<a class="headerlink" href="#save-progress" title="Permalink to this headline">¶</a></h2>
+<p><strong>Saving the partial progress is not possible</strong>. When the <em>close</em> button is pressed (Usually an <cite>X</cite> in a top corner of the window, depending on the Operating System), a pop-up dialog asks whether to quit the application. After clicking <em>Yes</em>, the application will close and all progress will be lost. <strong>Make sure that all the reduced ascii data and the figures required are correctly saved before closing the application</strong> –refer to sections <a class="reference internal" href="#popuproi"><span class="std std-ref">Pop up the ROI plots</span></a> and <a class="reference internal" href="#saveroi"><span class="std std-ref">Save the ROI</span></a>.</p>
+<p><a class="reference internal" href="_images/CloseApp.png"><img alt="CloseApp" src="_images/CloseApp.png" style="width: 600px;" /></a></p>
 </div>
 </div>
 
@@ -304,7 +338,7 @@ Once the new entries turn green, the <em>Update</em> button must be clicked for 
         <a href="gisansexplorer.html" class="btn btn-neutral float-right" title="gisansexplorer package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to gisansexplorer’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gisans-X-plorer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
