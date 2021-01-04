@@ -1,0 +1,1 @@
+C:\...\AppData\Local\Programs\Python\Python36\python.exe -m virtualenv --python=C:\...\AppData\Local\Programs\Python\Python36\python.exe .\py36venv2-test

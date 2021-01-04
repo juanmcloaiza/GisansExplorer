@@ -1,42 +1,28 @@
-# GisansExplorer
+# gisans-X-plorer
 
-Simple **GUI** that interactively helps in the reduction of [NICOS](https://nicos-controls.org/) [GISANS](http://www.gisaxs.de/theory.html) data.
+Simple App that interactively helps in the reduction of [NICOS](https://nicos-controls.org/) files for [GISA(N|X)S](http://www.gisaxs.de/theory.html) data.
 
-![Screenshot](./Screenshot.png)
+![Screenshot](./docs/source/screenshots/Screenshot.png)
 
-# Install:
+# Install - Windows, Mac, Linux; [Python 3.6](https://realpython.com/installing-python/)
+
+
+Open a terminal and use ``pip``:
+
 ```
- $ git clone https://github.com/juanmcloaiza/GisansExplorer.git
- $ cd NeutronDataViewer
- ```
- 
- [**Use Python 3.7**](https://realpython.com/installing-python/) from here on:
- 
- Linux / Mac:
- ```
- $ python -m venv ./GisansExplorerEnv
- $ source ./GisansExplorerEnv/bin/activate
-```
-
-Windows:
-```
- $ python -m venv .\GisansExplorerEnv
- $ python -m venv --system-site-packages GisansExplorerEnv
- $ python -m venv --upgrade GisansExplorerEnv
- $ .\GisansExplorerEnv\Scripts\activate
+    $ pip install gisansexplorer
 ```
 
 # Run:
+
+Once installed, open a terminal and simply call ``gisansexplorer``:
+
 ```
- $ python GisansExplorer.py
+ $ gisansexplorer
 ```
 
-**N.B.** Should requirements not be satisfied, run the following in the terminal within the GisansExplorerEnv [virtual environment](https://docs.python.org/3/tutorial/venv.html) created above:
-```
- (GisansExplorerEnv) $ pip install --upgrade pip
- (GisansExplorerEnv) $ pip install -r requirements.txt
- ```
+# [How To...](https://gisansexplorer.readthedocs.io/en/latest/howto.html)
 
- ---
-
-Developed and maintained by the [MLZ Scientific Computing Group](http://apps.jcns.fz-juelich.de/doku/sc/start) in collaboration with [Alexandros Koutsioumpas](https://alexandros-koutsioumpas.weebly.com/index.html)
+---
+| Developed by [Juan M. Carmona Loaiza](https://github.com/juanmcloaiza/) in collaboration with [Alexandros Koutsioumpas](https://alexandros-koutsioumpas.weebly.com/index.html).
+| Maintained by the [MLZ Scientific Computing Group](http://apps.jcns.fz-juelich.de/doku/sc/start).
