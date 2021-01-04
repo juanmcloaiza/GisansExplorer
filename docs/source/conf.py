@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../../')) #Gisans explorer is inside this pa
 # -- Project information -----------------------------------------------------
 
 project = 'gisansexplorer'
-copyright = '2020, Juan M. Carmona-Loaiza'
+copyright = 'Forschungszentrum Jülich GmbH'
 author = 'Juan M. Carmona-Loaiza'
 
 # The full version, including alpha/beta/rc tags
