@@ -1,0 +1,305 @@
+### NICOS data file, created at 2020-02-04 08:47:51
+#                    number : 1342
+#                  filename : p15347_00001342.dat
+#                  filepath : /data/2020/p15347/M08_GISANS_omega0p4/data/p15347_00001342.dat
+#                      info : timescan(1, 30600)
+### Experiment information
+#                 Exp_users : julian.heger@ph.tum.de
+#          Exp_localcontact : a.koutsioumpas@fz-juelich.de
+#                 Exp_title : A novel approach to hierarchical structures for hybrid photovoltaics
+#              Exp_proposal : p15347
+#                Exp_remark : 
+### Sample and alignment
+#         Sample_samplename : M08_GISANS_omega0p4
+### Instrument setup
+#                 maria_doi : 
+#          wavelength_alias : selector_lambda
+#            maria_facility : Heinz Maier-Leibnitz Zentrum Garching (MLZ)
+#             maria_website : http://www.mlz-garching.de/maria
+#                   T_alias : T_ls332
+#           maria_operators : Jülich Centre for Neutron Science (JCNS)
+#         maria_responsible : Stefan Mattauch <s.mattauch@fz-juelich.de>
+#                  Ts_alias : T_ls332
+#          maria_instrument : MARIA
+### Offsets
+#          s2_bottom_offset : 0.00 mm
+#          s1_bottom_offset : 0.0 mm
+#             s2_top_offset : 0.00 mm
+#             s1_top_offset : 0.0 mm
+### Limits
+#        ds_left_userlimits : (-70.000, 70.000) mm
+#        s2_left_userlimits : (-26.000, 23.000) mm
+#             sc_userlimits : (-197.000, 197.000) mm
+#        T_range_userlimits : (0, 3)
+#       s2_right_userlimits : (-23.000, 26.000) mm
+#          giref_userlimits : (-6000.000, 13500.000) steps
+#      bs2_trans_userlimits : (-10.000, 405.000) mm
+#        s1_left_userlimits : (-27.000, 22.000) mm
+#       HV_drift_userlimits : (-1000, 0) V
+#      bs1_trans_userlimits : (-5.000, 430.000) mm
+#          omega_userlimits : (-180.000, 180.000) deg
+#        bs1_rot_userlimits : (-170.000, 170.000) grd
+#             tz_userlimits : (-100.00, 100.00) mm
+#       ds_right_userlimits : (-70.000, 70.000) mm
+#       s1_right_userlimits : (-21.500, 27.500) mm
+#      s2_bottom_userlimits : (-28.78, 24.22) mm
+#        bs2_rot_userlimits : (-170.000, 170.000) grd
+#       HV_anode_userlimits : (0, 2800) V
+#         detarm_userlimits : (-10.000, 90.000) deg
+#            bsd_userlimits : (-35.000, 55.000) mm
+#   chopper_lift_userlimits : (540965.000, 1046600.000) steps
+#             ty_userlimits : (-45.00, 45.00) mm
+#            pol_userlimits : (-30000.000, 9130000.000) steps
+#             Ts_userlimits : (0.000, 350.000) K
+#             tx_userlimits : (-75.00, 75.00) mm
+#              T_userlimits : (0.000, 350.000) K
+#      s1_bottom_userlimits : (-74.8, 74.3) mm
+#             ry_userlimits : (-10.000, 10.000) deg
+#             rz_userlimits : (-10.000, 10.000) deg
+#         s2_top_userlimits : (-26.52, 22.48) mm
+#      pow4curr2_userlimits : (0.000, 10.000) A
+#         magnet_userlimits : (-33.000, 33.000) A
+#        T_ls332_userlimits : (0.000, 350.000) K
+#         s1_top_userlimits : (-75.3, 74.4) mm
+#             rx_userlimits : (-10.000, 10.000) deg
+# selector_speed_userlimits : (0, 28300) rpm
+### Precisions/tolerances
+#             bsd_precision : 0.010 mm
+#           giref_precision : 0.010 steps
+#         bs2_rot_precision : 0.250 grd
+#         s2_left_precision : 0.001 mm
+#         T_ls332_precision : 0.500 K
+#        HV_drift_precision : 2 V
+#              rx_precision : 0.001 deg
+#       pow4curr2_precision : 0.500 A
+#        s2_right_precision : 0.001 mm
+#          s2_top_precision : 0.08 mm
+#              ry_precision : 0.001 deg
+#       s1_bottom_precision : 0.4 mm
+#               T_precision : 0.500 K
+#              sc_precision : 0.010 mm
+#       bs1_trans_precision : 0.010 mm
+#         s1_left_precision : 0.001 mm
+#    chopper_lift_precision : 0.010 steps
+#          magnet_precision : 0.050 A
+#          s1_top_precision : 0.4 mm
+#         bs1_rot_precision : 0.250 grd
+#        s1_right_precision : 0.001 mm
+#              ty_precision : 0.01 mm
+#       s2_bottom_precision : 0.08 mm
+#              rz_precision : 0.001 deg
+#              tz_precision : 0.01 mm
+#        ds_right_precision : 0.001 mm
+#         ds_left_precision : 0.001 mm
+#          detarm_precision : 0.005 deg
+#             pol_precision : 0.010 steps
+#        HV_anode_precision : 4 V
+#              Ts_precision : 0.500 K
+#       T_ls332_B_precision : 0.000 K
+#       T_ls332_A_precision : 0.000 K
+#       bs2_trans_precision : 0.010 mm
+#           omega_precision : 0.005 deg
+#  selector_speed_precision : 10 rpm
+#              tx_precision : 0.01 mm
+### Device status
+#               full_status : ok: idle
+#                 s1_status : ok: left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]
+#         ArO2_fill1_status : ok: The device is in ON state.
+#        GuideHall_p_status : ok: The device is in ON state.
+#          pol_state_status : ok: idle
+#     selector_vibrt_status : ok: ok
+#               mon0_status : ok
+#            shutter_status : ok: The device is in ON state.
+#           s2_right_status : ok: on target, refswitch +
+#     analyzer_shift_status : ok: The device is in ON state.
+#          ArDiff_p1_status : ok: The device is in ON state.
+#               roi4_status : ok: idle
+#              field_status : ok: new field reading
+#         ArO2_fill2_status : ok: The device is in ON state.
+#    selector_vacuum_status : ok: ok
+#             s2_top_status : ok: ON [PosOk Sync]
+#                 rz_status : ok: at position
+#                 ds_status : ok: left=ON [PosOk], right=ON [PosOk Sync], bottom=idle, top=idle
+#            atten_A_status : ok: The device is in ON state.
+#               roi2_status : ok: idle
+#                  T_status : busy: target not yet reached, ok
+#     selector_woutt_status : ok: ok
+#          T_ls332_B_status : warn: zero sensor units
+#             detarm_status : ok: at position
+#                bsd_status : ok: ON [PosOk]
+#           HV_anode_status : ok: on
+#     selector_rtemp_status : ok: ok
+#    selector_lambda_status : ok: seldev=controlled
+#                 Ts_status : busy: target not yet reached, ok
+#          s2_bottom_status : ok: ON [PosOk Sync]
+#               roi3_status : ok: idle
+#           aflipper_status : ok
+#           s1_right_status : ok: on target
+#             Sample_status : ok
+#            s1_left_status : ok: on target, refswitch +
+#                 tz_status : ok: at position
+#            ds_left_status : ok: ON [PosOk]
+#          bs1_trans_status : ok: ON [PosOk]
+#                 rx_status : ok: at position
+#            T_ls332_status : busy: target not yet reached, ok
+#         compressor_status : ok
+#             magnet_status : ok: DC power on
+#           HV_drift_status : ok: on
+#                det_status : ok: shutter=The device is in ON state., roi1=idle, roi2=idle, roi3=idle, roi4=idle, roi5=idle, roi6=idle, full=idle
+#              giref_status : ok: ON [RefPlus Stop]
+#          bs2_trans_status : ok: ON [PosOk]
+#                NL5_status : ok: ok
+#          pow4curr2_status : ok: on
+#              timer_status : ok
+#           T_ar_air_status : ok: The device is in ON state.
+#          ArDiff_p2_status : ok: The device is in ON state.
+#                 ry_status : ok: at position
+#            T_range_status : ok
+#     selector_wflow_status : ok: ok
+#          s1_bottom_status : ok: ON [PosOk Sync]
+#     selector_speed_status : ok: controlled
+#   GuideHallO2_fill_status : ok: The device is in ON state.
+#               roi1_status : ok: idle
+#               roi5_status : ok: idle
+#            Sixfold_status : ok: ok
+#           ds_right_status : ok: ON [PosOk Sync]
+#           pflipper_status : ok: The device is in ON state., pow4curr1=on, pow4curr2=on
+#         T_ar_board_status : ok: The device is in ON state.
+#         T_ar_laser_status : ok: The device is in ON state.
+#     selector_winlt_status : ok: ok
+#              Crane_status : ok
+#                 tx_status : ok: at position
+#             s1_top_status : ok: ON [PosOk Sync]
+#                 sc_status : ok: ON [PosOk Sync]
+#                pol_status : ok: ON [PosOk]
+#          T_ls332_A_status : ok
+#            atten_B_status : ok: The device is in ON state.
+#       chopper_lift_status : ok: ON []
+#                t2t_status : busy: slave=at position, master=at position
+#         wavelength_status : ok: seldev=controlled
+#                 s2_status : ok: left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync]
+#          pow4curr1_status : ok: on
+#               roi6_status : ok: idle
+#            bs2_rot_status : ok: ON [PosOk]
+#          footprint_status : ok: s2=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), s1=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), theta=at position
+#              Space_status : ok: 224.53 GiB free
+#                 ty_status : ok: at position
+#            bs1_rot_status : ok: ON [PosOk]
+#            s2_left_status : ok: on target
+#       ReactorPower_status : ok: ok
+#            atten_C_status : ok: The device is in ON state.
+#              omega_status : ok: at position
+#             T_oven_status : ok: The device is in ON state.
+#               mon1_status : ok
+### Device positions and sample environment state
+#             atten_C_value : out
+#             s1_left_value : 0.500 mm
+#                  roi4_roi : (224, 226, 24, 576)
+#        chopper_lift_value : 1039409.000 steps
+#                 NL5_value : open
+#                  s1_value : 1.00 x 16.00 mm
+#                  rz_value : 0.250 deg
+#      selector_vibrt_value : 0.07 mm/s
+#               Space_value : 224.532 GiB
+#          wavelength_value : 10.00 A
+#                      Ts_i : 10.0
+#            s1_right_value : 0.500 mm
+#           ArDiff_p1_value : 0.00 mbar
+#                  s2_value : 1.00 x 16.00 mm
+#     selector_speed_window : 10.0 s
+#             ds_left_value : 60.000 mm
+#      selector_wflow_value : 3.1 l/min
+#                   T_value : 293.900 K
+#           bs1_trans_value : 0.080 mm
+#               omega_value : 0.400 deg
+#                  tz_value : -30.00 mm
+#             atten_A_value : out
+#           pow4curr2_value : 0.000 A
+#           s2_bottom_value : 8.00 mm
+#              s2_top_value : 8.00 mm
+#          T_ls332_setpoint : 300.0 K
+#                 t2t_value : 0.800 5.000 deg
+#            HV_anode_value : 2801 V
+#                 bsd_value : -2.500 mm
+#      selector_woutt_value : 21.0 degC
+#               Crane_value : 50.2 m
+#      selector_rtemp_value : 22.4 degC
+#                  ry_value : -0.700 deg
+#             bs2_rot_value : 0.088 grd
+#           T_ls332_B_value : 0.000 K
+#                      Ts_p : 20.0
+#    GuideHallO2_fill_value : 21.38 %
+#           pow4curr1_value : 0.600 A
+#      selector_winlt_value : 18.1 degC
+#                  roi2_roi : (500, 350, 24, 344)
+#          T_ar_laser_value : 27.4 C
+#                       T_p : 20.0
+#                  roi1_roi : (480, 200, 64, 624)
+#          compressor_value : off
+#            pflipper_value : down
+#                  tx_value : 4.00 mm
+#     selector_vacuum_value : 0.00013 mbar
+#                       T_i : 10.0
+#                 T_ls332_i : 10.0
+#             atten_B_value : out
+#               giref_value : 12780.000 steps
+#              detarm_value : 5.000 deg
+#                  sc_value : -7.996 mm
+#                  roi5_roi : (272, 500, 23, 60)
+#            aflipper_value : down
+#             T_range_value : 0
+#                  rx_value : -0.005 deg
+#            T_heateroutput : 0.0
+#        ReactorPower_value : 20.0 MW
+#             shutter_value : open
+#         GuideHall_p_value : 980 mbar
+#             Sixfold_value : open
+#            s2_right_value : 0.500 mm
+#                  T_window : 60.0 s
+#                  Ts_value : 293.900 K
+#          ArO2_fill2_value : 3.57 %
+#              magnet_value : 0.011 A
+#              T_oven_value : 28.0 C
+#     selector_lambda_value : 10.00 A
+#           T_ls332_A_value : 293.990 K
+#           pol_state_value : dd
+#            HV_drift_value : -1000 V
+#                      Ts_d : 0.0
+#            ds_right_value : 60.000 mm
+#              Sample_value : M08_GISANS_omega0p4
+#            T_ls332_window : 60.0 s
+#           s1_bottom_value : 8.0 mm
+#             s2_left_value : 0.500 mm
+#      analyzer_shift_value : out
+#           Ts_heateroutput : 0.0
+#           ArDiff_p2_value : 0.00 mbar
+#      selector_speed_value : 12738 rpm
+#           footprint_value : 174.351 mm
+#             T_ls332_value : 293.900 K
+#      T_ls332_heateroutput : 0.0
+#                 T_ls332_d : 0.0
+#                T_setpoint : 300.0 K
+#               field_value : 1.390 Gs
+#          T_ar_board_value : 26.2 C
+#                       T_d : 0.0
+#                  ds_value : (0.000, 0) 120.000 x 0 mm
+#               Ts_setpoint : 300.0 K
+#           bs2_trans_value : -0.000 mm
+#                  roi3_roi : (460, 350, 40, 380)
+#                  roi6_roi : (508, 300, 8, 420)
+#            T_ar_air_value : 27.3 C
+#                 Ts_window : 60.0 s
+#          ArO2_fill1_value : 3.65 %
+#                 pol_value : 769595.000 steps
+#             bs1_rot_value : 2.021 grd
+#                  ty_value : -6.00 mm
+#                 T_ls332_p : 20.0
+#              s1_top_value : 8.0 mm
+### Detector preset information
+#                det_preset : 30600.0 cts
+#                  det_mode : counts
+### Scan data
+# etime	;	timer	mon0	mon1	roi1 (total)	roi1 (rate)	roi2 (total)	roi2 (rate)	roi3 (total)	roi3 (rate)	roi4 (total)	roi4 (rate)	roi5 (total)	roi5 (rate)	roi6 (total)	roi6 (rate)	full (total)	full (rate)	detimg	file1	file2
+# s	;	s	cts	cts	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	-	-
+30602.5	;	30600.00	4242168	205641	39914	1.3	7955	0.3	15990	0.5	308191	10.1	513807	16.8	3073	0.1	13869086	453.2	13869086	p15347_M08_GISANS_omega0p4_00001342_00000001.yaml	p15347_M08_GISANS_omega0p4_00001342_00000001.gz
+### End of NICOS data file p15347_00001342.dat

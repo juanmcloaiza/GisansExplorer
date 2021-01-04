@@ -1,0 +1,602 @@
+instrument:
+    name: MARIA
+    facility: Heinz Maier-Leibnitz Zentrum Garching (MLZ)
+    operator: Jülich Centre for Neutron Science (JCNS)
+    website: "http://www.mlz-garching.de/maria"
+    references:
+    -   doi: ""
+format:
+    identifier: MLZ.MARIA.2.0-beta1
+    units:
+        angle: deg
+        clearance: mm
+        current: A
+        displacement: mm
+        duration: s
+        energy: meV
+        frequency: hertz
+        temperature: K
+        wavelength: A
+        offset: mm
+        width: mm
+        height: mm
+        length: mm
+experiment:
+    number: p15496
+    proposal: p15496
+    title: "Magnetic structure of CoFe2O4 monolayers \n"
+    authors:
+    -   name: flore.mees@uni-koeln.de
+        roles: [principal_investigator]
+    -   name: k.zhernenkov@fz-juelich.de
+        roles: [local_contact]
+measurement:
+    number: 1
+    unique_identifier: p15496/19922/1
+    history:
+        started: "2019-03-11T03:16:49"
+        stopped: "2019-03-11T05:16:49"
+    sample:
+        description:
+            name: Gisans-AH11_uo_m_3_FC-Minus90mT_5K
+        environment:
+        -   name: etime
+            unit: s
+            value: 7200.8402741
+        -   name: pow1curr
+            unit: A
+            value: 4.0
+            mean: 4.0
+            stddev: 0.0
+            min: 4.0
+            max: 4.0
+        -   name: powsampcurr1
+            unit: A
+            value: 5.0
+            mean: 5.0
+            stddev: 0.0
+            min: 5.0
+            max: 5.0
+        -   name: powsampcurr2
+            unit: A
+            value: 0.0
+            mean: 0.0
+            stddev: 0.0
+            min: 0.0
+            max: 0.0
+        -   name: T
+            unit: K
+            value: 5.1
+            mean: 5.00800560816
+            stddev: 0.136599860194
+            min: 4.108
+            max: 5.301
+        -   name: Ts
+            unit: K
+            value: 4.821
+            mean: 5.0036911465
+            stddev: 0.137138608508
+            min: 4.781
+            max: 5.812
+    info: "timescan(1, 7200, pflipper=['up', 'down'])"
+    devices:
+    -   name: pflipper
+        unit: ""
+        value: up
+        state: 200
+        status: "The device is in ON state., pow4curr1=on, pow4curr2=on"
+    -   name: selector_speed
+        unit: rpm
+        value: 21231.0
+        state: 200
+        status: controlled
+    -   name: atten_A
+        unit: ""
+        value: out
+        state: 200
+        status: The device is in ON state.
+    -   name: pow4curr2
+        unit: A
+        value: 0.0
+        state: 200
+        status: "on"
+    -   name: pow4curr1
+        unit: A
+        value: 0.012
+        state: 200
+        status: "on"
+    -   name: selector_vacuum
+        unit: mbar
+        value: 0.00012608516758
+        state: 200
+        status: ok
+    -   name: s2_top_cod
+        unit: mm
+        value: 4.038741
+        state: 200
+        status: The device is in ON state.
+    -   name: ds_left
+        unit: mm
+        value: 56.2
+        state: 200
+        status: "ON [PosOk]"
+    -   name: s2_top
+        unit: mm
+        value: 3.99996875
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: bs1_rot
+        unit: grd
+        value: -8.7451171875
+        state: 200
+        status: "ON [PosOk]"
+    -   name: tz
+        unit: mm
+        value: -22.0
+        state: 200
+        status: "On [STOP]"
+    -   name: ty
+        unit: mm
+        value: 0.0
+        state: 200
+        status: "On [STOP]"
+    -   name: s1_bottom_cod
+        unit: mm
+        value: 5.004618
+        state: 200
+        status: The device is in ON state.
+    -   name: mon4
+        unit: cts
+        value:
+        -   0
+        state: 220
+        status: counting
+    -   name: HV_drift
+        unit: V
+        value: -999.0
+        state: 200
+        status: "on"
+    -   name: selector_lambda
+        unit: A
+        value: 5.99983778437
+        state: 200
+        status: seldev=controlled
+    -   name: roi6
+        unit: ""
+        value: 
+            -   793.0
+            -   0.110138888889
+        state: 200
+        status: idle
+    -   name: roi5
+        unit: ""
+        value: 
+            -   610.0
+            -   0.0847222222222
+        state: 200
+        status: idle
+    -   name: roi4
+        unit: ""
+        value: 
+            -   2849.0
+            -   0.395694444444
+        state: 200
+        status: idle
+    -   name: detarm
+        unit: deg
+        value: 1.5
+        state: 200
+        status: "On [STOP]"
+    -   name: mon1
+        unit: cts
+        value:
+        -   58840
+        state: 200
+        status: ""
+    -   name: compressor
+        unit: ""
+        value: "on"
+        state: 200
+        status: ""
+    -   name: T
+        unit: K
+        value: 5.1
+        state: 200
+        status: ok
+    -   name: T_ls332_B
+        unit: K
+        value: 0.0
+        state: 210
+        status: zero sensor units
+    -   name: pow1curr
+        unit: A
+        value: 4.0
+        state: 200
+        status: "on"
+    -   name: s1_top_cod
+        unit: mm
+        value: 4.112278
+        state: 200
+        status: The device is in ON state.
+    -   name: s2.centerx
+        unit: mm
+        value: -0.000299999999999
+        state: 200
+        status: "slit=(left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: s2.centery
+        unit: mm
+        value: -1.56250000001e-05
+        state: 200
+        status: "slit=(left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: detimg
+        unit: ""
+        value: 
+            -   385233.0
+        state: 220
+        status: reading.
+    -   name: s1.centery
+        unit: mm
+        value: 0.0
+        state: 200
+        status: "slit=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: s1.centerx
+        unit: mm
+        value: -4.99999999999e-05
+        state: 200
+        status: "slit=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: T_range
+        unit: ""
+        value: 2.0
+        state: 200
+        status: ""
+    -   name: bs1_trans
+        unit: mm
+        value: 0.12
+        state: 200
+        status: "ON [PosOk]"
+    -   name: pol_state
+        unit: ""
+        value: uu
+        state: 200
+        status: idle
+    -   name: det
+        unit: ""
+        value:
+        -   7200.0
+        -   3905000
+        -   58840
+        -   10207.0
+        -   1.41763888889
+        -   2123.0
+        -   0.294861111111
+        -   14813.0
+        -   2.05736111111
+        -   2849.0
+        -   0.395694444444
+        -   610.0
+        -   0.0847222222222
+        -   793.0
+        -   0.110138888889
+        -   385233.0
+        -   53.5045833333
+        -   385233.0
+        state: 200
+        status: "shutter=The device is in ON state., detimg=reading., roi1=idle, roi2=idle, roi3=idle, roi4=idle, roi5=idle, roi6=idle, full=idle"
+    -   name: pol
+        unit: steps
+        value: 474000.0
+        state: 200
+        status: "ON [PosOk]"
+    -   name: s2_bottom_mot
+        unit: mm
+        value: 4.0
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: shutter
+        unit: ""
+        value: open
+        state: 200
+        status: The device is in ON state.
+    -   name: s1.height
+        unit: mm
+        value: 7.9995
+        state: 200
+        status: "slit=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: s2_top_mot
+        unit: mm
+        value: 3.99996875
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: s1_top_mot
+        unit: mm
+        value: 3.99975
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: field
+        unit: Gs
+        value: 914.91
+        state: 200
+        status: new field reading
+    -   name: s2_right
+        unit: mm
+        value: 0.2997
+        state: 200
+        status: "on target, refswitch +"
+    -   name: selector_winlt
+        unit: degC
+        value: 18.12
+        state: 200
+        status: ok
+    -   name: Space
+        unit: GiB
+        value: 386.863769531
+        state: 200
+        status: "386.86 GiB free"
+    -   name: Ts
+        unit: K
+        value: 4.821
+        state: 200
+        status: ""
+    -   name: s1_right
+        unit: mm
+        value: 0.8998
+        state: 200
+        status: on target
+    -   name: bs2_rot
+        unit: grd
+        value: 13.8427734375
+        state: 200
+        status: "ON [PosOk]"
+    -   name: s1_left
+        unit: mm
+        value: 0.8999
+        state: 200
+        status: "on target, refswitch +"
+    -   name: wavelength
+        unit: A
+        value: 5.99983778437
+        state: 200
+        status: seldev=controlled
+    -   name: T_ls332_A
+        unit: K
+        value: 4.821
+        state: 200
+        status: ""
+    -   name: magnet
+        unit: A
+        value: 2.809
+        state: 200
+        status: DC power on
+    -   name: selector_wflow
+        unit: l/min
+        value: 4.73976188
+        state: 200
+        status: ok
+    -   name: s2
+        unit: mm
+        value: 
+            -   0.6
+            -   7.99996875
+        state: 200
+        status: "left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync]"
+    -   name: s1
+        unit: mm
+        value: 
+            -   1.7997
+            -   7.9995
+        state: 200
+        status: "left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]"
+    -   name: rx
+        unit: deg
+        value: 0.0
+        state: 200
+        status: "On [STOP]"
+    -   name: ry
+        unit: deg
+        value: 0.10000000149
+        state: 200
+        status: "On [STOP]"
+    -   name: rz
+        unit: deg
+        value: 1.37000000477
+        state: 200
+        status: "On [STOP]"
+    -   name: roi2
+        unit: ""
+        value: 
+            -   2123.0
+            -   0.294861111111
+        state: 200
+        status: idle
+    -   name: roi3
+        unit: ""
+        value: 
+            -   14813.0
+            -   2.05736111111
+        state: 200
+        status: idle
+    -   name: s1_top
+        unit: mm
+        value: 3.99975
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: roi1
+        unit: cts
+        value: 
+            -   10207.0
+            -   1.41763888889
+        state: 200
+        status: idle
+    -   name: mon2
+        unit: cts
+        value:
+        -   0
+        state: 220
+        status: counting
+    -   name: mon3
+        unit: cts
+        value:
+        -   0
+        state: 220
+        status: counting
+    -   name: mon0
+        unit: cts
+        value:
+        -   3905000
+        state: 200
+        status: ""
+    -   name: selector_vibrt
+        unit: mm/s
+        value: 0.152
+        state: 200
+        status: ok
+    -   name: HV_anode
+        unit: V
+        value: 2799.0
+        state: 200
+        status: "on"
+    -   name: t2t
+        unit: deg
+        value: 
+            -   0.28
+            -   1.5
+        state: 200
+        status: "slave=On [STOP], master=On [STOP]"
+    -   name: bs2_trans
+        unit: mm
+        value: 0.2
+        state: 200
+        status: "ON [PosOk]"
+    -   name: full
+        unit: ""
+        value: 
+            -   385233.0
+            -   53.5045833333
+        state: 200
+        status: idle
+    -   name: footprint
+        unit: mm
+        value: 447.896053772
+        state: 200
+        status: "s2=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), s1=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), theta=On [STOP]"
+    -   name: T_ls332
+        unit: K
+        value: 5.1
+        state: 200
+        status: ok
+    -   name: selector_woutt
+        unit: degC
+        value: 21.02
+        state: 200
+        status: ok
+    -   name: s2.height
+        unit: mm
+        value: 7.99996875
+        state: 200
+        status: "slit=(left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: atten_C
+        unit: ""
+        value: out
+        state: 200
+        status: The device is in ON state.
+    -   name: s1_bottom
+        unit: mm
+        value: 3.99975
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: bsd
+        unit: mm
+        value: -0.39948989
+        state: 200
+        status: "ON [PosOk]"
+    -   name: s2_bottom
+        unit: mm
+        value: 4.0
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: omega
+        unit: deg
+        value: 0.28
+        state: 200
+        status: "On [STOP]"
+    -   name: s1_bottom_mot
+        unit: mm
+        value: 3.99975
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: tx
+        unit: mm
+        value: -4.90000009537
+        state: 200
+        status: "On [STOP]"
+    -   name: giref
+        unit: steps
+        value: 12780.0
+        state: 200
+        status: "ON [RefPlus Stop]"
+    -   name: selector_rtemp
+        unit: degC
+        value: 30.45
+        state: 200
+        status: ok
+    -   name: s2_left
+        unit: mm
+        value: 0.3003
+        state: 200
+        status: on target
+    -   name: powsampcurr2
+        unit: A
+        value: 0.0
+        state: 200
+        status: "on"
+    -   name: s1.width
+        unit: mm
+        value: 1.7997
+        state: 200
+        status: "slit=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"
+    -   name: timer
+        unit: s
+        value:
+        -   7200.0
+        state: 200
+        status: ""
+    -   name: Sample
+        unit: ""
+        value: Gisans-AH11_uo_m_3_FC-Minus90mT_5K
+        state: 200
+        status: ""
+    -   name: analyzer_shift
+        unit: ""
+        value: out
+        state: 200
+        status: The device is in ON state.
+    -   name: atten_B
+        unit: ""
+        value: out
+        state: 200
+        status: The device is in ON state.
+    -   name: aflipper
+        unit: ""
+        value: up
+        state: 200
+        status: ""
+    -   name: powsampcurr1
+        unit: A
+        value: 5.0
+        state: 200
+        status: "on"
+    -   name: sc
+        unit: mm
+        value: 0.00188454054
+        state: 200
+        status: "ON [PosOk Sync]"
+    -   name: s2_bottom_cod
+        unit: mm
+        value: 4.014775
+        state: 200
+        status: The device is in ON state.
+    -   name: s2.width
+        unit: mm
+        value: 0.6
+        state: 200
+        status: "slit=(left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync])"

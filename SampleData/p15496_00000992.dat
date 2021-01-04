@@ -1,0 +1,278 @@
+### NICOS data file, created at 2019-03-11 05:16:50
+#                    number : 992
+#                  filename : p15496_00000992.dat
+#                  filepath : /data/2019/p15496/Gisans-AH11_uo_m_3_FC-Minus90mT_5K/data/p15496_00000992.dat
+#                      info : timescan(1, 7200, pflipper=['up', 'down'])
+### Experiment information
+#                 Exp_users : flore.mees@uni-koeln.de
+#          Exp_localcontact : k.zhernenkov@fz-juelich.de
+#                 Exp_title : Magnetic structure of CoFe2O4 monolayers
+#              Exp_proposal : p15496
+#                Exp_remark : 
+### Sample and alignment
+#         Sample_samplename : Gisans-AH11_uo_m_3_FC-Minus90mT_5K
+### Instrument setup
+#             maria_website : http://www.mlz-garching.de/maria
+#                 maria_doi : 
+#          wavelength_alias : selector_lambda
+#            maria_facility : Heinz Maier-Leibnitz Zentrum Garching (MLZ)
+#                   T_alias : T_ls332
+#         maria_responsible : Stefan Mattauch <s.mattauch@fz-juelich.de>
+#           maria_operators : Jülich Centre for Neutron Science (JCNS)
+#                  Ts_alias : T_ls332_A
+#          maria_instrument : MARIA
+### Offsets
+#              omega_offset : 0.000 deg
+#             detarm_offset : -2.529 deg
+#          s2_bottom_offset : 0.00 mm
+#          s1_bottom_offset : 0.0 mm
+#             s2_top_offset : 0.00 mm
+#             s1_top_offset : 0.0 mm
+### Limits
+#        ds_left_userlimits : (0.000, 145.000) mm
+#        s2_left_userlimits : (-26.000, 23.000) mm
+#       pow1curr_userlimits : (0.000, 25.000) A
+#             sc_userlimits : (-197.000, 197.000) mm
+#   powsampcurr2_userlimits : (0.000, 5.000) A
+#       s2_right_userlimits : (-23.000, 26.000) mm
+#          giref_userlimits : (-6000.000, 13500.000) steps
+#      bs2_trans_userlimits : (-10.000, 405.000) mm
+#        s1_left_userlimits : (-27.000, 22.000) mm
+#       HV_drift_userlimits : (-1000, 0) V
+#            pol_userlimits : (-30000.000, 9130000.000) steps
+#      bs1_trans_userlimits : (-5.000, 430.000) mm
+#          omega_userlimits : (-180.000, 180.000) deg
+#        bs1_rot_userlimits : (-170.000, 170.000) grd
+#             ty_userlimits : (-45.00, 45.00) mm
+#       s1_right_userlimits : (-21.500, 27.500) mm
+#      s2_bottom_userlimits : (-28.78, 24.22) mm
+#             tz_userlimits : (-100.00, 100.00) mm
+#        bs2_rot_userlimits : (-170.000, 170.000) grd
+#   powsampcurr1_userlimits : (0.000, 5.000) A
+#       HV_anode_userlimits : (0, 2800) V
+#         detarm_userlimits : (-352.511, 362.529) deg
+#            bsd_userlimits : (-35.000, 55.000) mm
+#             tx_userlimits : (-75.00, 75.00) mm
+#              T_userlimits : (0.000, 350.000) K
+#      s1_bottom_userlimits : (-74.8, 74.3) mm
+#             ry_userlimits : (-10.000, 10.000) deg
+#             rz_userlimits : (-10.000, 10.000) deg
+#         s2_top_userlimits : (-26.52, 22.48) mm
+#      pow4curr2_userlimits : (0.000, 10.000) A
+#        T_range_userlimits : (0, 3)
+#         magnet_userlimits : (-33.000, 33.000) A
+#        T_ls332_userlimits : (0.000, 350.000) K
+#         s1_top_userlimits : (-75.3, 74.4) mm
+#             rx_userlimits : (-10.000, 10.000) deg
+# selector_speed_userlimits : (0, 28300) rpm
+### Precisions/tolerances
+#             bsd_precision : 0.010 mm
+#           giref_precision : 0.010 steps
+#         s2_left_precision : 0.001 mm
+#         T_ls332_precision : 0.500 K
+#        HV_drift_precision : 2 V
+#        pow1curr_precision : 0.000 A
+#              rx_precision : 0.001 deg
+#       pow4curr2_precision : 0.000 A
+#        s2_right_precision : 0.001 mm
+#          s2_top_precision : 0.08 mm
+#              ry_precision : 0.001 deg
+#         bs2_rot_precision : 0.250 grd
+#       s1_bottom_precision : 0.4 mm
+#               T_precision : 0.500 K
+#              sc_precision : 0.010 mm
+#       bs1_trans_precision : 0.010 mm
+#         s1_left_precision : 0.001 mm
+#          magnet_precision : 0.050 A
+#          s1_top_precision : 0.4 mm
+#         bs1_rot_precision : 0.250 grd
+#        s1_right_precision : 0.001 mm
+#              ty_precision : 0.01 mm
+#       s2_bottom_precision : 0.08 mm
+#              rz_precision : 0.001 deg
+#              tz_precision : 0.01 mm
+#         ds_left_precision : 0.001 mm
+#          detarm_precision : 0.005 deg
+#             pol_precision : 0.010 steps
+#    powsampcurr1_precision : 0.000 A
+#        HV_anode_precision : 4 V
+#    powsampcurr2_precision : 0.000 A
+#              Ts_precision : 0.000 K
+#       T_ls332_B_precision : 0.000 K
+#       T_ls332_A_precision : 0.000 K
+#       bs2_trans_precision : 0.010 mm
+#           omega_precision : 0.005 deg
+#  selector_speed_precision : 10 rpm
+#              tx_precision : 0.01 mm
+### Device status
+#            T_range_status : ok
+#               full_status : ok: idle
+#                 s1_status : ok: left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]
+#               mon3_status : ok
+#                 rx_status : ok: On [STOP]
+#          pol_state_status : ok: idle
+#     selector_vibrt_status : ok: ok
+#               mon0_status : ok
+#            shutter_status : ok: The device is in ON state.
+#           s2_right_status : ok: on target, refswitch +
+#     analyzer_shift_status : ok: The device is in ON state.
+#               roi4_status : ok: idle
+#              field_status : ok: new field reading
+#    selector_vacuum_status : ok: ok
+#             s2_top_status : ok: ON [PosOk Sync]
+#                 rz_status : ok: On [STOP]
+#            atten_A_status : ok: The device is in ON state.
+#               roi2_status : ok: idle
+#                  T_status : ok: ok
+#     selector_woutt_status : ok: ok
+#               mon2_status : ok
+#             detarm_status : ok: On [STOP]
+#                bsd_status : ok: ON [PosOk]
+#           HV_anode_status : ok: on
+#     selector_rtemp_status : ok: ok
+#    selector_lambda_status : ok: seldev=controlled
+#                 Ts_status : ok
+#          s2_bottom_status : ok: ON [PosOk Sync]
+#               roi3_status : ok: idle
+#           aflipper_status : ok
+#           s1_right_status : ok: on target
+#             Sample_status : ok
+#            s1_left_status : ok: on target, refswitch +
+#                 tz_status : ok: On [STOP]
+#            ds_left_status : ok: ON [PosOk]
+#          bs1_trans_status : ok: ON [PosOk]
+#               mon4_status : ok
+#            T_ls332_status : ok: ok
+#         compressor_status : ok
+#             magnet_status : ok: DC power on
+#           HV_drift_status : ok: on
+#                det_status : ok: shutter=The device is in ON state., roi1=idle, roi2=idle, roi3=idle, roi4=idle, roi5=idle, roi6=idle, full=idle
+#              giref_status : ok: ON [RefPlus Stop]
+#          bs2_trans_status : ok: ON [PosOk]
+#          pow4curr2_status : ok: on
+#              timer_status : ok
+#             s1_top_status : ok: ON [PosOk Sync]
+#                 ry_status : ok: On [STOP]
+#       powsampcurr2_status : ok: on
+#     selector_wflow_status : ok: ok
+#          s1_bottom_status : ok: ON [PosOk Sync]
+#     selector_speed_status : ok: controlled
+#               roi1_status : ok: idle
+#               roi5_status : ok: idle
+#           pflipper_status : ok: The device is in ON state., pow4curr1=on, pow4curr2=on
+#     selector_winlt_status : ok: ok
+#                 tx_status : ok: On [STOP]
+#          T_ls332_B_status : warn: zero sensor units
+#                 sc_status : ok: ON [PosOk Sync]
+#                pol_status : ok: ON [PosOk]
+#          T_ls332_A_status : ok
+#            atten_B_status : ok: The device is in ON state.
+#                t2t_status : ok: slave=On [STOP], master=On [STOP]
+#         wavelength_status : ok: seldev=controlled
+#           pow1curr_status : ok: on
+#       powsampcurr1_status : ok: on
+#                 s2_status : ok: left=on target, right=on target, refswitch +, bottom=ON [PosOk Sync], top=ON [PosOk Sync]
+#          pow4curr1_status : ok: on
+#               roi6_status : ok: idle
+#            bs2_rot_status : ok: ON [PosOk]
+#          footprint_status : ok: s2=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), s1=(left=on target, refswitch +, right=on target, bottom=ON [PosOk Sync], top=ON [PosOk Sync]), theta=On [STOP]
+#              Space_status : ok: 386.88 GiB free
+#                 ty_status : ok: On [STOP]
+#            bs1_rot_status : ok: ON [PosOk]
+#            s2_left_status : ok: on target
+#            atten_C_status : ok: The device is in ON state.
+#              omega_status : ok: On [STOP]
+#               mon1_status : ok
+### Device positions and sample environment state
+#             atten_C_value : out
+#             s1_left_value : 0.900 mm
+#                  roi4_roi : (224, 226, 24, 576)
+#                  s1_value : 1.80 x 8.00 mm
+#                  rz_value : 1.370 deg
+#      selector_vibrt_value : 0.15 mm/s
+#               Space_value : 386.876 GiB
+#          wavelength_value : 6.00 A
+#            s1_right_value : 0.900 mm
+#                  s2_value : 0.60 x 8.00 mm
+#     selector_speed_window : 10.0 s
+#             ds_left_value : 56.200 mm
+#      selector_wflow_value : 4.8 l/min
+#                   T_value : 4.871 K
+#           bs1_trans_value : 0.120 mm
+#               omega_value : 0.275 deg
+#             atten_A_value : out
+#           pow4curr2_value : 0.000 A
+#           s2_bottom_value : 4.00 mm
+#              s2_top_value : 4.00 mm
+#          T_ls332_setpoint : 5.0 K
+#                 t2t_value : 0.275 1.440 deg
+#            HV_anode_value : 2801 V
+#                 bsd_value : -0.399 mm
+#      selector_woutt_value : 20.9 degC
+#      selector_rtemp_value : 30.4 degC
+#                  ry_value : 0.100 deg
+#             bs2_rot_value : 13.843 grd
+#           T_ls332_B_value : 0.000 K
+#           pow4curr1_value : 0.600 A
+#      selector_winlt_value : 17.8 degC
+#                  roi2_roi : (500, 350, 24, 344)
+#                       T_p : 20.0
+#                  roi1_roi : (480, 200, 64, 624)
+#          compressor_value : on
+#            pflipper_value : up
+#        powsampcurr1_value : 5.000 A
+#                  tx_value : -4.90 mm
+#     selector_vacuum_value : 0.00013 mbar
+#                       T_i : 10.0
+#                 T_ls332_i : 10.0
+#             atten_B_value : out
+#             T_range_value : 2
+#               giref_value : 12780.000 steps
+#              detarm_value : 1.440 deg
+#                  sc_value : 0.002 mm
+#                  roi5_roi : (492, 514, 36, 36)
+#            aflipper_value : up
+#                  rx_value : 0.000 deg
+#            T_heateroutput : 3.5
+#             shutter_value : open
+#            s2_right_value : 0.300 mm
+#                  T_window : 60.0 s
+#                  Ts_value : 5.195 K
+#              magnet_value : 2.809 A
+#            pow1curr_value : 4.000 A
+#     selector_lambda_value : 6.00 A
+#           T_ls332_A_value : 5.195 K
+#           pol_state_value : uu
+#            HV_drift_value : -1000 V
+#                  tz_value : -22.00 mm
+#              Sample_value : Gisans-AH11_uo_m_3_FC-Minus90mT_5K
+#            T_ls332_window : 60.0 s
+#           s1_bottom_value : 4.0 mm
+#             s2_left_value : 0.300 mm
+#      analyzer_shift_value : out
+#        powsampcurr2_value : 0.000 A
+#      selector_speed_value : 21230 rpm
+#           footprint_value : 455.874 mm
+#             T_ls332_value : 4.871 K
+#      T_ls332_heateroutput : 3.5
+#                 T_ls332_d : 0.0
+#                T_setpoint : 5.0 K
+#               field_value : 914.950 Gs
+#                       T_d : 0.0
+#           bs2_trans_value : 0.200 mm
+#                  roi3_roi : (460, 350, 40, 380)
+#                  roi6_roi : (508, 300, 8, 420)
+#                 pol_value : 473995.000 steps
+#             bs1_rot_value : -8.745 grd
+#                  ty_value : 0.00 mm
+#                 T_ls332_p : 20.0
+#              s1_top_value : 4.0 mm
+### Detector preset information
+#                det_preset : 7200.0 cts
+#                  det_mode : counts
+### Scan data
+# pflipper	etime	pow1curr	powsampcurr1	powsampcurr2	T	Ts	;	timer	mon0	mon1	roi1 (total)	roi1 (rate)	roi2 (total)	roi2 (rate)	roi3 (total)	roi3 (rate)	roi4 (total)	roi4 (rate)	roi5 (total)	roi5 (rate)	roi6 (total)	roi6 (rate)	full (total)	full (rate)	detimg	file1	file2
+# -	s	A	A	A	K	K	;	s	cts	cts	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	cps	cts	-	-
+up	7200.8	4.000	5.000	0.000	5.100	4.821	;	7200.00	3905000	58840	10207	1.4	2123	0.3	14813	2.1	2849	0.4	610	0.1	793	0.1	385233	53.5	385233	p15496_Gisans-AH11_uo_m_3_FC-Minus90mT_5K_00000992_00000001.yaml	p15496_Gisans-AH11_uo_m_3_FC-Minus90mT_5K_00000992_00000001.gz
+down	14403.0	4.000	5.000	0.000	5.120	5.150	;	7200.00	3910458	58670	10401	1.4	2170	0.3	15400	2.1	2824	0.4	672	0.1	788	0.1	384419	53.4	384419	p15496_Gisans-AH11_uo_m_3_FC-Minus90mT_5K_00000992_00000002.yaml	p15496_Gisans-AH11_uo_m_3_FC-Minus90mT_5K_00000992_00000002.gz
+### End of NICOS data file p15496_00000992.dat
