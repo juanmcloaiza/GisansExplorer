@@ -22,7 +22,7 @@ copyright = 'Forschungszentrum Jülich GmbH'
 author = 'Juan M. Carmona-Loaiza'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.19'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
