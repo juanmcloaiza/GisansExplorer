@@ -1,6 +1,5 @@
 # gisans-X-plorer
 
-Simple App that interactively helps in the reduction of [NICOS](https://nicos-controls.org/) [GISANS](http://www.gisaxs.de/theory.html) data.
 Simple App that interactively helps in the reduction of [NICOS](https://nicos-controls.org/) files for [GISA(N|X)S](http://www.gisaxs.de/theory.html) data.
 
 ![Screenshot](./docs/source/screenshots/Screenshot.png)
