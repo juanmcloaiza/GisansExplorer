@@ -26,5 +26,4 @@ Indices and tables
 
 ------------
 
-| Developed by `Juan M. Carmona Loaiza <https://github.com/juanmcloaiza/>`_ in collaboration with `Alexandros Koutsioumpas <https://alexandros-koutsioumpas.weebly.com/index.html>`_.
-| Maintained by the `MLZ Scientific Computing Group <http://apps.jcns.fz-juelich.de/doku/sc/start>`_ .
+Developed by `Juan M. Carmona Loaiza <https://github.com/juanmcloaiza/>`_ - `MLZ Scientific Computing Group <http://apps.jcns.fz-juelich.de/doku/sc/start>`_, in collaboration with `Alexandros Koutsioumpas <https://alexandros-koutsioumpas.weebly.com/index.html>`_.
